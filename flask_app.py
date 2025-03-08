@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, jsonify
 import os
 import mysql.connector
 
@@ -83,6 +83,30 @@ def submit():
         print(f"Error: {err}")
 
     return redirect(url_for('index'))
+
+@app.route('/api/candidates')
+def get_candidates():
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+
+        cursor.execute("SELECT id, first_name, last_name, course_interests, cv_path, cover_letter_path, transcript_path FROM applicants")
+        applicants = cursor.fetchall()
+
+        candidates = []
+        for applicant in applicants:
+            candidates.append({
+                "name": f"{applicant['first_name']} {applicant['last_name']}",
+                "summary": f"Interested in {applicant['course_interests']}.",
+                "details": f"Resume: {applicant['cv_path']}, Cover Letter: {applicant['cover_letter_path']}, Transcript: {applicant['transcript_path']}"
+            })
+
+        cursor.close()
+        conn.close()
+        return jsonify(candidates)
+
+    except mysql.connector.Error as err:
+        return jsonify({"error": str(err)})
 
 if __name__ == '__main__':
     app.run(debug=True)
