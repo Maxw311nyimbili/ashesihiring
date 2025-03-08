@@ -92,7 +92,6 @@ function displayCandidate(index, direction) {
         candidateCard.innerHTML = `
             <h3>${candidate.name}</h3>
             <p>${candidate.summary}</p>
-            <div>${candidate.details}</div>
             <button onclick="viewMore(${index})">View More</button>
         `;
 
@@ -128,7 +127,7 @@ document.getElementById("nextBtn").addEventListener("click", () => {
 // Open candidate details modal
 function viewMore(index) {
     document.getElementById("modalCandidateName").innerText = candidates[index].name;
-    document.getElementById("modalCandidateDetails").innerText = candidates[index].details;
+    document.getElementById("modalCandidateDetails").innerHTML = candidates[index].details;
     document.getElementById("modalCandidateSummary").innerText = candidates[index].summary;
     document.getElementById("detailsModal").style.display = "flex";
 }
