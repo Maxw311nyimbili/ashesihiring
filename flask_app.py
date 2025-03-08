@@ -94,11 +94,16 @@ def get_candidates():
         applicants = cursor.fetchall()
 
         candidates = []
+        base_url = "https://ashesihiring.pythonanywhere.com/static/uploads/"
         for applicant in applicants:
             candidates.append({
                 "name": f"{applicant['first_name']} {applicant['last_name']}",
                 "summary": f"Interested in {applicant['course_interests']}.",
-                "details": f"Resume: {applicant['cv_path']}, Cover Letter: {applicant['cover_letter_path']}, Transcript: {applicant['transcript_path']}"
+                "details": f"""
+                    <a href='{base_url}{applicant['cv_path']}' target='_blank'>Resume</a> | 
+                    <a href='{base_url}{applicant['cover_letter_path']}' target='_blank'>Cover Letter</a> | 
+                    <a href='{base_url}{applicant['transcript_path']}' target='_blank'>Transcript</a>
+                """
             })
 
         cursor.close()
