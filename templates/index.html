@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Candidate Review</title>
+
+    <!-- Load Bootstrap CSS first to avoid overriding custom styles -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css">
+
+    <!-- Load Custom CSS after Bootstrap -->
+    <link rel="stylesheet" href="../static/css/styles.css">
+
+    <!-- FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-lg bg-white shadow-sm">
+            <div class="container-fluid">
+                <a class="navbar-brand logo" href="/">
+                    <img src="../static/images/Group 13.png" alt="Logo" width="200px" style="margin-left: 100px;"> 
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav ms-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="/news">Candidate selection</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/logout">Logout</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <section>
+        <div class="container">
+            <button id="prevBtn" class="btn-1">
+                <i class="fa-solid fa-chevron-left"></i>
+            </button>
+
+            <div class="card-container">
+                <!-- Candidate details will be dynamically inserted here -->
+                <div class="custom-card" id="candidateCard"></div>
+            </div>
+
+            <button id="nextBtn" class="btn-1">
+                <i class="fa-solid fa-chevron-right"></i>
+            </button>
+        </div>
+
+        <!-- Modal -->
+        <div id="detailsModal" class="modal">
+            <div class="modal-content-1">
+                <div><span class="close" onclick="closeModal()">&times;</span></div> 
+
+                <div class="flex-div">
+                    <div class="section-1">
+                        <h1>Hiring Details:</h1>
+                        <h5>Name: </h5><h2 id="modalCandidateName"></h2>
+    
+                        <h5>Interested to be an FI for:</h5>
+                        <li> Hardware and Systems Fundamentals</li>
+                        <li>Intro to Robotics</li>
+                    </div>
+    
+                    <div class="section-2">
+                        <h1>Summary</h1>
+                        <p class="summary" id="modalCandidateSummary"></p>
+                        <p id="modalCandidateDetails"></p>
+                        <button onclick="openRateModal()">Rate Candidate</button>
+                    </div>
+
+                </div>
+                
+                          
+            </div>
+        </div>
+
+        <!-- Rating Modal -->
+        <div id="rateModal" class="modal">
+            <div class="modal-content">
+                <span class="close" onclick="closeRateModal()">&times;</span>
+                <h2>Rate Candidate</h2>
+                <label for="rating">Rating:</label>
+                <input type="number" id="rating" min="1" max="5">
+                <label for="comment">Comment (Required if rating < 4):</label>
+                <textarea id="comment"></textarea>
+                <button onclick="submitRating()">Submit</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../static/scripts/main.js"></script>
+
+</body>
+</html>

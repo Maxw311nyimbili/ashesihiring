@@ -1,0 +1,110 @@
+.candidate-container{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 100px;
+}
+button{
+    border: 12px dashed white;
+    margin-right: 40px;
+    padding: 100px;
+    border-radius: 20px;
+    color: #AD4245;
+    font-weight: bolder;
+    text-transform: uppercase;
+}
+
+.form {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    width: 500px;
+    margin-left: 190px;
+    margin-top: 30px;
+}
+.form div {
+    margin-bottom: 10px;
+}
+
+.check{
+    margin-left: 190px;
+    margin-top: 30px;
+}
+.candidate-section2{
+    display: flex;
+}
+label{
+    color: white;
+}
+
+
+input[type="text"],
+input[type="email"] {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 14px;
+    margin-bottom: 20px;
+}
+input[type="text"]:focus,
+input[type="email"]:focus {
+    border: 1px solid #ccc;/* Optional: Slightly change border color on focus */
+    box-shadow: none; /* Ensures no glow effect */
+    outline: #ccc;
+}
+input[type="submit"] {
+    width: 50%;
+    padding: 10px;
+    background-color: #AD4245;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.dropdown {
+    margin-top: 30px;
+    margin-left: 100px;
+    position: relative;
+    width: 600px;
+}
+
+.dropdown-btn {
+    width: 100%;
+    padding: 10px;
+    background-color: white;
+    color: #AD4245;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    text-align: left;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    width: 100%;
+    background: #AD4245;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    margin-top: 5px;
+    padding: 10px;
+}
+
+.dropdown-content div {
+    display: flex;
+    align-items: center;
+    margin-bottom: 5px;
+}
+
+.dropdown-content input[type="checkbox"] {
+    margin-right: 8px;
+}
+
+.dropdown-content.show {
+    display: block;
+}
