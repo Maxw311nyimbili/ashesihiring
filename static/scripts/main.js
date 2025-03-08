@@ -92,6 +92,7 @@ function displayCandidate(index, direction) {
         candidateCard.innerHTML = `
             <h3>${candidate.name}</h3>
             <p>${candidate.summary}</p>
+            <div>${candidate.details}</div>
             <button onclick="viewMore(${index})">View More</button>
         `;
 
