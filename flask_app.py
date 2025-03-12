@@ -9,15 +9,6 @@ UPLOAD_FOLDER = 'static/uploads'
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
-# Database Configuration (XAMPP MySQL)
-# db_config = {
-#     'host': 'localhost',
-#     'port': 8080,
-#     'user': 'root',
-#     'password': '',
-#     'database': 'applications_db'
-# }
-
 def get_db_connection():
     return mysql.connector.connect(
         host='ashesihiring.mysql.pythonanywhere-services.com',
