@@ -9,7 +9,7 @@
 <body>
 
 <!-- Navbar -->
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+<nav class="navbar navbar-expand-lg navbar-dark">
     <div class="container">
         <a class="navbar-brand" href="#">Internship Portal</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
@@ -30,8 +30,8 @@
     <div class="container">
         <h1>Welcome to the Internship Application System</h1>
         <p class="lead">Apply for an internship or log in as faculty to manage applications.</p>
-        <a href="candidate.html" class="btn btn-light btn-lg m-2">Apply for Internship</a>
-        <a href="faculty_login.html" class="btn btn-dark btn-lg m-2">Faculty Login</a>
+        <a href="{{ url_for('candidate.html') }}" class="btn btn-light btn-lg m-2">Apply for Internship</a>
+        <a href="{{ url_for('faculty_login.html') }}" class="btn btn-dark btn-lg m-2">Faculty Login</a>
     </div>
 </header>
 
