@@ -1,4 +1,7 @@
-from flask import Flask, render_template, request, redirect, url_for, jsonify
+from flask import Flask, render_template, request, redirect, url_for, jsonify, session
+from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
+from cryptography.hazmat.primitives import hashes
+import base64
 import os
 import mysql.connector
 
@@ -17,6 +20,90 @@ def get_db_connection():
         database="ashesihiring$default"
     )
 
+# Login and Sign up
+# Password hashing using cryptography (PBKDF2)
+def hash_password(password: str, salt: bytes) -> str:
+    kdf = PBKDF2HMAC(
+        algorithm=hashes.SHA256(),
+        length=32,
+        salt=salt,
+        iterations=100000,
+    )
+    return base64.urlsafe_b64encode(kdf.derive(password.encode())).decode()
+
+
+# Verify password with the stored hash
+def verify_password(stored_password: str, password: str, salt: bytes) -> bool:
+    # Log hashed attempts to ensure the verification works correctly
+    hashed_attempt = hash_password(password, salt)
+    app.logger.debug(f"Stored hashed password: {stored_password}")
+    app.logger.debug(f"Hashed password attempt: {hashed_attempt}")
+    return stored_password == hashed_attempt
+
+@app.route('/faculty_signup', methods=['GET', 'POST'])
+def faculty_signup():
+    if request.method == 'POST':
+        username = request.form['username']
+        email = request.form['email']
+        password = request.form['password']
+
+        # Hash password
+        salt = os.urandom(16)
+        hashed_password = hash_password(password, salt)
+
+        # Store faculty in database
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute(
+            "INSERT INTO faculty_users (username, email, password_hash, salt) VALUES (%s, %s, %s, %s)",
+            (username, email, hashed_password, base64.urlsafe_b64encode(salt).decode())
+        )
+        conn.commit()
+        conn.close()
+
+        return redirect(url_for('faculty_login'))
+
+    return render_template('faculty_signup.html')
+
+
+
+@app.route('/faculty_login', methods=['GET', 'POST'])
+def faculty_login():
+    if request.method == 'POST':
+        email = request.form['email']
+        password = request.form['password']
+
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT id, username, password_hash, salt FROM faculty_users WHERE email = %s", (email,))
+        faculty = cursor.fetchone()
+
+        if faculty:
+            faculty_id, username, stored_hash, salt = faculty
+            if verify_password(password, stored_hash, base64.urlsafe_b64decode(salt)):
+                session['faculty_logged_in'] = True
+                session['faculty_id'] = faculty_id
+                session['faculty_username'] = username
+                return redirect(url_for('faculty_dashboard'))
+
+        return "Invalid login credentials"
+
+    return render_template('faculty_login.html')
+
+
+#---------END OF PAGE ROUTES
+
+@app.route('/logout')
+def logout():
+    # Clear the session data
+    session.pop('user_id', None)
+    session.pop('username', None)
+    session.pop('role', None)
+    session.pop('logged_in', None)
+
+    # Redirect to the login page or homepage
+    return redirect(url_for('login'))
+# End of login and sign up
 @app.route('/')
 def index():
     return render_template('index.html')
