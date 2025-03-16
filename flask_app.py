@@ -106,6 +106,10 @@ def logout():
 # End of login and sign up
 @app.route('/')
 def index():
+    return render_template('landing_page.html')
+
+@app.route('/faculty_dashboard')
+def faculty_dashboard():
     return render_template('index.html')
 
 @app.route('/candidate')
