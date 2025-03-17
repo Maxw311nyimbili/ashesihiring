@@ -1,0 +1,17 @@
+:root{
+    --white: #ffffff;
+    --gray: #ccc;
+    --maroon: #AD4245;
+}
+header {
+    width: 100%; /* Full viewport width */
+    height: 90.4vh; /* Full viewport height */
+    background: linear-gradient(rgba(128, 0, 0, 0.7), rgba(128, 0, 0, 0.7)), 
+                url("../images/banner.webp");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    display: flex;
+    align-items: center; 
+    justify-content: center; 
+}
