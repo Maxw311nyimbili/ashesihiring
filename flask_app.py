@@ -133,6 +133,9 @@ def submit_application():
 
     logging.debug("Course Selection: %s", course_selection)
 
+    logging.debug("🚀 Full Form Data Received: %s", request.form)
+    logging.debug("📌 Form Keys: %s", list(request.form.keys()))
+
     # Handle file uploads
     cv = request.files.get('cv')
     cover_letter = request.files.get('cover_letter')
