@@ -117,54 +117,55 @@ def candidate_page():
     return render_template('candidate.html')
 
 @app.route('/submit', methods=['POST'])
-def submit():
+def submit_application():
+    # Get form data
     first_name = request.form.get('first-name')
     last_name = request.form.get('last-name')
-    email = request.form.get('email')
-    course_interests = ', '.join(request.form.getlist('courses'))  # Convert list to string
+    telephone = request.form.get('telephone')
+    gender = request.form.get('gender')
+    course_selection = request.form.get('course_selection')  # "CS/MIS", "Math", "Both"
 
-    cv_path = cover_letter_path = transcript_path = None
+    # Handle file uploads
+    cv = request.files.get('cv')
+    cover_letter = request.files.get('cover_letter')
+    transcript = request.files.get('transcript')
 
-    # Check and save uploaded files
-    if 'cv' in request.files:
-        cv = request.files['cv']
-        if cv.filename:
-            cv_path = os.path.join(app.config['UPLOAD_FOLDER'], cv.filename)
-            cv.save(cv_path)
+    def save_file(file, folder):
+        if file and file.filename:
+            path = os.path.join(folder, file.filename)
+            file.save(path)
+            return path
+        return None
 
-    if 'cover_letter' in request.files:
-        cover_letter = request.files['cover_letter']
-        if cover_letter.filename:
-            cover_letter_path = os.path.join(app.config['UPLOAD_FOLDER'], cover_letter.filename)
-            cover_letter.save(cover_letter_path)
+    cv_path = save_file(cv, app.config['UPLOAD_FOLDER'])
+    cover_letter_path = save_file(cover_letter, app.config['UPLOAD_FOLDER'])
+    transcript_path = save_file(transcript, app.config['UPLOAD_FOLDER'])
 
-    if 'transcript' in request.files:
-        transcript = request.files['transcript']
-        if transcript.filename:
-            transcript_path = os.path.join(app.config['UPLOAD_FOLDER'], transcript.filename)
-            transcript.save(transcript_path)
+    # Store applicant information
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("""
+        INSERT INTO applicants (first_name, last_name, telephone, gender, course_selection, cv_path, cover_letter_path, transcript_path) 
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+    """, (first_name, last_name, telephone, gender, course_selection, cv_path, cover_letter_path, transcript_path))
+    applicant_id = cursor.lastrowid
+    conn.commit()
 
-    try:
-        conn = get_db_connection()
-        cursor = conn.cursor()
+    # Get course preferences from the form
+    for course in request.form.keys():
+        if course.startswith("preference_"):  # Example: preference_algorithm_design
+            course_name = course.replace("preference_", "").replace("_", " ")
+            preference = request.form.get(course)
+            cursor.execute("""
+                INSERT INTO course_preferences (applicant_id, course_name, preference) 
+                VALUES (%s, %s, %s)
+            """, (applicant_id, course_name, preference))
 
-        # Insert applicant details into MySQL
-        cursor.execute("""
-            INSERT INTO applicants (first_name, last_name, email, course_interests, cv_path, cover_letter_path, transcript_path)
-            VALUES (%s, %s, %s, %s, %s, %s, %s)
-        """, (first_name, last_name, email, course_interests, cv_path, cover_letter_path, transcript_path))
+    conn.commit()
+    cursor.close()
+    conn.close()
 
-        conn.commit()
-        cursor.close()
-        conn.close()
-
-        print(f"Stored submission: {first_name} {last_name}, Email: {email}")
-        print(f"CV Path: {cv_path}, Cover Letter Path: {cover_letter_path}, Transcript Path: {transcript_path}")
-
-    except mysql.connector.Error as err:
-        print(f"Error: {err}")
-
-    return redirect(url_for('index'))
+    return redirect('/index')
 
 @app.route('/api/candidates')
 def get_candidates():
