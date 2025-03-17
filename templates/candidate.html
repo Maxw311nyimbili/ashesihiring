@@ -749,6 +749,12 @@
         updateFileName("cvInput", "cvName");
         updateFileName("coverLetterInput", "coverLetterName");
         updateFileName("transcriptInput", "transcriptName");
+
+    document.querySelector('form').addEventListener('submit', function(event) {
+        let selectedCourse = document.querySelector('input[name="course_selection"]:checked');
+        console.log("Course Selection:", selectedCourse ? selectedCourse.value : "None selected");
+});
+
     </script>
     
 </body>
