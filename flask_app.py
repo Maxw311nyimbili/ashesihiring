@@ -124,6 +124,8 @@ def submit_application():
     telephone = request.form.get('telephone')
     gender = request.form.get('gender')
     course_selection = request.form.get('course_selection')  # "CS/MIS", "Math", "Both"
+    
+    print(course_selection)
 
     # Handle file uploads
     cv = request.files.get('cv')
