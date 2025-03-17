@@ -4,6 +4,10 @@ from cryptography.hazmat.primitives import hashes
 import base64
 import os
 import mysql.connector
+import logging
+
+# Configure logging
+logging.basicConfig(filename='form_debug.log', level=logging.DEBUG, format='%(asctime)s - %(message)s')
 
 app = Flask(__name__)
 
@@ -118,14 +122,16 @@ def candidate_page():
 
 @app.route('/submit', methods=['POST'])
 def submit_application():
+    logging.debug("Received Form Data: %s", request.form)  # Log all form data
+
     # Get form data
     first_name = request.form.get('first-name')
     last_name = request.form.get('last-name')
     telephone = request.form.get('telephone')
     gender = request.form.get('gender')
     course_selection = request.form.get('course_selection')  # "CS/MIS", "Math", "Both"
-    
-    print(course_selection)
+
+    logging.debug("Course Selection: %s", course_selection)
 
     # Handle file uploads
     cv = request.files.get('cv')
