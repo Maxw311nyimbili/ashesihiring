@@ -165,7 +165,7 @@ def submit_application():
     cursor.close()
     conn.close()
 
-    return redirect('/index')
+    return redirect('/candidate')
 
 @app.route('/api/candidates')
 def get_candidates():

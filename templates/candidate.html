@@ -17,102 +17,102 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
 </head>
-<body>
-    <header>
-        <nav class="navbar navbar-expand-lg bg-white shadow-sm">
-            <div class="container-fluid">
-                <a class="navbar-brand logo" href="/">
-                    <img src="../static/images/Group 13.png" alt="Logo" width="170px" style="margin-left: 100px;"> 
-                </a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse" id="navbarNav">
-                    <ul class="navbar-nav ms-auto">
-<!--                        <li class="nav-item">-->
-<!--                            <a class="nav-link" href="/news">Candidate selection</a>-->
-<!--                        </li>-->
-<!--                        <li class="nav-item">-->
-<!--                            <a class="nav-link" href="/logout">Logout</a>-->
-<!--                        </li>-->
-                    </ul>
-                </div>
-            </div>
-        </nav>
-    </header>
-
-    <div class="main-container">
-        <!-- Heading Section -->
-        <section class="heading-container">
-            <div class="heading"><h1>CSIS NSS Application - 2025</h1></div>
-            <div class="paragraph"><p>Kindly complete this form if you are interested in being an NSS FI for either the CS/MIS and/or Mathematics courses at the Computer Science and Information Systems Department.</p></div>
-        </section>
-
-        <!-- Form Heading -->
-        <div class="form-heading"><h2>General Information</h2></div>
-
-    <form action="/submit" method="POST" enctype="multipart/form-data">
-        
-        <div class="candidate-section2">
-            <div class="form">
-                <div><input type="text" name="first-name" placeholder="Enter first name"></div>
-                <div><input type="text" name="last-name" placeholder="Enter last name"></div>
-                <div><input type="tel" name="telephone" placeholder="+233"></div>
-                <label style="color: brown;">Select Gender</label>
-                <div><input type="radio" name="gender"> Male</div>
-                <div><input type="radio" name="gender"> Female</div>
-            </div>
-
-            <div class="outer-container">
-                <div class="notification"><p>Submit documents in PDF Ensure to name them properly 
-                    (SurnameFirstname)</p></div>
-                <div class="candidate-container">
-                    <div class="candidate-card candidate-card1">
-                        <button type="button" class="upload-btn" onclick="document.getElementById('cvInput').click()">Upload CV</button>
-                        <input type="file" name="cv" id="cvInput" accept=".pdf,.doc,.docx" style="display: none;">
-                        <p class="file-name" id="cvName" style="display: none;">No file selected</p>
-                    </div>
-        
-                    <div class="candidate-card candidate-card2">
-                        <button type="button" class="upload-btn" onclick="document.getElementById('coverLetterInput').click()">Upload Cover Letter</button>
-                        <input type="file" name="cover_letter" id="coverLetterInput" accept=".pdf,.doc,.docx" style="display: none;">
-                        <p class="file-name" id="coverLetterName" style="display: none;">No file selected</p>
-                    </div>
-        
-                    <div class="candidate-card candidate-card3">
-                        <button type="button" class="upload-btn" onclick="document.getElementById('transcriptInput').click()">Upload Transcript</button>
-                        <input type="file" name="transcript" id="transcriptInput" accept=".pdf,.doc,.docx" style="display: none;">
-                        <p class="file-name" id="transcriptName" style="display: none;">No file selected</p>
+    <body>
+        <header>
+            <nav class="navbar navbar-expand-lg bg-white shadow-sm">
+                <div class="container-fluid">
+                    <a class="navbar-brand logo" href="/">
+                        <img src="../static/images/Group 13.png" alt="Logo" width="170px" style="margin-left: 100px;"> 
+                    </a>
+                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <div class="collapse navbar-collapse" id="navbarNav">
+                        <ul class="navbar-nav ms-auto">
+    <!--                        <li class="nav-item">-->
+    <!--                            <a class="nav-link" href="/news">Candidate selection</a>-->
+    <!--                        </li>-->
+    <!--                        <li class="nav-item">-->
+    <!--                            <a class="nav-link" href="/logout">Logout</a>-->
+    <!--                        </li>-->
+                        </ul>
                     </div>
                 </div>
+            </nav>
+        </header>
 
+        <div class="main-container">
+            <!-- Heading Section -->
+            <section class="heading-container">
+                <div class="heading"><h1>CSIS NSS Application - 2025</h1></div>
+                <div class="paragraph"><p>Kindly complete this form if you are interested in being an NSS FI for either the CS/MIS and/or Mathematics courses at the Computer Science and Information Systems Department.</p></div>
+            </section>
 
-                <div class="select" style="color: white; margin-top: 55px; line-height: 23px;">
-                    <div class="select-heading">Which courses would you be interested in being a Faculty Intern?</div>
-                    <br>
-                    <div class="main">
+            <!-- Form Heading -->
+            <div class="form-heading"><h2>General Information</h2></div>
 
-                        <div><input type="radio" name="course_selection" id="cs_mis" onclick="openModal1()"> CS/MIS courses</div>
-                        <br>
-                        <div><input type="radio" name="course_selection" id="math_courses" onclick="openModal()"> Math courses</div>
-                        <br>
-                        <div><input type="radio" name="course_selection" id="both_courses" onclick="openModal2()"> Both (CS/MIS courses & Math Courses)</div>
-                        
-                    </div>
-
-                </div>
-
-            </div>
+        <form action="/submit" method="POST" enctype="multipart/form-data">
             
+            <div class="candidate-section2">
+                <div class="form">
+                    <div><input type="text" name="first-name" placeholder="Enter first name"></div>
+                    <div><input type="text" name="last-name" placeholder="Enter last name"></div>
+                    <div><input type="tel" name="telephone" placeholder="+233"></div>
+                    <label style="color: brown;">Select Gender</label>
+                    <div><input type="radio" name="gender" value="Male"> Male</div>
+                    <div><input type="radio" name="gender" value="Female"> Female</div>
+                </div>
+
+                <div class="outer-container">
+                    <div class="notification"><p>Submit documents in PDF Ensure to name them properly 
+                        (SurnameFirstname)</p></div>
+                    <div class="candidate-container">
+                        <div class="candidate-card candidate-card1">
+                            <button type="button" class="upload-btn" onclick="document.getElementById('cvInput').click()">Upload CV</button>
+                            <input type="file" name="cv" id="cvInput" accept=".pdf,.doc,.docx" style="display: none;">
+                            <p class="file-name" id="cvName" style="display: none;">No file selected</p>
+                        </div>
+            
+                        <div class="candidate-card candidate-card2">
+                            <button type="button" class="upload-btn" onclick="document.getElementById('coverLetterInput').click()">Upload Cover Letter</button>
+                            <input type="file" name="cover_letter" id="coverLetterInput" accept=".pdf,.doc,.docx" style="display: none;">
+                            <p class="file-name" id="coverLetterName" style="display: none;">No file selected</p>
+                        </div>
+            
+                        <div class="candidate-card candidate-card3">
+                            <button type="button" class="upload-btn" onclick="document.getElementById('transcriptInput').click()">Upload Transcript</button>
+                            <input type="file" name="transcript" id="transcriptInput" accept=".pdf,.doc,.docx" style="display: none;">
+                            <p class="file-name" id="transcriptName" style="display: none;">No file selected</p>
+                        </div>
+                    </div>
+
+
+                    <div class="select" style="color: white; margin-top: 55px; line-height: 23px;">
+                        <div class="select-heading">Which courses would you be interested in being a Faculty Intern?</div>
+                        <br>
+                        <div class="main">
+
+                            <div><input type="radio" name="course_selection" value="CS/MIS courses" id="cs_mis" onclick="openModal1()"> CS/MIS courses</div>
+                            <br>
+                            <div><input type="radio" name="course_selection" value="Math Courses" id="math_courses" onclick="openModal()"> Math courses</div>
+                            <br>
+                            <div><input type="radio" name="course_selection" value="Both" id="both_courses" onclick="openModal2()"> Both (CS/MIS courses & Math Courses)</div>
+                            
+                        </div>
+
+                    </div>
+
+                </div>
+                
+
+            </div>
+
+            <div><input type="submit" value="Submit"></div>
+
+
+        </form>
 
         </div>
-
-        <div><input type="submit" value="Submit"></div>
-
-
-    </form>
-
-    </div>
 
 
 
@@ -242,59 +242,59 @@
             </tr>
             <tr>
                 <td>College Algebra</td>
-                <td><input type="radio" name="college_algebra" value="interested_prior"></td>
-                <td><input type="radio" name="college_algebra" value="interested_no_experience"></td>
-                <td><input type="radio" name="college_algebra" value="not_preferred"></td>
-                <td><input type="radio" name="college_algebra" value="not_interested"></td>
+                <td><input type="radio" name="preference_college_algebra" value="interested_prior"></td>
+                <td><input type="radio" name="preference_college_algebra" value="interested_no_experience"></td>
+                <td><input type="radio" name="preference_college_algebra" value="not_preferred"></td>
+                <td><input type="radio" name="preference_college_algebra" value="not_interested"></td>
             </tr>
             <tr>
                 <td>Pre-Calculus I & II</td>
-                <td><input type="radio" name="pre_calculus" value="interested_prior"></td>
-                <td><input type="radio" name="pre_calculus" value="interested_no_experience"></td>
-                <td><input type="radio" name="pre_calculus" value="not_preferred"></td>
-                <td><input type="radio" name="pre_calculus" value="not_interested"></td>
+                <td><input type="radio" name="preference_pre_calculus" value="interested_prior"></td>
+                <td><input type="radio" name="preference_pre_calculus" value="interested_no_experience"></td>
+                <td><input type="radio" name="preference_pre_calculus" value="not_preferred"></td>
+                <td><input type="radio" name="preference_pre_calculus" value="not_interested"></td>
             </tr>
             <tr>
                 <td>Calculus I & II</td>
-                <td><input type="radio" name="calculus" value="interested_prior"></td>
-                <td><input type="radio" name="calculus" value="interested_no_experience"></td>
-                <td><input type="radio" name="calculus" value="not_preferred"></td>
-                <td><input type="radio" name="calculus" value="not_interested"></td>
+                <td><input type="radio" name="preference_calculus" value="interested_prior"></td>
+                <td><input type="radio" name="preference_calculus" value="interested_no_experience"></td>
+                <td><input type="radio" name="preference_calculus" value="not_preferred"></td>
+                <td><input type="radio" name="preference_calculus" value="not_interested"></td>
             </tr>
             <tr>
                 <td>Applied Calculus</td>
-                <td><input type="radio" name="applied_calculus" value="interested_prior"></td>
-                <td><input type="radio" name="applied_calculus" value="interested_no_experience"></td>
-                <td><input type="radio" name="applied_calculus" value="not_preferred"></td>
-                <td><input type="radio" name="applied_calculus" value="not_interested"></td>
+                <td><input type="radio" name="preference_applied_calculus" value="interested_prior"></td>
+                <td><input type="radio" name="preference_applied_calculus" value="interested_no_experience"></td>
+                <td><input type="radio" name="preference_applied_calculus" value="not_preferred"></td>
+                <td><input type="radio" name="preference_applied_calculus" value="not_interested"></td>
             </tr>
             <tr>
                 <td>Quantitative Methods</td>
-                <td><input type="radio" name="quantitative_methods" value="interested_prior"></td>
-                <td><input type="radio" name="quantitative_methods" value="interested_no_experience"></td>
-                <td><input type="radio" name="quantitative_methods" value="not_preferred"></td>
-                <td><input type="radio" name="quantitative_methods" value="not_interested"></td>
+                <td><input type="radio" name="preference_quantitative_methods" value="interested_prior"></td>
+                <td><input type="radio" name="preference_quantitative_methods" value="interested_no_experience"></td>
+                <td><input type="radio" name="preference_quantitative_methods" value="not_preferred"></td>
+                <td><input type="radio" name="preference_quantitative_methods" value="not_interested"></td>
             </tr>
             <tr>
                 <td>Linear Algebra</td>
-                <td><input type="radio" name="linear_algebra" value="interested_prior"></td>
-                <td><input type="radio" name="linear_algebra" value="interested_no_experience"></td>
-                <td><input type="radio" name="linear_algebra" value="not_preferred"></td>
-                <td><input type="radio" name="linear_algebra" value="not_interested"></td>
+                <td><input type="radio" name="preference_linear_algebra" value="interested_prior"></td>
+                <td><input type="radio" name="preference_linear_algebra" value="interested_no_experience"></td>
+                <td><input type="radio" name="preference_linear_algebra" value="not_preferred"></td>
+                <td><input type="radio" name="preference_linear_algebra" value="not_interested"></td>
             </tr>
             <tr>
                 <td>Statistics with Probability</td>
-                <td><input type="radio" name="statistics" value="interested_prior"></td>
-                <td><input type="radio" name="statistics" value="interested_no_experience"></td>
-                <td><input type="radio" name="statistics" value="not_preferred"></td>
-                <td><input type="radio" name="statistics" value="not_interested"></td>
+                <td><input type="radio" name="preference_statistics" value="interested_prior"></td>
+                <td><input type="radio" name="preference_statistics" value="interested_no_experience"></td>
+                <td><input type="radio" name="preference_statistics" value="not_preferred"></td>
+                <td><input type="radio" name="preference_statistics" value="not_interested"></td>
             </tr>
             <tr>
                 <td>Discrete Structures & Theory</td>
-                <td><input type="radio" name="discrete_structures" value="interested_prior"></td>
-                <td><input type="radio" name="discrete_structures" value="interested_no_experience"></td>
-                <td><input type="radio" name="discrete_structures" value="not_preferred"></td>
-                <td><input type="radio" name="discrete_structures" value="not_interested"></td>
+                <td><input type="radio" name="preference_discrete_structures" value="interested_prior"></td>
+                <td><input type="radio" name="preference_discrete_structures" value="interested_no_experience"></td>
+                <td><input type="radio" name="preference_discrete_structures" value="not_preferred"></td>
+                <td><input type="radio" name="preference_discrete_structures" value="not_interested"></td>
             </tr>
         </table>
     </div>
@@ -325,73 +325,73 @@
             </tr>
             <tr>
                 <td>Introduction to Computing & Information Systems</td>
-                <td><input type="radio" name="intro_to_computing" value="interested_prior"></td>
-                <td><input type="radio" name="intro_to_computing" value="interested_no_experience"></td>
-                <td><input type="radio" name="intro_to_computing" value="not_preferred"></td>
-                <td><input type="radio" name="intro_to_computing" value="not_interested"></td>
+                <td><input type="radio" name="preference_intro_to_computing" value="interested_prior"></td>
+                <td><input type="radio" name="preference_intro_to_computing" value="interested_no_experience"></td>
+                <td><input type="radio" name="preference_intro_to_computing" value="not_preferred"></td>
+                <td><input type="radio" name="preference_intro_to_computing" value="not_interested"></td>
             </tr>
             <tr>
                 <td>Object Oriented Programming</td>
-                <td><input type="radio" name="oop" value="interested_prior"></td>
-                <td><input type="radio" name="oop" value="interested_no_experience"></td>
-                <td><input type="radio" name="oop" value="not_preferred"></td>
-                <td><input type="radio" name="oop" value="not_interested"></td>
+                <td><input type="radio" name="preference_object_oriented_programming" value="interested_prior"></td>
+                <td><input type="radio" name="preference_object_oriented_programming" value="interested_no_experience"></td>
+                <td><input type="radio" name="preference_object_oriented_programming" value="not_preferred"></td>
+                <td><input type="radio" name="preference_object_oriented_programming" value="not_interested"></td>
             </tr>
             <tr>
                 <td>Hardware & Systems Fundamentals</td>
-                <td><input type="radio" name="Hardware" value="interested_prior"></td>
-                <td><input type="radio" name="Hardware" value="interested_no_experience"></td>
-                <td><input type="radio" name="Hardware" value="not_preferred"></td>
-                <td><input type="radio" name="Hardware" value="not_interested"></td>
+                <td><input type="radio" name="preference_Hardware" value="interested_prior"></td>
+                <td><input type="radio" name="preference_Hardware" value="interested_no_experience"></td>
+                <td><input type="radio" name="preference_Hardware" value="not_preferred"></td>
+                <td><input type="radio" name="preference_Hardware" value="not_interested"></td>
             </tr>
             <tr>
                 <td>Algorithm Design & Analysis</td>
-                <td><input type="radio" name="algorithms" value="interested_prior"></td>
-                <td><input type="radio" name="algorithms" value="interested_no_experience"></td>
-                <td><input type="radio" name="algorithms" value="not_preferred"></td>
-                <td><input type="radio" name="algorithms" value="not_interested"></td>
+                <td><input type="radio" name="preference_algorithm_design_&_analysis" value="interested_prior"></td>
+                <td><input type="radio" name="preference_algorithm_design_&_analysis" value="interested_no_experience"></td>
+                <td><input type="radio" name="preference_algorithm_design_&_analysis" value="not_preferred"></td>
+                <td><input type="radio" name="preference_algorithm_design_&_analysis" value="not_interested"></td>
             </tr>
             <tr>
                 <td>Intermediate Computer Programming(C++)</td>
-                <td><input type="radio" name="intermediate" value="interested_prior"></td>
-                <td><input type="radio" name="intermediate" value="interested_no_experience"></td>
-                <td><input type="radio" name="intermediate" value="not_preferred"></td>
-                <td><input type="radio" name="intermediate" value="not_interested"></td>
+                <td><input type="radio" name="preference_intermediate_computer_programming" value="interested_prior"></td>
+                <td><input type="radio" name="preference_intermediate_computer_programming" value="interested_no_experience"></td>
+                <td><input type="radio" name="preference_intermediate_computer_programming" value="not_preferred"></td>
+                <td><input type="radio" name="preference_intermediate_computer_programming" value="not_interested"></td>
             </tr>
             <tr>
                 <td>Systems Analysis & Design</td>
-                <td><input type="radio" name="Systems_analysis" value="interested_prior"></td>
-                <td><input type="radio" name="Systems_analysis" value="interested_no_experience"></td>
-                <td><input type="radio" name="Systems_analysis" value="not_preferred"></td>
-                <td><input type="radio" name="Systems_analysis" value="not_interested"></td>
+                <td><input type="radio" name="preference_Systems_analysis_&_design" value="interested_prior"></td>
+                <td><input type="radio" name="preference_Systems_analysis_&_design" value="interested_no_experience"></td>
+                <td><input type="radio" name="preference_Systems_analysis_&_design" value="not_preferred"></td>
+                <td><input type="radio" name="preference_Systems_analysis_&_design" value="not_interested"></td>
             </tr>
             <tr>
                 <td>Web Technologies</td>
-                <td><input type="radio" name="web_tech" value="interested_prior"></td>
-                <td><input type="radio" name="web_tech" value="interested_no_experience"></td>
-                <td><input type="radio" name="web_tech" value="not_preferred"></td>
-                <td><input type="radio" name="web_tech" value="not_interested"></td>
+                <td><input type="radio" name="preference_web_tech" value="interested_prior"></td>
+                <td><input type="radio" name="preference_web_tech" value="interested_no_experience"></td>
+                <td><input type="radio" name="preference_web_tech" value="not_preferred"></td>
+                <td><input type="radio" name="preference_web_tech" value="not_interested"></td>
             </tr>
             <tr>
                 <td>E-Commerce</td>
-                <td><input type="radio" name="e_commerce" value="interested_prior"></td>
-                <td><input type="radio" name="e_commerce" value="interested_no_experience"></td>
-                <td><input type="radio" name="e_commerce" value="not_preferred"></td>
-                <td><input type="radio" name="e_commerce" value="not_interested"></td>
+                <td><input type="radio" name="preference_e_commerce" value="interested_prior"></td>
+                <td><input type="radio" name="preference_e_commerce" value="interested_no_experience"></td>
+                <td><input type="radio" name="preference_e_commerce" value="not_preferred"></td>
+                <td><input type="radio" name="preference_e_commerce" value="not_interested"></td>
             </tr>
             <tr>
                 <td>Information & Systems Security</td>
-                <td><input type="radio" name="Info_sec" value="interested_prior"></td>
-                <td><input type="radio" name="Info_sec" value="interested_no_experience"></td>
-                <td><input type="radio" name="Info_sec" value="not_preferred"></td>
-                <td><input type="radio" name="Info_sec" value="not_interested"></td>
+                <td><input type="radio" name="preference_Info_sec" value="interested_prior"></td>
+                <td><input type="radio" name="preference_Info_sec" value="interested_no_experience"></td>
+                <td><input type="radio" name="preference_Info_sec" value="not_preferred"></td>
+                <td><input type="radio" name="preference_Info_sec" value="not_interested"></td>
             </tr>
             <tr>
                 <td>Operating Systems</td>
-                <td><input type="radio" name="operating_system" value="interested_prior"></td>
-                <td><input type="radio" name="operating_system" value="interested_no_experience"></td>
-                <td><input type="radio" name="operating_system" value="not_preferred"></td>
-                <td><input type="radio" name="operating_system" value="not_interested"></td>
+                <td><input type="radio" name="preference_operating_system" value="interested_prior"></td>
+                <td><input type="radio" name="preference_operating_system" value="interested_no_experience"></td>
+                <td><input type="radio" name="preference_operating_system" value="not_preferred"></td>
+                <td><input type="radio" name="preference_operating_system" value="not_interested"></td>
             </tr>
         </table>
         
@@ -408,83 +408,83 @@
             </tr>
             <tr>
                 <td>Computer Programming for CS</td>
-                <td><input type="radio" name="computing_for_cs" value="interested_prior"></td>
-                <td><input type="radio" name="computing_for_cs" value="interested_no_experience"></td>
-                <td><input type="radio" name="computing_for_cs" value="not_preferred"></td>
-                <td><input type="radio" name="computing_for_cs" value="not_interested"></td>
+                <td><input type="radio" name="preference_computing_for_cs" value="interested_prior"></td>
+                <td><input type="radio" name="preference_computing_for_cs" value="interested_no_experience"></td>
+                <td><input type="radio" name="preference_computing_for_cs" value="not_preferred"></td>
+                <td><input type="radio" name="preference_computing_for_cs" value="not_interested"></td>
             </tr>
             <tr>
                 <td>Computer Programming for Engineering</td>
-                <td><input type="radio" name="computing_for_eng" value="interested_prior"></td>
-                <td><input type="radio" name="computing_for_eng" value="interested_no_experience"></td>
-                <td><input type="radio" name="computing_for_eng" value="not_preferred"></td>
-                <td><input type="radio" name="computing_for_eng" value="not_interested"></td>
+                <td><input type="radio" name="preference_computing_for_eng" value="interested_prior"></td>
+                <td><input type="radio" name="preference_computing_for_eng" value="interested_no_experience"></td>
+                <td><input type="radio" name="preference_computing_for_eng" value="not_preferred"></td>
+                <td><input type="radio" name="preference_computing_for_eng" value="not_interested"></td>
             </tr>
             <tr>
                 <td>Database Systems</td>
-                <td><input type="radio" name="database" value="interested_prior"></td>
-                <td><input type="radio" name="database" value="interested_no_experience"></td>
-                <td><input type="radio" name="database" value="not_preferred"></td>
-                <td><input type="radio" name="database" value="not_interested"></td>
+                <td><input type="radio" name="preference_database_systems" value="interested_prior"></td>
+                <td><input type="radio" name="preference_database_systems" value="interested_no_experience"></td>
+                <td><input type="radio" name="preference_database_systems" value="not_preferred"></td>
+                <td><input type="radio" name="preference_database_systems" value="not_interested"></td>
             </tr>
             <tr>
                 <td>Data Structures & Algorithm</td>
-                <td><input type="radio" name="dsa" value="interested_prior"></td>
-                <td><input type="radio" name="dsa" value="interested_no_experience"></td>
-                <td><input type="radio" name="dsa" value="not_preferred"></td>
-                <td><input type="radio" name="dsa" value="not_interested"></td>
+                <td><input type="radio" name="preference_data_structures_&_algorithm" value="interested_prior"></td>
+                <td><input type="radio" name="preference_data_structures_&_algorithm" value="interested_no_experience"></td>
+                <td><input type="radio" name="preference_data_structures_&_algorithm" value="not_preferred"></td>
+                <td><input type="radio" name="preference_data_structures_&_algorithm" value="not_interested"></td>
             </tr>
             <tr>
                 <td>Introduction to AI</td>
-                <td><input type="radio" name="intro_to_AI" value="interested_prior"></td>
-                <td><input type="radio" name="intro_to_AI" value="interested_no_experience"></td>
-                <td><input type="radio" name="intro_to_AI" value="not_preferred"></td>
-                <td><input type="radio" name="intro_to_AI" value="not_interested"></td>
+                <td><input type="radio" name="preference_intro_to_AI" value="interested_prior"></td>
+                <td><input type="radio" name="preference_intro_to_AI" value="interested_no_experience"></td>
+                <td><input type="radio" name="preference_intro_to_AI" value="not_preferred"></td>
+                <td><input type="radio" name="preference_intro_to_AI" value="not_interested"></td>
             </tr>
             <tr>
                 <td>IT Infrastructure & Systems Admin Lab</td>
-                <td><input type="radio" name="IT_infrastructure" value="interested_prior"></td>
-                <td><input type="radio" name="IT_infrastructure" value="interested_no_experience"></td>
-                <td><input type="radio" name="IT_infrastructure" value="not_preferred"></td>
-                <td><input type="radio" name="IT_infrastructure" value="not_interested"></td>
+                <td><input type="radio" name="preference_IT_infrastructure" value="interested_prior"></td>
+                <td><input type="radio" name="preference_IT_infrastructure" value="interested_no_experience"></td>
+                <td><input type="radio" name="preference_IT_infrastructure" value="not_preferred"></td>
+                <td><input type="radio" name="preference_IT_infrastructure" value="not_interested"></td>
             </tr>
             <tr>
                 <td>IS Project Management</td>
-                <td><input type="radio" name="project_management" value="interested_prior"></td>
-                <td><input type="radio" name="project_management" value="interested_no_experience"></td>
-                <td><input type="radio" name="project_management" value="not_preferred"></td>
-                <td><input type="radio" name="project_management" value="not_interested"></td>
+                <td><input type="radio" name="preference_project_management" value="interested_prior"></td>
+                <td><input type="radio" name="preference_project_management" value="interested_no_experience"></td>
+                <td><input type="radio" name="preference_project_management" value="not_preferred"></td>
+                <td><input type="radio" name="preference_project_management" value="not_interested"></td>
             </tr>
             <tr>
                 <td>Software Engineering</td>
-                <td><input type="radio" name="SE" value="interested_prior"></td>
-                <td><input type="radio" name="SE" value="interested_no_experience"></td>
-                <td><input type="radio" name="SE" value="not_preferred"></td>
-                <td><input type="radio" name="SE" value="not_interested"></td>
+                <td><input type="radio" name="preference_Software_Engineering" value="interested_prior"></td>
+                <td><input type="radio" name="preference_Software_Engineering" value="interested_no_experience"></td>
+                <td><input type="radio" name="preference_Software_Engineering" value="not_preferred"></td>
+                <td><input type="radio" name="preference_Software_Engineering" value="not_interested"></td>
             </tr>
 
             <tr>
                 <td>Introduction to Modelling & Simulation</td>
-                <td><input type="radio" name="modelling" value="interested_prior"></td>
-                <td><input type="radio" name="modelling" value="interested_no_experience"></td>
-                <td><input type="radio" name="modelling" value="not_preferred"></td>
-                <td><input type="radio" name="modelling" value="not_interested"></td>
+                <td><input type="radio" name="preference_modelling" value="interested_prior"></td>
+                <td><input type="radio" name="preference_modelling" value="interested_no_experience"></td>
+                <td><input type="radio" name="preference_modelling" value="not_preferred"></td>
+                <td><input type="radio" name="preference_modelling" value="not_interested"></td>
             </tr>
 
             <tr>
                 <td>Networks and Data Communication</td>
-                <td><input type="radio" name="network_data_communication" value="interested_prior"></td>
-                <td><input type="radio" name="network_data_communication" value="interested_no_experience"></td>
-                <td><input type="radio" name="network_data_communication" value="not_preferred"></td>
-                <td><input type="radio" name="network_data_communication" value="not_interested"></td>
+                <td><input type="radio" name="preference_network_data_communication" value="interested_prior"></td>
+                <td><input type="radio" name="preference_network_data_communication" value="interested_no_experience"></td>
+                <td><input type="radio" name="preference_network_data_communication" value="not_preferred"></td>
+                <td><input type="radio" name="preference_network_data_communication" value="not_interested"></td>
             </tr>
 
             <tr>
                 <td>Computer Organization and Architecture</td>
-                <td><input type="radio" name="COA" value="interested_prior"></td>
-                <td><input type="radio" name="COA" value="interested_no_experience"></td>
-                <td><input type="radio" name="COA" value="not_preferred"></td>
-                <td><input type="radio" name="COA" value="not_interested"></td>
+                <td><input type="radio" name="preference_Computer_Organization_&_Architecture" value="interested_prior"></td>
+                <td><input type="radio" name="preference_Computer_Organization_&_Architecture" value="interested_no_experience"></td>
+                <td><input type="radio" name="preference_Computer_Organization_&_Architecture" value="not_preferred"></td>
+                <td><input type="radio" name="preference_Computer_Organization_&_Architecture" value="not_interested"></td>
             </tr>
         </table>
         
@@ -502,113 +502,113 @@
             </tr>
             <tr>
                 <td>Advanced Database Systems</td>
-                <td><input type="radio" name="advanced_database" value="experienced"></td>
-                <td><input type="radio" name="advanced_database" value="no_experience"></td>
-                <td><input type="radio" name="advanced_database" value="not_preferred"></td>
-                <td><input type="radio" name="advanced_database" value="not_interested"></td>
+                <td><input type="radio" name="preference_advanced_database" value="experienced"></td>
+                <td><input type="radio" name="preference_advanced_database" value="no_experience"></td>
+                <td><input type="radio" name="preference_advanced_database" value="not_preferred"></td>
+                <td><input type="radio" name="preference_advanced_database" value="not_interested"></td>
             </tr>
             <tr>
                 <td>Data Science</td>
-                <td><input type="radio" name="data_Science" value="experienced"></td>
-                <td><input type="radio" name="data_Science" value="no_experience"></td>
-                <td><input type="radio" name="data_Science" value="not_preferred"></td>
-                <td><input type="radio" name="data_Science" value="not_interested"></td>
+                <td><input type="radio" name="preference_data_Science" value="experienced"></td>
+                <td><input type="radio" name="preference_data_Science" value="no_experience"></td>
+                <td><input type="radio" name="preference_data_Science" value="not_preferred"></td>
+                <td><input type="radio" name="preference_data_Science" value="not_interested"></td>
             </tr>
 
             <tr>
                 <td>Computer Vision</td>
-                <td><input type="radio" name="computer_vision" value="experienced"></td>
-                <td><input type="radio" name="computer_vision" value="no_experience"></td>
-                <td><input type="radio" name="computer_vision" value="not_preferred"></td>
-                <td><input type="radio" name="computer_vision" value="not_interested"></td>
+                <td><input type="radio" name="preference_computer_vision" value="experienced"></td>
+                <td><input type="radio" name="preference_computer_vision" value="no_experience"></td>
+                <td><input type="radio" name="preference_computer_vision" value="not_preferred"></td>
+                <td><input type="radio" name="preference_computer_vision" value="not_interested"></td>
             </tr>
 
             <tr>
                 <td>Applied Cryptography & Computer Security</td>
-                <td><input type="radio" name="cyber" value="experienced"></td>
-                <td><input type="radio" name="cyber" value="no_experience"></td>
-                <td><input type="radio" name="cyber" value="not_preferred"></td>
-                <td><input type="radio" name="cyber" value="not_interested"></td>
+                <td><input type="radio" name="preference_applied_cryptography_&_computer_security" value="experienced"></td>
+                <td><input type="radio" name="preference_applied_cryptography_&_computer_security" value="no_experience"></td>
+                <td><input type="radio" name="preference_applied_cryptography_&_computer_security" value="not_preferred"></td>
+                <td><input type="radio" name="preference_applied_cryptography_&_computer_security" value="not_interested"></td>
             </tr>
 
             <tr>
                 <td>Human Computer Interaction</td>
-                <td><input type="radio" name="human_computer_interaction" value="experienced"></td>
-                <td><input type="radio" name="human_computer_interaction" value="no_experience"></td>
-                <td><input type="radio" name="human_computer_interaction" value="not_preferred"></td>
-                <td><input type="radio" name="human_computer_interaction" value="not_interested"></td>
+                <td><input type="radio" name="preference_human_computer_interaction" value="experienced"></td>
+                <td><input type="radio" name="preference_human_computer_interaction" value="no_experience"></td>
+                <td><input type="radio" name="preference_human_computer_interaction" value="not_preferred"></td>
+                <td><input type="radio" name="preference_human_computer_interaction" value="not_interested"></td>
             </tr>
 
             <tr>
                 <td>Natural Language Processing</td>
-                <td><input type="radio" name="NLP" value="experienced"></td>
-                <td><input type="radio" name="NLP" value="no_experience"></td>
-                <td><input type="radio" name="NLP" value="not_preferred"></td>
-                <td><input type="radio" name="NLP" value="not_interested"></td>
+                <td><input type="radio" name="preference_Natural_Language_Processing" value="experienced"></td>
+                <td><input type="radio" name="preference_Natural_Language_Processing" value="no_experience"></td>
+                <td><input type="radio" name="preference_Natural_Language_Processing" value="not_preferred"></td>
+                <td><input type="radio" name="preference_Natural_Language_Processing" value="not_interested"></td>
             </tr>
 
             <tr>
                 <td>Concepts of Programming Language</td>
-                <td><input type="radio" name="concepts_of_programming" value="experienced"></td>
-                <td><input type="radio" name="concepts_of_programming" value="no_experience"></td>
-                <td><input type="radio" name="concepts_of_programming" value="not_preferred"></td>
-                <td><input type="radio" name="concepts_of_programming" value="not_interested"></td>
+                <td><input type="radio" name="preference_concepts_of_programming" value="experienced"></td>
+                <td><input type="radio" name="preference_concepts_of_programming" value="no_experience"></td>
+                <td><input type="radio" name="preference_concepts_of_programming" value="not_preferred"></td>
+                <td><input type="radio" name="preference_concepts_of_programming" value="not_interested"></td>
             </tr>
 
             <tr>
                 <td>Computer Graphics</td>
-                <td><input type="radio" name="computer_graphics" value="experienced"></td>
-                <td><input type="radio" name="computer_graphics" value="no_experience"></td>
-                <td><input type="radio" name="computer_graphics" value="not_preferred"></td>
-                <td><input type="radio" name="computer_graphics" value="not_interested"></td>
+                <td><input type="radio" name="preference_computer_graphics" value="experienced"></td>
+                <td><input type="radio" name="preference_computer_graphics" value="no_experience"></td>
+                <td><input type="radio" name="preference_computer_graphics" value="not_preferred"></td>
+                <td><input type="radio" name="preference_computer_graphics" value="not_interested"></td>
             </tr>
 
             <tr>
                 <td>Machine Learning</td>
-                <td><input type="radio" name="ml" value="experienced"></td>
-                <td><input type="radio" name="ml" value="no_experience"></td>
-                <td><input type="radio" name="ml" value="not_preferred"></td>
-                <td><input type="radio" name="ml" value="not_interested"></td>
+                <td><input type="radio" name="preference_machine_learning" value="experienced"></td>
+                <td><input type="radio" name="preference_machine_learning" value="no_experience"></td>
+                <td><input type="radio" name="preference_machine_learning" value="not_preferred"></td>
+                <td><input type="radio" name="preference_machine_learning" value="not_interested"></td>
             </tr>
 
             <tr>
                 <td>Mobile Application Development</td>
-                <td><input type="radio" name="mobile_app" value="experienced"></td>
-                <td><input type="radio" name="mobile_app" value="no_experience"></td>
-                <td><input type="radio" name="mobile_app" value="not_preferred"></td>
-                <td><input type="radio" name="mobile_app" value="not_interested"></td>
+                <td><input type="radio" name="preference_mobile_app_development" value="experienced"></td>
+                <td><input type="radio" name="preference_mobile_app_development" value="no_experience"></td>
+                <td><input type="radio" name="preference_mobile_app_development" value="not_preferred"></td>
+                <td><input type="radio" name="preference_mobile_app_development" value="not_interested"></td>
             </tr>
 
             <tr>
                 <td>Parallel & Distributed Computing</td>
-                <td><input type="radio" name="parallel" value="experienced"></td>
-                <td><input type="radio" name="parallel" value="no_experience"></td>
-                <td><input type="radio" name="parallel" value="not_preferred"></td>
-                <td><input type="radio" name="parallel" value="not_interested"></td>
+                <td><input type="radio" name="preference_parallel_&_distributed_computing" value="experienced"></td>
+                <td><input type="radio" name="preference_parallel_&_distributed_computing" value="no_experience"></td>
+                <td><input type="radio" name="preference_parallel_&_distributed_computing" value="not_preferred"></td>
+                <td><input type="radio" name="preference_parallel_&_distributed_computing" value="not_interested"></td>
             </tr>
 
             <tr>
                 <td>Introduction to AI Robotics</td>
-                <td><input type="radio" name="robotics" value="experienced"></td>
-                <td><input type="radio" name="robotics" value="no_experience"></td>
-                <td><input type="radio" name="robotics" value="not_preferred"></td>
-                <td><input type="radio" name="robotics" value="not_interested"></td>
+                <td><input type="radio" name="preference_intro_to_robotics" value="experienced"></td>
+                <td><input type="radio" name="preference_intro_to_robotics" value="no_experience"></td>
+                <td><input type="radio" name="preference_intro_to_robotics" value="not_preferred"></td>
+                <td><input type="radio" name="preference_intro_to_robotics" value="not_interested"></td>
             </tr>
 
             <tr>
                 <td>Computer Game Development</td>
-                <td><input type="radio" name="game_dev" value="experienced"></td>
-                <td><input type="radio" name="game_dev" value="no_experience"></td>
-                <td><input type="radio" name="game_dev" value="not_preferred"></td>
-                <td><input type="radio" name="game_dev" value="not_interested"></td>
+                <td><input type="radio" name="preference_game_dev" value="experienced"></td>
+                <td><input type="radio" name="preference_game_dev" value="no_experience"></td>
+                <td><input type="radio" name="preference_game_dev" value="not_preferred"></td>
+                <td><input type="radio" name="preference_game_dev" value="not_interested"></td>
             </tr>
 
             <tr>
                 <td>Deep Learning</td>
-                <td><input type="radio" name="deep_learning" value="experienced"></td>
-                <td><input type="radio" name="deep_learning" value="no_experience"></td>
-                <td><input type="radio" name="deep_learning" value="not_preferred"></td>
-                <td><input type="radio" name="deep_learning" value="not_interested"></td>
+                <td><input type="radio" name="preference_deep_learning" value="experienced"></td>
+                <td><input type="radio" name="preference_deep_learning" value="no_experience"></td>
+                <td><input type="radio" name="preference_deep_learning" value="not_preferred"></td>
+                <td><input type="radio" name="preference_deep_learning" value="not_interested"></td>
             </tr>
         </table>
     </div>
@@ -634,59 +634,59 @@
             </tr>
             <tr>
                 <td>College Algebra</td>
-                <td><input type="radio" name="college_algebra" value="interested_prior"></td>
-                <td><input type="radio" name="college_algebra" value="interested_no_experience"></td>
-                <td><input type="radio" name="college_algebra" value="not_preferred"></td>
-                <td><input type="radio" name="college_algebra" value="not_interested"></td>
+                <td><input type="radio" name="preference_college_algebra" value="interested_prior"></td>
+                <td><input type="radio" name="preference_college_algebra" value="interested_no_experience"></td>
+                <td><input type="radio" name="preference_college_algebra" value="not_preferred"></td>
+                <td><input type="radio" name="preference_college_algebra" value="not_interested"></td>
             </tr>
             <tr>
                 <td>Pre-Calculus I & II</td>
-                <td><input type="radio" name="pre_calculus" value="interested_prior"></td>
-                <td><input type="radio" name="pre_calculus" value="interested_no_experience"></td>
-                <td><input type="radio" name="pre_calculus" value="not_preferred"></td>
-                <td><input type="radio" name="pre_calculus" value="not_interested"></td>
+                <td><input type="radio" name="preference_pre_calculus" value="interested_prior"></td>
+                <td><input type="radio" name="preference_pre_calculus" value="interested_no_experience"></td>
+                <td><input type="radio" name="preference_pre_calculus" value="not_preferred"></td>
+                <td><input type="radio" name="preference_pre_calculus" value="not_interested"></td>
             </tr>
             <tr>
                 <td>Calculus I & II</td>
-                <td><input type="radio" name="calculus" value="interested_prior"></td>
-                <td><input type="radio" name="calculus" value="interested_no_experience"></td>
-                <td><input type="radio" name="calculus" value="not_preferred"></td>
-                <td><input type="radio" name="calculus" value="not_interested"></td>
+                <td><input type="radio" name="preference_calculus" value="interested_prior"></td>
+                <td><input type="radio" name="preference_calculus" value="interested_no_experience"></td>
+                <td><input type="radio" name="preference_calculus" value="not_preferred"></td>
+                <td><input type="radio" name="preference_calculus" value="not_interested"></td>
             </tr>
             <tr>
                 <td>Applied Calculus</td>
-                <td><input type="radio" name="applied_calculus" value="interested_prior"></td>
-                <td><input type="radio" name="applied_calculus" value="interested_no_experience"></td>
-                <td><input type="radio" name="applied_calculus" value="not_preferred"></td>
-                <td><input type="radio" name="applied_calculus" value="not_interested"></td>
+                <td><input type="radio" name="preference_applied_calculus" value="interested_prior"></td>
+                <td><input type="radio" name="preference_applied_calculus" value="interested_no_experience"></td>
+                <td><input type="radio" name="preference_applied_calculus" value="not_preferred"></td>
+                <td><input type="radio" name="preference_applied_calculus" value="not_interested"></td>
             </tr>
             <tr>
                 <td>Quantitative Methods</td>
-                <td><input type="radio" name="quantitative_methods" value="interested_prior"></td>
-                <td><input type="radio" name="quantitative_methods" value="interested_no_experience"></td>
-                <td><input type="radio" name="quantitative_methods" value="not_preferred"></td>
-                <td><input type="radio" name="quantitative_methods" value="not_interested"></td>
+                <td><input type="radio" name="preference_quantitative_methods" value="interested_prior"></td>
+                <td><input type="radio" name="preference_quantitative_methods" value="interested_no_experience"></td>
+                <td><input type="radio" name="preference_quantitative_methods" value="not_preferred"></td>
+                <td><input type="radio" name="preference_quantitative_methods" value="not_interested"></td>
             </tr>
             <tr>
                 <td>Linear Algebra</td>
-                <td><input type="radio" name="linear_algebra" value="interested_prior"></td>
-                <td><input type="radio" name="linear_algebra" value="interested_no_experience"></td>
-                <td><input type="radio" name="linear_algebra" value="not_preferred"></td>
-                <td><input type="radio" name="linear_algebra" value="not_interested"></td>
+                <td><input type="radio" name="preference_linear_algebra" value="interested_prior"></td>
+                <td><input type="radio" name="preference_linear_algebra" value="interested_no_experience"></td>
+                <td><input type="radio" name="preference_linear_algebra" value="not_preferred"></td>
+                <td><input type="radio" name="preference_linear_algebra" value="not_interested"></td>
             </tr>
             <tr>
                 <td>Statistics with Probability</td>
-                <td><input type="radio" name="statistics" value="interested_prior"></td>
-                <td><input type="radio" name="statistics" value="interested_no_experience"></td>
-                <td><input type="radio" name="statistics" value="not_preferred"></td>
-                <td><input type="radio" name="statistics" value="not_interested"></td>
+                <td><input type="radio" name="preference_statistics" value="interested_prior"></td>
+                <td><input type="radio" name="preference_statistics" value="interested_no_experience"></td>
+                <td><input type="radio" name="preference_statistics" value="not_preferred"></td>
+                <td><input type="radio" name="preference_statistics" value="not_interested"></td>
             </tr>
             <tr>
                 <td>Discrete Structures & Theory</td>
-                <td><input type="radio" name="discrete_structures" value="interested_prior"></td>
-                <td><input type="radio" name="discrete_structures" value="interested_no_experience"></td>
-                <td><input type="radio" name="discrete_structures" value="not_preferred"></td>
-                <td><input type="radio" name="discrete_structures" value="not_interested"></td>
+                <td><input type="radio" name="preference_discrete_structures" value="interested_prior"></td>
+                <td><input type="radio" name="preference_discrete_structures" value="interested_no_experience"></td>
+                <td><input type="radio" name="preference_discrete_structures" value="not_preferred"></td>
+                <td><input type="radio" name="preference_discrete_structures" value="not_interested"></td>
             </tr>
         </table>
         <br>
