@@ -127,8 +127,6 @@ def candidate_page():
 
 @app.route('/submit', methods=['POST'])
 def submit_application():
-    logging.debug("Received Form Data: %s", request.form)  # Log all form data
-
     # Get form data
     first_name = request.form.get('first-name')
     last_name = request.form.get('last-name')
@@ -137,9 +135,6 @@ def submit_application():
     # course_selection = request.form.get('course_selection')  # "CS/MIS", "Math", "Both"
     course_selection = request.form.get('course_selection_id')
 
-    logging.debug("Course Selection: %s", course_selection)
-    logging.debug("🚀 Full Form Data Received: %s", request.form)
-    logging.debug("📌 Form Keys: %s", list(request.form.keys()))
 
     # Handle file uploads
     cv = request.files.get('cv')
