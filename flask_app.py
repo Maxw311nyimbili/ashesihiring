@@ -7,7 +7,12 @@ import mysql.connector
 import logging
 
 # Configure logging
-logging.basicConfig(filename='form_debug.log', level=logging.DEBUG, format='%(asctime)s - %(message)s')
+logging.basicConfig(
+    filename='form_debug.log',
+    level=logging.DEBUG,
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    encoding='utf-8',  # Ensure correct encoding
+)
 
 app = Flask(__name__)
 
@@ -132,7 +137,6 @@ def submit_application():
     course_selection = request.form.get('course_selection')  # "CS/MIS", "Math", "Both"
 
     logging.debug("Course Selection: %s", course_selection)
-
     logging.debug("🚀 Full Form Data Received: %s", request.form)
     logging.debug("📌 Form Keys: %s", list(request.form.keys()))
 
