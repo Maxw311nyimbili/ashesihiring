@@ -134,7 +134,8 @@ def submit_application():
     last_name = request.form.get('last-name')
     telephone = request.form.get('telephone')
     gender = request.form.get('gender')
-    course_selection = request.form.get('course_selection')  # "CS/MIS", "Math", "Both"
+    # course_selection = request.form.get('course_selection')  # "CS/MIS", "Math", "Both"
+    course_selection = request.form.get('course_selection_id')
 
     logging.debug("Course Selection: %s", course_selection)
     logging.debug("🚀 Full Form Data Received: %s", request.form)
