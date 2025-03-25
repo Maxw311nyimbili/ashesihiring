@@ -81,6 +81,8 @@ def faculty_signup():
     return render_template('faculty_signup.html')
 
 
+import json
+
 @app.route('/faculty-login', methods=['GET', 'POST'])
 def faculty_login():
     faculty_debug = None  # Store debugging information
@@ -97,18 +99,28 @@ def faculty_login():
             cursor.execute("SELECT id, username, password_hash, salt FROM faculty_users WHERE email = %s", (email,))
             faculty = cursor.fetchone()
 
-            if faculty:
-                # Decode the salt from base64
-                salt = base64.b64decode(faculty['salt'])
+            # Debugging: Log faculty data to a file
+            with open("faculty_debug.json", "w") as log_file:
+                json.dump(faculty, log_file, indent=4)
 
-                # Debugging info
+            # If faculty data exists, process further
+            if faculty:
+                try:
+                    salt = base64.b64decode(faculty['salt'])
+                except Exception as e:
+                    return jsonify({"error": f"Failed to decode salt: {str(e)}", "faculty": faculty})
+
+                # Debugging information
                 faculty_debug = {
                     "id": faculty["id"],
                     "username": faculty["username"],
                     "stored_password": faculty["password_hash"],
-                    "decoded_salt": faculty["salt"],  # Base64 encoded
+                    "decoded_salt": faculty["salt"],  # Keep Base64 encoded salt for reference
                     "rehashed_password": hash_password(password, salt)
                 }
+
+                # Return faculty data for debugging in browser
+                return jsonify(faculty_debug)
 
                 # Verify password
                 if verify_password(faculty['password_hash'], password, salt):
@@ -122,7 +134,7 @@ def faculty_login():
                 return render_template('faculty_login.html', login_error="Invalid login credentials")
 
         except Exception as e:
-            return render_template('faculty_login.html', login_error="Database error", faculty_debug={"error": str(e)})
+            return jsonify({"error": str(e)})  # Return error as JSON for debugging
 
         finally:
             cursor.close()
