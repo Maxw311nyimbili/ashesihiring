@@ -71,7 +71,7 @@ def faculty_signup():
         cursor = conn.cursor()
         cursor.execute(
             "INSERT INTO faculty_users (username, email, password_hash, salt) VALUES (%s, %s, %s, %s)",
-            (username, email, hashed_password, base64.urlsafe_b64encode(salt).decode())
+            (username, email, hashed_password, base64.b64encode(salt).decode())
         )
         conn.commit()
         conn.close()
@@ -80,12 +80,9 @@ def faculty_signup():
 
     return render_template('faculty_signup.html')
 
-
-import json
-
 @app.route('/faculty-login', methods=['GET', 'POST'])
 def faculty_login():
-    faculty_debug = None  # Store debugging information
+    faculty_debug = None
 
     if request.method == 'POST':
         email = request.form['email']
@@ -95,53 +92,49 @@ def faculty_login():
         cursor = conn.cursor(dictionary=True)
 
         try:
-            # Retrieve user info from database
             cursor.execute("SELECT id, username, password_hash, salt FROM faculty_users WHERE email = %s", (email,))
             faculty = cursor.fetchone()
 
-            # Debugging: Log faculty data to a file
-            with open("faculty_debug.json", "w") as log_file:
-                json.dump(faculty, log_file, indent=4)
-
-            # If faculty data exists, process further
             if faculty:
-                try:
-                    salt = base64.b64decode(faculty['salt'])
-                except Exception as e:
-                    return jsonify({"error": f"Failed to decode salt: {str(e)}", "faculty": faculty})
+                salt_encoded = faculty["salt"]
 
-                # Debugging information
+                # Decode the salt using standard Base64
+                try:
+                    salt = base64.b64decode(salt_encoded)
+                except Exception:
+                    return jsonify({
+                        "error": "Invalid Base64 salt stored in database.",
+                        "faculty": faculty
+                    })
+
+                # Debugging info
                 faculty_debug = {
                     "id": faculty["id"],
                     "username": faculty["username"],
                     "stored_password": faculty["password_hash"],
-                    "decoded_salt": faculty["salt"],  # Keep Base64 encoded salt for reference
+                    "decoded_salt": salt_encoded,
                     "rehashed_password": hash_password(password, salt)
                 }
 
-                # Return faculty data for debugging in browser
-                return jsonify(faculty_debug)
-
-                # Verify password
                 if verify_password(faculty['password_hash'], password, salt):
                     session['faculty_id'] = faculty['id']
                     session['faculty_name'] = faculty['username']
-                    return redirect(url_for('faculty_dashboard'))  # Redirect on successful login
+                    return redirect(url_for('faculty_dashboard'))
                 else:
                     return render_template('faculty_login.html', login_error="Invalid login credentials",
                                            faculty_debug=faculty_debug)
+
             else:
                 return render_template('faculty_login.html', login_error="Invalid login credentials")
 
         except Exception as e:
-            return jsonify({"error": str(e)})  # Return error as JSON for debugging
+            return jsonify({"error": str(e)})
 
         finally:
             cursor.close()
             conn.close()
 
     return render_template('faculty_login.html')
-
 
 #---------END OF PAGE ROUTES
 
