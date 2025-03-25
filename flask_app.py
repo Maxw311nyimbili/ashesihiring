@@ -34,6 +34,7 @@ def get_db_connection():
         database="ashesihiring$default"
     )
 
+
 # Login and Sign up
 # Password hashing using cryptography (PBKDF2)
 def hash_password(password: str, salt: bytes) -> str:
@@ -80,27 +81,52 @@ def faculty_signup():
     return render_template('faculty_signup.html')
 
 
-
-@app.route('/faculty_login', methods=['GET', 'POST'])
+@app.route('/faculty-login', methods=['GET', 'POST'])
 def faculty_login():
+    faculty_debug = None  # Store debugging information
+
     if request.method == 'POST':
         email = request.form['email']
         password = request.form['password']
 
         conn = get_db_connection()
-        cursor = conn.cursor()
-        cursor.execute("SELECT id, username, password_hash, salt FROM faculty_users WHERE email = %s", (email,))
-        faculty = cursor.fetchone()
+        cursor = conn.cursor(dictionary=True)
 
-        if faculty:
-            faculty_id, username, stored_hash, salt = faculty
-            if verify_password(password, stored_hash, base64.urlsafe_b64decode(salt)):
-                session['faculty_logged_in'] = True
-                session['faculty_id'] = faculty_id
-                session['faculty_username'] = username
-                return redirect(url_for('faculty_dashboard'))
+        try:
+            # Retrieve user info from database
+            cursor.execute("SELECT id, username, password_hash, salt FROM faculty_users WHERE email = %s", (email,))
+            faculty = cursor.fetchone()
 
-        return "Invalid login credentials"
+            if faculty:
+                # Decode the salt from base64
+                salt = base64.b64decode(faculty['salt'])
+
+                # Debugging info
+                faculty_debug = {
+                    "id": faculty["id"],
+                    "username": faculty["username"],
+                    "stored_password": faculty["password_hash"],
+                    "decoded_salt": faculty["salt"],  # Base64 encoded
+                    "rehashed_password": hash_password(password, salt)
+                }
+
+                # Verify password
+                if verify_password(faculty['password_hash'], password, salt):
+                    session['faculty_id'] = faculty['id']
+                    session['faculty_name'] = faculty['username']
+                    return redirect(url_for('faculty_dashboard'))  # Redirect on successful login
+                else:
+                    return render_template('faculty_login.html', login_error="Invalid login credentials",
+                                           faculty_debug=faculty_debug)
+            else:
+                return render_template('faculty_login.html', login_error="Invalid login credentials")
+
+        except Exception as e:
+            return render_template('faculty_login.html', login_error="Database error", faculty_debug={"error": str(e)})
+
+        finally:
+            cursor.close()
+            conn.close()
 
     return render_template('faculty_login.html')
 
