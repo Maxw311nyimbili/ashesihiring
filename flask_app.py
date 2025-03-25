@@ -6,6 +6,9 @@ import os
 import mysql.connector
 import logging
 
+
+
+
 # Configure logging
 logging.basicConfig(
     filename='form_debug.log',
@@ -15,6 +18,8 @@ logging.basicConfig(
 )
 
 app = Flask(__name__)
+app.secret_key = os.urandom(24)
+
 
 # Configure upload folder
 UPLOAD_FOLDER = 'static/uploads'
