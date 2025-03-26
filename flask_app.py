@@ -232,20 +232,31 @@ def get_candidates():
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
 
-        cursor.execute("SELECT id, first_name, last_name, telephone, gender, course_selection, cv_path, cover_letter_path, transcript_path FROM applicants")
+        # Fetch applicant details
+        cursor.execute("""
+            SELECT id, first_name, last_name, telephone, gender, course_selection, 
+                   cv_path, cover_letter_path, transcript_path 
+            FROM applicants
+        """)
         applicants = cursor.fetchall()
 
         candidates = []
-        base_url = "https://www.pythonanywhere.com/user/ashesihiring/files/home/ashesihiring/"
+        base_url = "https://www.pythonanywhere.com/user/ashesihiring/files/home/ashesihiring/static/uploads/"
+
         for applicant in applicants:
+            # Fetch course preferences for each candidate
+            cursor.execute("SELECT course_name FROM course_preferences WHERE candidate_id = %s", (applicant["id"],))
+            interests = [row["course_name"] for row in cursor.fetchall()]
+
             candidates.append({
                 "name": f"{applicant['first_name']} {applicant['last_name']}",
                 "summary": f"Interested in {applicant.get('course_selection', 'Unknown Course')}.",
                 "details": f"""
-                    <a href='{base_url}/{applicant['cv_path']}' target='_blank'>Resume</a> | 
-                    <a href='{base_url}/{applicant['cover_letter_path']}' target='_blank'>Cover Letter</a> | 
-                    <a href='{base_url}/{applicant['transcript_path']}' target='_blank'>Transcript</a>
-                """
+                    <a href='{base_url}{applicant['cv_path']}' target='_blank'>Resume</a> | 
+                    <a href='{base_url}{applicant['cover_letter_path']}' target='_blank'>Cover Letter</a> | 
+                    <a href='{base_url}{applicant['transcript_path']}' target='_blank'>Transcript</a>
+                """,
+                "interests": interests  # Include interests dynamically
             })
 
         cursor.close()
@@ -265,7 +276,6 @@ def get_candidates():
             json.dump(error_response, json_file, indent=4)
 
         return jsonify(error_response), 500
-
 
 
 if __name__ == '__main__':
