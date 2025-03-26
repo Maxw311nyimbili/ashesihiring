@@ -217,7 +217,7 @@ def get_candidates():
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
 
-        cursor.execute("SELECT id, first_name, last_name, course_interests, cv_path, cover_letter_path, transcript_path FROM applicants")
+        cursor.execute("SELECT id, first_name, last_name, telephone, gender, course_selection, cv_path, cover_letter_path, transcript_path FROM applicants")
         applicants = cursor.fetchall()
 
         candidates = []
