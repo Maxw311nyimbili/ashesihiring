@@ -59,6 +59,8 @@
 //    }
 //});
 
+
+
 let candidates = [];
 let currentIndex = 0;
 const candidateCard = document.getElementById("candidateCard");
@@ -73,7 +75,7 @@ async function fetchCandidates() {
         candidates = data;
 
         if (candidates.length > 0) {
-            displayCandidate(currentIndex, "left");
+            displayCandidate(currentIndex, "right"); // Initial display
         }
     } catch (error) {
         console.error("Error fetching candidates:", error);
@@ -81,21 +83,22 @@ async function fetchCandidates() {
     }
 }
 
-// Function to display a candidate
+// Function to display a candidate with animation
 function displayCandidate(index, direction) {
-    if (candidates.length === 0) return; // Ensure data is available
+    if (candidates.length === 0) return;
 
     let candidate = candidates[index];
 
-    // Determine animation direction
+    // Set exit animation class
     let outClass = direction === "left" ? "hidden-left" : "hidden-right";
     let inClass = direction === "left" ? "hidden-right" : "hidden-left";
 
-    // Slide-out effect
+    // Remove active class for smooth exit animation
+    candidateCard.classList.remove("active");
     candidateCard.classList.add(outClass);
 
     setTimeout(() => {
-        // Update content
+        // Update content only after animation
         candidateCard.innerHTML = `
             <h3>${candidate.name}</h3>
             <p>${candidate.summary}</p>
@@ -103,13 +106,15 @@ function displayCandidate(index, direction) {
             <button onclick="viewMore(${index})">View More</button>
         `;
 
-        // Reset and apply slide-in effect
+        // Reset and apply entrance animation
         candidateCard.classList.remove(outClass);
         candidateCard.classList.add(inClass);
 
-        // Small timeout to ensure smooth animation reflow
-        setTimeout(() => candidateCard.classList.add("active"), 50);
-    }, 400); // Matches transition duration
+        // Small timeout to ensure animation reflow
+        setTimeout(() => {
+            candidateCard.classList.add("active");
+        }, 50);
+    }, 400); // Matches CSS transition duration
 }
 
 // Navigation buttons
@@ -130,103 +135,76 @@ nextBtn.addEventListener("click", () => {
 // Load candidates on page load
 fetchCandidates();
 
-
-
 //let candidates = [];
 //let currentIndex = 0;
-//let candidateCard = document.getElementById("candidateCard");
+//const candidateCard = document.getElementById("candidateCard");
+//const prevBtn = document.getElementById("prevBtn");
+//const nextBtn = document.getElementById("nextBtn");
 //
-//// Fetch candidates from Flask API
+//// Fetch candidates from backend API
 //async function fetchCandidates() {
 //    try {
 //        let response = await fetch("/api/candidates");
-//        candidates = await response.json();
+//        let data = await response.json();
+//        candidates = data;
+//
 //        if (candidates.length > 0) {
 //            displayCandidate(currentIndex, "left");
 //        }
 //    } catch (error) {
 //        console.error("Error fetching candidates:", error);
+//        candidateCard.innerHTML = "<p>Error loading candidates. Please try again later.</p>";
 //    }
 //}
 //
-//// Display candidate details
+//// Function to display a candidate
 //function displayCandidate(index, direction) {
-//    if (candidates.length === 0) return;
+//    if (candidates.length === 0) return; // Ensure data is available
 //
 //    let candidate = candidates[index];
 //
+//    // Determine animation direction
 //    let outClass = direction === "left" ? "hidden-left" : "hidden-right";
 //    let inClass = direction === "left" ? "hidden-right" : "hidden-left";
 //
-//    candidateCard.classList.remove("active");
+//    // Slide-out effect
 //    candidateCard.classList.add(outClass);
 //
 //    setTimeout(() => {
+//        // Update content
 //        candidateCard.innerHTML = `
 //            <h3>${candidate.name}</h3>
 //            <p>${candidate.summary}</p>
+//            <p>${candidate.details}</p>
 //            <button onclick="viewMore(${index})">View More</button>
 //        `;
 //
-//        candidateCard.classList.remove("hidden-left", "hidden-right");
+//        // Reset and apply slide-in effect
+//        candidateCard.classList.remove(outClass);
+//        candidateCard.classList.add(inClass);
 //
-//        setTimeout(() => {
-//            candidateCard.classList.add("active");
-//        }, 50);
-//    }, 400);
+//        // Small timeout to ensure smooth animation reflow
+//        setTimeout(() => candidateCard.classList.add("active"), 50);
+//    }, 400); // Matches transition duration
 //}
 //
-//// Initial fetch and display
-//fetchCandidates();
-//
-//// Navigation logic
-//document.getElementById("prevBtn").addEventListener("click", () => {
+//// Navigation buttons
+//prevBtn.addEventListener("click", () => {
 //    if (currentIndex > 0) {
 //        currentIndex--;
 //        displayCandidate(currentIndex, "left");
 //    }
 //});
 //
-//document.getElementById("nextBtn").addEventListener("click", () => {
+//nextBtn.addEventListener("click", () => {
 //    if (currentIndex < candidates.length - 1) {
 //        currentIndex++;
 //        displayCandidate(currentIndex, "right");
 //    }
 //});
 //
-//
-//
-//
-//// Open candidate details modal
-//function viewMore(index) {
-//    document.getElementById("modalCandidateName").innerText = candidates[index].name;
-//    document.getElementById("modalCandidateDetails").innerHTML = candidates[index].details;
-//    document.getElementById("modalCandidateSummary").innerText = candidates[index].summary;
-//    document.getElementById("detailsModal").style.display = "flex";
-//}
-//
-//// Close modals
-//function closeModal() {
-//    document.getElementById("detailsModal").style.display = "none";
-//}
-//
-//function openRateModal() {
-//    document.getElementById("rateModal").style.display = "flex";
-//}
-//
-//function closeRateModal() {
-//    document.getElementById("rateModal").style.display = "none";
-//}
-//
-//function submitRating() {
-//    let rating = document.getElementById("rating").value;
-//    let comment = document.getElementById("comment").value;
-//
-//    if (rating < 4 && comment.trim() === "") {
-//        alert("Please add a comment for low ratings.");
-//        return;
-//    }
-//
-//    alert(`Candidate rated ${rating}/5. Comment: ${comment}`);
-//    closeRateModal();
-//}
+//// Load candidates on page load
+//fetchCandidates();
+
+
+

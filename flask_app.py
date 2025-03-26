@@ -264,7 +264,7 @@ def get_candidates():
         applicants = cursor.fetchall()
 
         candidates = []
-        base_url = "https://www.pythonanywhere.com/user/ashesihiring/files/home/ashesihiring/static/uploads"
+        base_url = "https://www.pythonanywhere.com/user/ashesihiring/files/home/ashesihiring/"
         for applicant in applicants:
             candidates.append({
                 "name": f"{applicant['first_name']} {applicant['last_name']}",
