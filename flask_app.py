@@ -6,9 +6,6 @@ import os
 import mysql.connector
 import logging
 
-
-
-
 # Configure logging
 logging.basicConfig(
     filename='form_debug.log',
