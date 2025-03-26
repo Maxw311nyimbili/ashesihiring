@@ -241,11 +241,11 @@ def get_candidates():
         applicants = cursor.fetchall()
 
         candidates = []
-        base_url = "https://www.pythonanywhere.com/user/ashesihiring/files/home/ashesihiring/static/uploads/"
+        base_url = "https://www.pythonanywhere.com/user/ashesihiring/files/home/ashesihiring/"
 
         for applicant in applicants:
             # Fetch course preferences for each candidate
-            cursor.execute("SELECT course_name FROM course_preferences WHERE candidate_id = %s", (applicant["id"],))
+            cursor.execute("SELECT course_name FROM course_preferences WHERE applicant_id = %s", (applicant["id"],))
             interests = [row["course_name"] for row in cursor.fetchall()]
 
             candidates.append({
