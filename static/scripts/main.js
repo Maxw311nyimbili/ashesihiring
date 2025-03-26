@@ -1,63 +1,136 @@
-let candidates = [
-    { name: "John Doe",
-      summary: "Software Engineer with 3 years experience. He has Lorem ipsum dolor sit amet consectetur adipisicing elit. Illum quos numquam aliquam. Non rem fugiat ut fugit exercitationem, sit error hic tempore accusamus, voluptatibus facere neque quia at adipisci. Molestias culpa nesciunt vitae voluptas, modi iusto explicabo eum similique dolorem maxime, id officia cupiditate praesentium itaque quia. Quidem, totam nihil?",
-      details: "Full Resume, Cover Letter & Transcript Here." },
+//let candidates = [
+//    { name: "John Doe",
+//      summary: "Software Engineer with 3 years experience. He has Lorem ipsum dolor sit amet consectetur adipisicing elit. Illum quos numquam aliquam. Non rem fugiat ut fugit exercitationem, sit error hic tempore accusamus, voluptatibus facere neque quia at adipisci. Molestias culpa nesciunt vitae voluptas, modi iusto explicabo eum similique dolorem maxime, id officia cupiditate praesentium itaque quia. Quidem, totam nihil?",
+//      details: "Full Resume, Cover Letter & Transcript Here." },
+//
+//    { name: "Jane Smith", summary: "Data Analyst with expertise in Python & SQL. SHe has Lorem ipsum dolor sit amet consectetur adipisicing elit. Illum quos numquam aliquam. Non rem fugiat ut fugit exercitationem, sit error hic tempore accusamus, voluptatibus facere neque quia at adipisci. Molestias culpa nesciunt vitae voluptas, modi iusto explicabo eum similique dolorem maxime, id officia cupiditate praesentium itaque quia. Quidem, totam nihil?", details: "Full Resume, Cover Letter & Transcript Here." },
+//    { name: "Michael Brown", summary: "Project Manager skilled in Agile. He He has Lorem ipsum dolor sit amet consectetur adipisicing elit. Illum quos numquam aliquam. Non rem fugiat ut fugit exercitationem, sit error hic tempore accusamus, voluptatibus facere neque quia at adipisci. Molestias culpa nesciunt vitae voluptas, modi iusto explicabo eum similique dolorem maxime, id officia cupiditate praesentium itaque quia. Quidem, totam nihil?", details: "Full Resume, Cover Letter & Transcript Here." }
+//];
+//
+//let currentIndex = 0;
+//let candidateCard = document.getElementById("candidateCard");
+//
+//function displayCandidate(index, direction) {
+//    let candidate = candidates[index];
+//
+//    // Determine slide-out direction
+//    let outClass = direction === "left" ? "hidden-left" : "hidden-right";
+//    let inClass = direction === "left" ? "hidden-right" : "hidden-left";
+//
+//    // Remove previous classes before adding the new one
+//    candidateCard.classList.remove("active");
+//    candidateCard.classList.add(outClass);
+//
+//    // Wait for slide-out animation to finish
+//    setTimeout(() => {
+//        // Update content
+//        candidateCard.innerHTML = `
+//            <h3>${candidate.name}</h3>
+//            <p>${candidate.summary}</p>
+//            <button onclick="viewMore(${index})">View More</button>
+//        `;
+//
+//        // Reset classes and force reflow
+//        candidateCard.classList.remove("hidden-left", "hidden-right");
+//
+//        // Small timeout to force animation reflow
+//        setTimeout(() => {
+//            candidateCard.classList.add("active");
+//        }, 50); // Short delay to ensure smooth transition
+//    }, 400); // Matches transition duration
+//}
+//
+//
+//// Initial candidate display
+//displayCandidate(currentIndex, "left");
+//
+//// Navigation logic
+//document.getElementById("prevBtn").addEventListener("click", () => {
+//    if (currentIndex > 0) {
+//        currentIndex--;
+//        displayCandidate(currentIndex, "left");
+//    }
+//});
+//
+//document.getElementById("nextBtn").addEventListener("click", () => {
+//    if (currentIndex < candidates.length - 1) {
+//        currentIndex++;
+//        displayCandidate(currentIndex, "right");
+//    }
+//});
 
-    { name: "Jane Smith", summary: "Data Analyst with expertise in Python & SQL. SHe has Lorem ipsum dolor sit amet consectetur adipisicing elit. Illum quos numquam aliquam. Non rem fugiat ut fugit exercitationem, sit error hic tempore accusamus, voluptatibus facere neque quia at adipisci. Molestias culpa nesciunt vitae voluptas, modi iusto explicabo eum similique dolorem maxime, id officia cupiditate praesentium itaque quia. Quidem, totam nihil?", details: "Full Resume, Cover Letter & Transcript Here." },
-    { name: "Michael Brown", summary: "Project Manager skilled in Agile. He He has Lorem ipsum dolor sit amet consectetur adipisicing elit. Illum quos numquam aliquam. Non rem fugiat ut fugit exercitationem, sit error hic tempore accusamus, voluptatibus facere neque quia at adipisci. Molestias culpa nesciunt vitae voluptas, modi iusto explicabo eum similique dolorem maxime, id officia cupiditate praesentium itaque quia. Quidem, totam nihil?", details: "Full Resume, Cover Letter & Transcript Here." }
-];
-
+let candidates = [];
 let currentIndex = 0;
-let candidateCard = document.getElementById("candidateCard");
+const candidateCard = document.getElementById("candidateCard");
+const prevBtn = document.getElementById("prevBtn");
+const nextBtn = document.getElementById("nextBtn");
 
+// Fetch candidates from backend API
+async function fetchCandidates() {
+    try {
+        let response = await fetch("/api/candidates");
+        let data = await response.json();
+        candidates = data;
+
+        if (candidates.length > 0) {
+            displayCandidate(currentIndex, "left");
+        }
+    } catch (error) {
+        console.error("Error fetching candidates:", error);
+        candidateCard.innerHTML = "<p>Error loading candidates. Please try again later.</p>";
+    }
+}
+
+// Function to display a candidate
 function displayCandidate(index, direction) {
+    if (candidates.length === 0) return; // Ensure data is available
+
     let candidate = candidates[index];
 
-    // Determine slide-out direction
+    // Determine animation direction
     let outClass = direction === "left" ? "hidden-left" : "hidden-right";
     let inClass = direction === "left" ? "hidden-right" : "hidden-left";
 
-    // Remove previous classes before adding the new one
-    candidateCard.classList.remove("active");
+    // Slide-out effect
     candidateCard.classList.add(outClass);
 
-    // Wait for slide-out animation to finish
     setTimeout(() => {
         // Update content
         candidateCard.innerHTML = `
             <h3>${candidate.name}</h3>
             <p>${candidate.summary}</p>
+            <p>${candidate.details}</p>
             <button onclick="viewMore(${index})">View More</button>
         `;
 
-        // Reset classes and force reflow
-        candidateCard.classList.remove("hidden-left", "hidden-right");
+        // Reset and apply slide-in effect
+        candidateCard.classList.remove(outClass);
+        candidateCard.classList.add(inClass);
 
-        // Small timeout to force animation reflow
-        setTimeout(() => {
-            candidateCard.classList.add("active");
-        }, 50); // Short delay to ensure smooth transition
+        // Small timeout to ensure smooth animation reflow
+        setTimeout(() => candidateCard.classList.add("active"), 50);
     }, 400); // Matches transition duration
 }
 
-
-// Initial candidate display
-displayCandidate(currentIndex, "left");
-
-// Navigation logic
-document.getElementById("prevBtn").addEventListener("click", () => {
+// Navigation buttons
+prevBtn.addEventListener("click", () => {
     if (currentIndex > 0) {
         currentIndex--;
         displayCandidate(currentIndex, "left");
     }
 });
 
-document.getElementById("nextBtn").addEventListener("click", () => {
+nextBtn.addEventListener("click", () => {
     if (currentIndex < candidates.length - 1) {
         currentIndex++;
         displayCandidate(currentIndex, "right");
     }
 });
+
+// Load candidates on page load
+fetchCandidates();
+
+
 
 //let candidates = [];
 //let currentIndex = 0;
