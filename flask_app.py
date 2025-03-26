@@ -211,34 +211,6 @@ def submit_application():
 
     return redirect('/candidate')
 
-# @app.route('/api/candidates')
-# def get_candidates():
-#     try:
-#         conn = get_db_connection()
-#         cursor = conn.cursor(dictionary=True)
-#
-#         cursor.execute("SELECT id, first_name, last_name, telephone, gender, course_selection, cv_path, cover_letter_path, transcript_path FROM applicants")
-#         applicants = cursor.fetchall()
-#
-#         candidates = []
-#         base_url = "https://www.pythonanywhere.com/user/ashesihiring/files/home/ashesihiring/static/uploads"
-#         for applicant in applicants:
-#             candidates.append({
-#                 "name": f"{applicant['first_name']} {applicant['last_name']}",
-#                 "summary": f"Interested in {applicant['course_interests']}.",
-#                 "details": f"""
-#                     <a href='{base_url}{applicant['cv_path']}' target='_blank'>Resume</a> |
-#                     <a href='{base_url}{applicant['cover_letter_path']}' target='_blank'>Cover Letter</a> |
-#                     <a href='{base_url}{applicant['transcript_path']}' target='_blank'>Transcript</a>
-#                 """
-#             })
-#
-#         cursor.close()
-#         conn.close()
-#         return jsonify(candidates)
-#
-#     except mysql.connector.Error as err:
-#         return jsonify({"error": str(err)})
 
 @app.route('/json/candidates')
 def serve_candidates_json():
