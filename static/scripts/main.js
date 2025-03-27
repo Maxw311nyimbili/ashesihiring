@@ -7,9 +7,16 @@ const nextBtn = document.getElementById("nextBtn");
 // Modal elements
 const detailsModal = document.getElementById("detailsModal");
 const rateModal = document.getElementById("rateModal");
+const modalButton = document.getElementById("button");
 const modalCandidateName = document.getElementById("modalCandidateName");
 const modalCandidateSummary = document.getElementById("modalCandidateSummary");
 const modalCandidateDetails = document.getElementById("modalCandidateDetails");
+const modalCandidateInterests = document.getElementById("modalCandidateInterests");
+
+//rating modal
+const modalCandidateName_rating= document.getElementById("modalCandidateName-1");
+const modalCandidateInterests_rating = document.getElementById("modalCandidateInterests-1");
+
 
 // Fetch candidates from backend API
 async function fetchCandidates() {
@@ -83,6 +90,7 @@ function openModal(index) {
     modalCandidateName.textContent = candidate.name;
     modalCandidateSummary.textContent = candidate.summary;
     modalCandidateDetails.innerHTML = candidate.details;
+    modalButton.innerHTML = "<button onclick='openRateModal(${index})'>Rate Candidate</button>";
 
     // Populate interests dynamically
     if (candidate.interests && candidate.interests.length > 0) {
@@ -109,17 +117,15 @@ fetchCandidates();
 function openRateModal(index){
     let candidate = candidates[index];
 
-    modalCandidateName.textContent = candidate.name;
-    modalCandidateSummary.textContent = candidate.summary;
-    modalCandidateDetails.innerHTML = candidate.details;
+    modalCandidateName_rating.textContent = candidate.name;
 
     // Populate interests dynamically
     if (candidate.interests && candidate.interests.length > 0) {
-        modalCandidateInterests.innerHTML = candidate.interests
+        modalCandidateInterests_rating.innerHTML = candidate.interests
             .map(interest => `<li>${interest}</li>`)
             .join(""); // Convert array to list items
     } else {
-        modalCandidateInterests.innerHTML = "<li>No interests specified.</li>";
+        modalCandidateInterests_rating.innerHTML = "<li>No interests specified.</li>";
     }
 
     rateModal.style.display = "flex";
