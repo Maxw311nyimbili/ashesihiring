@@ -108,7 +108,9 @@ fetchCandidates();
 
 function openRateModal(){
     rateModal.style.display = "flex";
+    detailsModal.style.display = "none"; // Hide modal
 }
 function closeRateModal(){
     rateModal.style.display = "none";
+    detailsModal.style.display = "flex"; // Show modal
 }
