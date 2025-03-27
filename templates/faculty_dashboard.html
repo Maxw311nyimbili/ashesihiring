@@ -88,9 +88,16 @@
         <div id="rateModal" class="modal">
             <div class="modal-content">
                 <span class="close" onclick="closeRateModal()">&times;</span>
-                <h2>Rate Candidate</h2>
-                <label for="rating">Rating:</label>
-                <input type="number" id="rating" min="1" max="5">
+                <h2>Candidate Rating</h2>
+                <div style="display: flex; "><label for="rating">Rating:</label>
+                <input type="number" id="rating" min="1" max="5"></div>
+
+                <div id="first_display">
+                    <h5>Name: </h5><h2 id="modalCandidateName-1"></h2>
+                    <h5>Interested to be an FI for:</h5>
+                    <ul id="modalCandidateInterests-1"></ul>
+                </div>
+
                 <label for="comment">Comment (Required if rating < 4):</label>
                 <textarea id="comment"></textarea>
                 <button onclick="submitRating()">Submit</button>

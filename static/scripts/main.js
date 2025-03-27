@@ -106,7 +106,22 @@ function closeModal() {
 // Load candidates on page load
 fetchCandidates();
 
-function openRateModal(){
+function openRateModal(index){
+    let candidate = candidates[index];
+
+    modalCandidateName.textContent = candidate.name;
+    modalCandidateSummary.textContent = candidate.summary;
+    modalCandidateDetails.innerHTML = candidate.details;
+
+    // Populate interests dynamically
+    if (candidate.interests && candidate.interests.length > 0) {
+        modalCandidateInterests.innerHTML = candidate.interests
+            .map(interest => `<li>${interest}</li>`)
+            .join(""); // Convert array to list items
+    } else {
+        modalCandidateInterests.innerHTML = "<li>No interests specified.</li>";
+    }
+
     rateModal.style.display = "flex";
     detailsModal.style.display = "none"; // Hide modal
 }
