@@ -114,7 +114,7 @@ function closeModal() {
 // Load candidates on page load
 fetchCandidates();
 
-function openRateModal(index){
+function openRateModal(index) {
     let candidate = candidates[index];
 
     modalCandidateName_rating.textContent = candidate.name;
@@ -128,10 +128,44 @@ function openRateModal(index){
         modalCandidateInterests_rating.innerHTML = "<li>No interests specified.</li>";
     }
 
+    // Reset modal elements
+    document.getElementById("rating").value = ""; // Clear previous rating
+    document.getElementById("first_display").style.display = "block"; // Show initial details
+    document.querySelector(".interest-prompt").style.display = "none"; // Hide interest prompt
+    document.getElementById("comment").style.display = "none"; // Hide comment box
+
     rateModal.style.display = "flex";
-    detailsModal.style.display = "none"; // Hide modal
+    detailsModal.style.display = "none"; // Hide details modal
 }
-function closeRateModal(){
+
+// Event listener for rating input
+document.getElementById("rating").addEventListener("input", function () {
+    let rating = parseInt(this.value, 10);
+
+    if (rating < 4) {
+        // Hide initial details, Show interest prompt, Hide comment initially
+        document.getElementById("first_display").style.display = "none";
+        document.querySelector(".interest-prompt").style.display = "block";
+        document.getElementById("comment").style.display = "none";
+    } else {
+        document.getElementById("first_display").style.display = "block"; // Show initial details
+        document.querySelector(".interest-prompt").style.display = "none"; // Hide interest prompt
+        document.getElementById("comment").style.display = "none"; // Hide comment box
+    }
+});
+
+// Event listener for radio buttons
+document.querySelectorAll("input[name='interest_prompt']").forEach((radio) => {
+    radio.addEventListener("change", function () {
+        if (this.value === "yes") {
+            document.getElementById("comment").style.display = "block"; // Show comment box
+        } else {
+            document.getElementById("comment").style.display = "none"; // Hide comment box
+        }
+    });
+});
+
+function closeRateModal() {
     rateModal.style.display = "none";
-    detailsModal.style.display = "flex"; // Show modal
+    detailsModal.style.display = "flex"; // Show details modal
 }
