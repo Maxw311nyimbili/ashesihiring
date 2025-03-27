@@ -109,3 +109,6 @@ fetchCandidates();
 function openRateModal(){
     rateModal.style.display = "flex";
 }
+function closeRateModal(){
+    rateModal.style.display = "none";
+}
