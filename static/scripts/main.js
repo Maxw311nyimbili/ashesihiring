@@ -90,7 +90,7 @@ function openModal(index) {
     modalCandidateName.textContent = candidate.name;
     modalCandidateSummary.textContent = candidate.summary;
     modalCandidateDetails.innerHTML = candidate.details;
-    modalButton.innerHTML = "<button onclick='openRateModal(${index})'>Rate Candidate</button>";
+    modalButton.innerHTML = `<button onclick="openRateModal(${index})">Rate Candidate</button>`;
 
     // Populate interests dynamically
     if (candidate.interests && candidate.interests.length > 0) {
