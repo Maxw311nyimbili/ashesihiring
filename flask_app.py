@@ -152,7 +152,7 @@ def index():
 
 @app.route('/faculty_dashboard')
 def faculty_dashboard():
-    return render_template('index.html')
+    return render_template('faculty_dashboard.html')
 
 @app.route('/candidate')
 def candidate_page():

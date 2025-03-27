@@ -21,15 +21,6 @@ body {
     padding: 20px;
     border-radius: 10px;
 }
-
-/* button {
-    font-size: 24px;
-    border: none;
-    padding: 10px;
-    border-radius: 5px;
-    cursor: pointer;
-} */
-
 .btn-1{
     font-size: 64px;
     border: none;
@@ -49,7 +40,6 @@ body {
     position: relative;
     overflow: hidden;
 }
-
 
 .custom-card {
     background: white;
@@ -107,6 +97,7 @@ body {
 
 .modal {
     display: none;
+    display: flex;
     position: fixed;
     top: 0;
     left: 0;
