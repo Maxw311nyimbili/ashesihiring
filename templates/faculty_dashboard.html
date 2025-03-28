@@ -89,22 +89,25 @@
         <div id="rateModal" class="modal">
             <div class="modal-content">
                 <span class="close" onclick="closeRateModal()">&times;</span>
-                <h2>Candidate Rating</h2>
-                <div style="display: flex; "><label for="rating">Rating:</label>
+                <h2 style="color: #AD4245;">Candidate Rating</h2>
+                <div style="display: flex; color: #AD4245;"><label for="rating">Rating:</label>
                 <input type="number" id="rating" min="1" max="5"></div>
                 
                 <!-- This must be the first display we see -->
                 <div id="first_display">
-                    <h5>Name: </h5><h2 id="modalCandidateName-1"></h2>
-                    <h5>Interested to be an FI for:</h5>
+                    <div class="name-area">
+                        <h5 style="color: #AD4245;">Name: </h5><h2 id="modalCandidateName-1" style="color: #AD4245;"></h2>
+                    </div>
+
+                    <h5 style="color:#236465 !important">Interested to be an FI for:</h5>
                     <ul id="modalCandidateInterests-1"></ul>
                 </div>
 
                 <!-- when rating is less than 4, then show this message-->
                 <div class="interest-prompt">
-                    <p>Despite the low rating, does the candidate have qualities that make them a desirable FI?</p>
+                    <p style="color: #AD4245;">Despite the low rating, does the candidate have qualities that make them a desirable FI?</p>
                     
-                    <div class="prompt_display_flex" >
+                    <div class="prompt_display_flex" style="display: flex">
                         <div><input type="radio" name="interest_prompt" value="yes"> Yes</div>
                         <div><input type="radio" name="interest_prompt" value="no"> No</div>
                     </div>
