@@ -114,12 +114,11 @@ function closeModal() {
 // Load candidates on page load
 fetchCandidates();
 
+// Open the rating modal and load existing comments from the database
 function openRateModal(index) {
     let candidate = candidates[index];
-
     modalCandidateName_rating.textContent = candidate.name;
 
-    // Populate interests dynamically
     if (candidate.interests && candidate.interests.length > 0) {
         modalCandidateInterests_rating.innerHTML = candidate.interests
             .map(interest => `<li>${interest}</li>`)
@@ -129,14 +128,17 @@ function openRateModal(index) {
     }
 
     // Reset modal elements
-    document.getElementById("rating").value = ""; // Clear rating input
-    document.getElementById("first_display").style.display = "block"; // Show initial details
-    document.querySelector(".interest-prompt").style.display = "none"; // Hide interest prompt
-    document.getElementById("comment").style.display = "none"; // Hide comment box
+    document.getElementById("rating").value = "";
+    document.getElementById("first_display").style.display = "block";
+    document.querySelector(".interest-prompt").style.display = "none";
+    document.getElementById("comment").style.display = "none";
     document.getElementById("comments-section").innerHTML = ""; // Clear previous comments
 
+    // Fetch and display existing comments for this application
+    fetchComments(candidate.id);
+
     rateModal.style.display = "flex";
-    detailsModal.style.display = "none"; // Hide details modal
+    detailsModal.style.display = "none";
 }
 
 // Handle rating input
@@ -167,45 +169,129 @@ document.querySelectorAll("input[name='interest_prompt']").forEach((radio) => {
 
 // Function to post a comment
 document.getElementById("post-comment-btn").addEventListener("click", function () {
+    const applicationId = candidates[0].id; // Update to get the actual candidate ID
+    const rating = document.getElementById("rating").value;
+    const interestPrompt = document.querySelector("input[name='interest_prompt']:checked")?.value || "";
     const commentText = document.getElementById("new-comment").value.trim();
-    if (commentText === "") {
-        alert("Comment cannot be empty.");
+
+    if (!rating || !interestPrompt || commentText === "") {
+        alert("All fields are required.");
         return;
     }
 
-    const commentId = new Date().getTime(); // Unique ID for comment
-    const commentDiv = document.createElement("div");
-    commentDiv.classList.add("border", "p-2");
-    commentDiv.setAttribute("id", `comment-${commentId}`);
-
-    commentDiv.innerHTML = `
-        <p style="color:#236465 !important">
-            <strong>User:</strong>
-            <span id="commentText-${commentId}" style="color: inherit;">${commentText}</span>
-        </p>
-        <small class="text-muted">
-            <button class="btn btn-sm" style="background:#008080 !important; color: white;" onclick="editComment('${commentId}')">Edit</button>
-            <button class="btn btn-sm" style="background:#AD4245 !important;  color: white;" onclick="deleteComment('${commentId}')">Delete</button>
-        </small>
-    `;
-
-    document.getElementById("comments-section").appendChild(commentDiv);
-    document.getElementById("new-comment").value = ""; // Clear input
+    fetch("/comment", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            application_id: applicationId,
+            rating: rating,
+            interest_prompt: interestPrompt,
+            comment: commentText
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert("Comment added successfully!");
+            document.getElementById("new-comment").value = "";
+            fetchComments(applicationId); // Refresh comments
+        } else {
+            alert("Error: " + data.message);
+        }
+    })
+    .catch(error => console.error("Error posting comment:", error));
 });
 
-// Function to edit a comment
+
+function fetchComments(applicationId) {
+    fetch(`/get_comments?application_id=${applicationId}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                let commentsSection = document.getElementById("comments-section");
+                commentsSection.innerHTML = ""; // Clear previous comments
+
+                data.comments.forEach(comment => {
+                    const commentDiv = document.createElement("div");
+                    commentDiv.classList.add("border", "p-2");
+                    commentDiv.setAttribute("id", `comment-${comment.id}`);
+
+                    commentDiv.innerHTML = `
+                        <p style="color:#236465 !important">
+                            <strong>User:</strong>
+                            <span id="commentText-${comment.id}" style="color: inherit;">${comment.comment}</span>
+                        </p>
+                        <small class="text-muted">
+                            <button class="btn btn-sm" style="background:#008080 !important; color: white;"
+                                onclick="editComment('${comment.id}')">Edit</button>
+                            <button class="btn btn-sm" style="background:#AD4245 !important; color: white;"
+                                onclick="deleteComment('${comment.id}')">Delete</button>
+                        </small>
+                    `;
+
+                    commentsSection.appendChild(commentDiv);
+                    document.getElementById("new-comment").value = ""; // Clear input
+                });
+            } else {
+                console.error("Failed to fetch comments:", data.message);
+            }
+        })
+        .catch(error => console.error("Error fetching comments:", error));
+}
+
+
+
+
+// // Function to edit a comment
 function editComment(commentId) {
     const commentSpan = document.getElementById(`commentText-${commentId}`);
     const newComment = prompt("Edit your comment:", commentSpan.textContent);
+
     if (newComment !== null && newComment.trim() !== "") {
-        commentSpan.textContent = newComment;
+        fetch("/comment", {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                comment_id: commentId,
+                rating: document.getElementById("rating").value, // Include updated rating
+                interest_prompt: document.querySelector("input[name='interest_prompt']:checked")?.value || "",
+                comment: newComment
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                commentSpan.textContent = newComment;
+                alert("Comment updated successfully!");
+            } else {
+                alert("Error: " + data.message);
+            }
+        })
+        .catch(error => console.error("Error updating comment:", error));
     }
 }
 
 // Function to delete a comment
 function deleteComment(commentId) {
-    document.getElementById(`comment-${commentId}`).remove();
+    if (confirm("Are you sure you want to delete this comment?")) {
+        fetch("/delete_comment", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ comment_id: commentId })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                document.getElementById(`comment-${commentId}`).remove();
+                alert("Comment deleted successfully!");
+            } else {
+                alert("Error: " + data.message);
+            }
+        })
+        .catch(error => console.error("Error deleting comment:", error));
+    }
 }
+
 
 function closeRateModal() {
     rateModal.style.display = "none";

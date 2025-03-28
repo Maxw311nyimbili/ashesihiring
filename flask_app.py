@@ -279,121 +279,134 @@ def get_candidates():
 
 # -----------------------------------------------------------
 
-# INSERTING A COMMENT IN THE DATABASE
+# INSERTING A COMMENT INTO THE DB
 @app.route('/comment', methods=['POST'])
-def comment():
-    # Extract data from the JSON body of the request
+def add_comment():
     data = request.get_json()
-    print(data)
 
     if not data:
         return jsonify({'success': False, 'message': 'No data provided.'}), 400
 
-    article_link = data.get('article_id')  # Get article ID from the body
-    comment_text = data.get('comment')  # Get the comment text from the body
+    application_id = data.get('application_id')
+    rating = data.get('rating')
+    interest_prompt = data.get('interest_prompt')
+    comment_text = data.get('comment')
 
-    if not article_link or not comment_text:
-        return jsonify({'success': False, 'message': 'Article ID and Comment are required.'}), 400
+    if not application_id or rating is None or not interest_prompt:
+        return jsonify({'success': False, 'message': 'Application ID, Rating, and Interest Prompt are required.'}), 400
 
-    # Check if the user is logged in
     if 'user_id' not in session:
-        return jsonify({'success': False, 'message': 'You must be logged in to comment.'}), 400
-
-    user_id = session['user_id']
+        return jsonify({'success': False, 'message': 'You must be logged in to comment.'}), 403
 
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
 
         cursor.execute("""
-                    INSERT INTO articles (title, content, link) 
-                    VALUES ('Default Title', 'Default Content', %s)
-        """, (article_link,))
-
-        article_id = cursor.lastrowid  # Get the last inserted ID, which is the article ID
-
-        cursor.execute("""
-                    INSERT INTO comments (user_id, article_id, comment_text) 
-                    VALUES (%s, %s, %s)
-                """, (user_id, article_id, comment_text))
+            INSERT INTO comments (application_id, rating, interest_prompt, comment)
+            VALUES (%s, %s, %s, %s)
+        """, (application_id, rating, interest_prompt, comment_text))
 
         conn.commit()
+        cursor.close()
         conn.close()
-        return jsonify({'success': True, 'message': 'Comment posted successfully.'})
+
+        return jsonify({'success': True, 'message': 'Comment added successfully.'})
     except Exception as e:
         return jsonify({'success': False, 'message': f'Error: {str(e)}'}), 500
 
-# UPDATING AN INSERTED COMMENT
+# GET COMMENTS FROM DB
+@app.route('/get_comments', methods=['GET'])
+def get_comments():
+    application_id = request.args.get('application_id')
+
+    if not application_id:
+        return jsonify({'success': False, 'message': 'Application ID is required.'}), 400
+
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+
+        cursor.execute("""
+            SELECT id, application_id, rating, interest_prompt, comment 
+            FROM comments WHERE application_id = %s
+        """, (application_id,))
+
+        comments = cursor.fetchall()
+        cursor.close()
+        conn.close()
+
+        return jsonify({'success': True, 'comments': comments})
+    except Exception as e:
+        return jsonify({'success': False, 'message': f'Error: {str(e)}'}), 500
+
+# UPDATING A COMMENT IN THE DB
 @app.route('/comment', methods=['PUT'])
 def update_comment():
-    # Extract data from the JSON body of the request
     data = request.get_json()
-    print(data)
 
     if not data:
         return jsonify({'success': False, 'message': 'No data provided.'}), 400
 
-    comment_id = data.get('comment_id')  # Get the comment ID from the body
-    updated_text = data.get('comment')  # Get the updated comment text from the body
+    comment_id = data.get('comment_id')
+    rating = data.get('rating')
+    interest_prompt = data.get('interest_prompt')
+    updated_comment = data.get('comment')
 
-    if not comment_id or not updated_text:
-        return jsonify({'success': False, 'message': 'Comment ID and updated text are required.'}), 400
+    if not comment_id or rating is None or not interest_prompt:
+        return jsonify({'success': False, 'message': 'Comment ID, Rating, and Interest Prompt are required.'}), 400
 
-    # Check if the user is logged in
     if 'user_id' not in session:
-        return jsonify({'success': False, 'message': 'You must be logged in to update a comment.'}), 400
-
-    user_id = session['user_id']
+        return jsonify({'success': False, 'message': 'You must be logged in to update a comment.'}), 403
 
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
 
-        # Check if the comment exists and belongs to the logged-in user
         cursor.execute("""
-            SELECT id FROM comments WHERE id = %s AND user_id = %s
-        """, (comment_id, user_id))
+            SELECT id FROM comments WHERE id = %s
+        """, (comment_id,))
         result = cursor.fetchone()
 
         if not result:
-            return jsonify(
-                {'success': False, 'message': 'Comment not found or you do not have permission to update it.'}), 403
+            return jsonify({'success': False, 'message': 'Comment not found.'}), 404
 
-        # Update the comment text
         cursor.execute("""
-            UPDATE comments SET comment_text = %s WHERE id = %s
-        """, (updated_text, comment_id))
+            UPDATE comments SET rating = %s, interest_prompt = %s, comment = %s WHERE id = %s
+        """, (rating, interest_prompt, updated_comment, comment_id))
 
         conn.commit()
+        cursor.close()
         conn.close()
 
         return jsonify({'success': True, 'message': 'Comment updated successfully.'})
     except Exception as e:
         return jsonify({'success': False, 'message': f'Error: {str(e)}'}), 500
 
-# DELETING A COMMENT FROM THE DATABASE
+# DELETING A COMMENT
 @app.route('/delete_comment', methods=['POST'])
 def delete_comment():
-    # Extract data from the JSON body of the request
     data = request.get_json()
+
     if not data:
         return jsonify({'success': False, 'message': 'No data provided.'}), 400
 
-    comment_id = data.get('comment_id')  # Get comment ID from the body
+    comment_id = data.get('comment_id')
 
     if not comment_id:
         return jsonify({'success': False, 'message': 'Comment ID is required.'}), 400
 
-    # Check if the user is logged in
     if 'user_id' not in session:
-        return redirect(url_for('login'))
+        return jsonify({'success': False, 'message': 'You must be logged in to delete a comment.'}), 403
 
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
-        cursor.execute("DELETE FROM comments WHERE id = %s AND user_id = %s", (comment_id, session['user_id']))
+        cursor.execute("DELETE FROM comments WHERE id = %s", (comment_id,))
         conn.commit()
+        cursor.close()
         conn.close()
+
         return jsonify({'success': True, 'message': 'Comment deleted successfully.'}), 200
     except Exception as e:
         return jsonify({'success': False, 'message': f'Error: {str(e)}'}), 500
