@@ -89,22 +89,23 @@
         <div id="rateModal" class="modal">
             <div class="modal-content">
                 <span class="close" onclick="closeRateModal()">&times;</span>
-                <h2 style="color: #AD4245; font-size: 34px; text-align: left;">Candidate Rating</h2>
+                <h2 style="color: #AD4245; font-size: 28px; text-align: left;">Candidate Rating</h2>
                 <div style="display: flex; color: #AD4245;"><label for="rating">Rating:</label>
                 <input type="number" id="rating" min="1" max="5"></div>
                 
                 <!-- This must be the first display we see -->
                 <div id="first_display">
-                    <div class="name-area">
-                        <h5 style="color: #AD4245; text-align: left;">Name: </h5><h2 id="modalCandidateName-1" style="color: #AD4245; text-align: left;"></h2>
+                    <div class="name-area" style="display: flex;">
+                        <h5 style="color: #AD4245; text-align: left; ">Name: </h5><h2 id="modalCandidateName-1" style="color: #AD4245; text-align: left; font-size: 20px;"></h2>
                     </div>
 
                     <h5 style="color:#236465 !important; text-align: left;">Interested to be an FI for:</h5>
-                    <ul id="modalCandidateInterests-1"></ul>
+                    <ul id="modalCandidateInterests-1" style="text-align: left;"></ul>
                 </div>
 
                 <!-- when rating is less than 4, then show this message-->
                 <div class="interest-prompt">
+                    <br>
                     <p style="color: #AD4245; text-align: left;">Despite the low rating, does the candidate have qualities that make them a desirable FI?</p>
                     
                     <div class="prompt_display_flex" style="display: flex">
@@ -120,7 +121,7 @@
                          <!-- Existing comments will be appended here -->
                     </div>
                     <textarea style="color:#236465 !important; text-align: left;" id="new-comment" class="form-control my-3" placeholder="Write your comment here..."></textarea>
-                    <button id="post-comment-btn" class="btn" style="background:#008080 !important; color: white;">Post Comment</button>
+                    <button id="post-comment-btn" class="btn" style="background:#008080 !important; color: white; text-align: left;">Post Comment</button>
                 </div>
 
                 <button class="rating-subButton" onclick="submitRating()">Submit</button>
