@@ -104,7 +104,7 @@
                 <div class="interest-prompt">
                     <p>Despite the low rating, does the candidate have qualities that make them a desirable FI?</p>
                     
-                    <div class="prompt_display_flex">
+                    <div class="prompt_display_flex" >
                         <div><input type="radio" name="interest_prompt" value="yes"> Yes</div>
                         <div><input type="radio" name="interest_prompt" value="no"> No</div>
                     </div>
@@ -114,6 +114,14 @@
                 <div id="comment">
                     <label for="comment">Comment (Required if rating < 4):</label>
                     <textarea></textarea>
+                </div>
+
+                <div class="modal-body">
+                    <div id="comments-section">
+                         <!-- Existing comments will be appended here -->
+                    </div>
+                    <textarea style="color:white !important" id="new-comment" class="form-control my-3" placeholder="Write your comment here..."></textarea>
+                    <button id="post-comment-btn" class="btn btn-success">Post Comment</button>
                 </div>
 
                 <button onclick="submitRating()">Submit</button>

@@ -123,47 +123,89 @@ function openRateModal(index) {
     if (candidate.interests && candidate.interests.length > 0) {
         modalCandidateInterests_rating.innerHTML = candidate.interests
             .map(interest => `<li>${interest}</li>`)
-            .join(""); // Convert array to list items
+            .join("");
     } else {
         modalCandidateInterests_rating.innerHTML = "<li>No interests specified.</li>";
     }
 
     // Reset modal elements
-    document.getElementById("rating").value = ""; // Clear previous rating
+    document.getElementById("rating").value = ""; // Clear rating input
     document.getElementById("first_display").style.display = "block"; // Show initial details
     document.querySelector(".interest-prompt").style.display = "none"; // Hide interest prompt
     document.getElementById("comment").style.display = "none"; // Hide comment box
+    document.getElementById("comments-section").innerHTML = ""; // Clear previous comments
 
     rateModal.style.display = "flex";
     detailsModal.style.display = "none"; // Hide details modal
 }
 
-// Event listener for rating input
+// Handle rating input
 document.getElementById("rating").addEventListener("input", function () {
     let rating = parseInt(this.value, 10);
 
     if (rating < 4) {
-        // Hide initial details, Show interest prompt, Hide comment initially
         document.getElementById("first_display").style.display = "none";
         document.querySelector(".interest-prompt").style.display = "block";
         document.getElementById("comment").style.display = "none";
     } else {
-        document.getElementById("first_display").style.display = "block"; // Show initial details
-        document.querySelector(".interest-prompt").style.display = "none"; // Hide interest prompt
-        document.getElementById("comment").style.display = "none"; // Hide comment box
+        document.getElementById("first_display").style.display = "block";
+        document.querySelector(".interest-prompt").style.display = "none";
+        document.getElementById("comment").style.display = "none";
     }
 });
 
-// Event listener for radio buttons
+// Handle radio button selection
 document.querySelectorAll("input[name='interest_prompt']").forEach((radio) => {
     radio.addEventListener("change", function () {
         if (this.value === "yes") {
-            document.getElementById("comment").style.display = "block"; // Show comment box
+            document.getElementById("comment").style.display = "block";
         } else {
-            document.getElementById("comment").style.display = "none"; // Hide comment box
+            document.getElementById("comment").style.display = "none";
         }
     });
 });
+
+// Function to post a comment
+document.getElementById("post-comment-btn").addEventListener("click", function () {
+    const commentText = document.getElementById("new-comment").value.trim();
+    if (commentText === "") {
+        alert("Comment cannot be empty.");
+        return;
+    }
+
+    const commentId = new Date().getTime(); // Unique ID for comment
+    const commentDiv = document.createElement("div");
+    commentDiv.classList.add("border", "p-2");
+    commentDiv.setAttribute("id", `comment-${commentId}`);
+
+    commentDiv.innerHTML = `
+        <p style="color:white !important">
+            <strong>User:</strong>
+            <span id="commentText-${commentId}" style="color: inherit;">${commentText}</span>
+        </p>
+        <small class="text-muted">
+            <button class="btn btn-sm btn-primary" onclick="editComment('${commentId}')">Edit</button>
+            <button class="btn btn-sm btn-danger" onclick="deleteComment('${commentId}')">Delete</button>
+        </small>
+    `;
+
+    document.getElementById("comments-section").appendChild(commentDiv);
+    document.getElementById("new-comment").value = ""; // Clear input
+});
+
+// Function to edit a comment
+function editComment(commentId) {
+    const commentSpan = document.getElementById(`commentText-${commentId}`);
+    const newComment = prompt("Edit your comment:", commentSpan.textContent);
+    if (newComment !== null && newComment.trim() !== "") {
+        commentSpan.textContent = newComment;
+    }
+}
+
+// Function to delete a comment
+function deleteComment(commentId) {
+    document.getElementById(`comment-${commentId}`).remove();
+}
 
 function closeRateModal() {
     rateModal.style.display = "none";
