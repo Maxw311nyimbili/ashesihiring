@@ -184,8 +184,8 @@ document.getElementById("post-comment-btn").addEventListener("click", function (
             <span id="commentText-${commentId}" style="color: inherit;">${commentText}</span>
         </p>
         <small class="text-muted">
-            <button class="btn btn-sm" style="background:#236465 !important" onclick="editComment('${commentId}')">Edit</button>
-            <button class="btn btn-sm" style="background:#AD4245 !important" onclick="deleteComment('${commentId}')">Delete</button>
+            <button class="btn btn-sm" style="background:#008080 !important; color: white;" onclick="editComment('${commentId}')">Edit</button>
+            <button class="btn btn-sm" style="background:#AD4245 !important;  color: white;" onclick="deleteComment('${commentId}')">Delete</button>
         </small>
     `;
 
