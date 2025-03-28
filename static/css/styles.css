@@ -128,7 +128,6 @@ body {
     max-width: 90%;
     max-height: 90%;
     overflow-y: auto;
-    text-align: center;
 }
 .section-1{
     width: 350px;
@@ -177,4 +176,5 @@ body {
     width: 34px;
     height: 26px;
     color: white;
+    text-align: center;
 }
