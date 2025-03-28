@@ -179,7 +179,7 @@ document.getElementById("post-comment-btn").addEventListener("click", function (
     commentDiv.setAttribute("id", `comment-${commentId}`);
 
     commentDiv.innerHTML = `
-        <p style="color:white !important">
+        <p style="color:#236465 !important">
             <strong>User:</strong>
             <span id="commentText-${commentId}" style="color: inherit;">${commentText}</span>
         </p>
