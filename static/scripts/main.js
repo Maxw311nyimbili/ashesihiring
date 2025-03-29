@@ -168,14 +168,14 @@ document.querySelectorAll("input[name='interest_prompt']").forEach((radio) => {
 });
 
 // Function to post a comment
-document.getElementById("post-comment").addEventListener("click", function () {
-    const applicationId = candidates[0].id; // Update to get the actual candidate ID
+document.getElementById("post-comment-btn").addEventListener("click", function () {
+    const applicationId = candidates[selectedCandidateIndex].id; // Ensure correct ID
     const rating = document.getElementById("rating").value;
     const interestPrompt = document.querySelector("input[name='interest_prompt']:checked")?.value || "";
     const commentText = document.getElementById("new-comment").value.trim();
 
     if (!rating || !interestPrompt || commentText === "") {
-        alert("All fields are required.");
+        alert("All fields are required to post a comment.");
         return;
     }
 
@@ -192,14 +192,52 @@ document.getElementById("post-comment").addEventListener("click", function () {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            alert("Comment added successfully!");
+            alert("Comment posted successfully!");
             document.getElementById("new-comment").value = "";
-            fetchComments(applicationId); // Refresh comments
+            fetchComments(applicationId); // Refresh comments display
         } else {
             alert("Error: " + data.message);
         }
     })
     .catch(error => console.error("Error posting comment:", error));
+});
+
+document.getElementById("submit-rating").addEventListener("click", function () {
+    const applicationId = candidates[selectedCandidateIndex].id;
+    const rating = document.getElementById("rating").value;
+    const interestPrompt = document.querySelector("input[name='interest_prompt']:checked")?.value || "";
+    const commentText = document.getElementById("new-comment").value.trim();
+
+    if (!rating) {
+        alert("Please provide a rating before submitting.");
+        return;
+    }
+
+    const requestBody = {
+        application_id: applicationId,
+        rating: rating
+    };
+
+    // Include comment only if posted
+    if (commentText !== "") {
+        requestBody.comment = commentText;
+        requestBody.interest_prompt = interestPrompt;
+    }
+
+    fetch("/submit_rating", {  // Change route if needed
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(requestBody)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert("Rating submitted successfully!");
+        } else {
+            alert("Error: " + data.message);
+        }
+    })
+    .catch(error => console.error("Error submitting rating:", error));
 });
 
 
