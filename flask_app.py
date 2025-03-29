@@ -453,8 +453,24 @@ def submit_rating():
 
 
 
-# Another part
 
+# PART ONE: RENDERING THE PAGES
+
+@app.route('/faculty_scheduling')
+def faculty_scheduling():
+    if 'faculty_id' not in session:
+        return "Unauthorized", 403  # Ensure only logged-in faculty can access
+    return render_template('faculty_scheduling.html')
+
+# Route to render Admin Dashboard
+@app.route('/admin_dashboard')
+def admin_dashboard():
+    if 'faculty_id' not in session:  # Adjust if you have admin authentication
+        return "Unauthorized", 403
+    return render_template('admin_dashboard.html')
+
+
+# PART TWO: IMPLEMENTING BACKEND FUNCTIONALITIES FOR THE PAGES
 
 # Fetch shortlisted applicants (rating >= 4 or "yes" interest)
 @app.route('/get_shortlisted_applicants')
