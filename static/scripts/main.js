@@ -113,10 +113,10 @@ function closeModal() {
 
 // Load candidates on page load
 fetchCandidates();
-
+ let candidate;
 // Open the rating modal and load existing comments from the database
 function openRateModal(index) {
-    let candidate = candidates[index];
+    candidate = candidates[index];
     modalCandidateName_rating.textContent = candidate.name;
 
     if (candidate.interests && candidate.interests.length > 0) {
@@ -169,7 +169,7 @@ document.querySelectorAll("input[name='interest_prompt']").forEach((radio) => {
 
 // Function to post a comment
 document.getElementById("post-comment-btn").addEventListener("click", function () {
-    const applicationId = candidates[index].id; // Ensure correct ID
+    const applicationId = candidates.id; // Ensure correct ID
     const rating = document.getElementById("rating").value;
     const interestPrompt = document.querySelector("input[name='interest_prompt']:checked")?.value || "";
     const commentText = document.getElementById("new-comment").value.trim();
@@ -203,7 +203,7 @@ document.getElementById("post-comment-btn").addEventListener("click", function (
 });
 
 document.getElementById("final-subButton").addEventListener("click", function () {
-    const applicationId = candidates[index].id;
+    const applicationId = candidates.id;
     const rating = document.getElementById("rating").value;
     const interestPrompt = document.querySelector("input[name='interest_prompt']:checked")?.value || "";
     const commentText = document.getElementById("new-comment").value.trim();
