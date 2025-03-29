@@ -202,8 +202,8 @@ document.getElementById("post-comment-btn").addEventListener("click", function (
     .catch(error => console.error("Error posting comment:", error));
 });
 
-document.getElementById("submit-rating").addEventListener("click", function () {
-    const applicationId = candidates[selectedCandidateIndex].id;
+document.getElementById("final-subButton").addEventListener("click", function () {
+    const applicationId = candidates[index].id;
     const rating = document.getElementById("rating").value;
     const interestPrompt = document.querySelector("input[name='interest_prompt']:checked")?.value || "";
     const commentText = document.getElementById("new-comment").value.trim();
