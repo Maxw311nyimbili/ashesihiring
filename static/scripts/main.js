@@ -196,7 +196,7 @@ document.getElementById("post-comment-btn").addEventListener("click", function (
             document.getElementById("new-comment").value = "";
             fetchComments(applicationId); // Refresh comments display
         } else {
-            alert("Error: " + data.message);
+            alert("Error: " + data.message + " id" + applicationId + " rating: " + rating + " interest prompt: " + interestPrompt + " comment" + commentText);
         }
     })
     .catch(error => console.error("Error posting comment:", error));
