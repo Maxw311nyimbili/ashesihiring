@@ -280,7 +280,7 @@ def get_candidates():
 # -----------------------------------------------------------
 
 # INSERTING A COMMENT INTO THE DB
-@app.route('/comment', methods=['POST'])
+@app.route('/add_comment', methods=['POST'])
 def add_comment():
     data = request.get_json()
 
