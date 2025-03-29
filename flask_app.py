@@ -453,5 +453,60 @@ def submit_rating():
 
 
 
+# Another part
+
+
+# Fetch shortlisted applicants (rating >= 4 or "yes" interest)
+@app.route('/get_shortlisted_applicants')
+def get_shortlisted_applicants():
+    conn = get_db_connection()
+    cur = conn.cursor()
+    cur.execute("""
+        SELECT a.id, a.name, c.rating, c.interest_prompt 
+        FROM applicants a 
+        JOIN comments c ON a.id = c.application_id
+        WHERE c.rating >= 4 OR c.interest_prompt = 'Yes'
+    """)
+    applicants = cur.fetchall()
+    conn.close()
+    return jsonify([dict(row) for row in applicants])
+
+
+# Schedule interview
+@app.route('/schedule_interview', methods=['POST'])
+def schedule_interview():
+    if 'faculty_id' not in session:
+        return jsonify({"message": "Unauthorized"}), 403
+
+    data = request.json
+    applicant_id = data.get("applicant_id")
+    interview_date = data.get("date")
+    faculty_id = session["faculty_id"]
+
+    conn = get_db_connection()
+    cur = conn.cursor()
+    cur.execute("INSERT INTO interviews (applicant_id, faculty_id, interview_date) VALUES (?, ?, ?)",
+                (applicant_id, faculty_id, interview_date))
+    conn.commit()
+    conn.close()
+
+    return jsonify({"message": "Interview scheduled successfully!"})
+
+
+# Fetch scheduled interviews
+@app.route('/get_scheduled_interviews')
+def get_scheduled_interviews():
+    conn = get_db_connection()
+    cur = conn.cursor()
+    cur.execute("""
+        SELECT i.interview_date, f.username as faculty_name, a.name
+        FROM interviews i
+        JOIN faculty f ON i.faculty_id = f.id
+        JOIN applicants a ON i.applicant_id = a.id
+    """)
+    interviews = cur.fetchall()
+    conn.close()
+    return jsonify([dict(row) for row in interviews])
+
 if __name__ == '__main__':
     app.run(debug=True)
