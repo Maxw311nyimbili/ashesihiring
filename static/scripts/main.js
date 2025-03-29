@@ -240,6 +240,7 @@ document.getElementById("final-subButton").addEventListener("click", function ()
     .then(data => {
         if (data.success) {
             alert("Rating submitted successfully!");
+            disableInputs(); // Disable inputs after submission
         } else {
             alert("Error: " + data.message);
         }
@@ -248,22 +249,14 @@ document.getElementById("final-subButton").addEventListener("click", function ()
 });
 
 
+// Function to fetch and display comments
 function fetchComments(applicationId) {
-    console.log("Fetching comments for Application ID:", applicationId); // Debugging
-
     fetch(`/get_comments?application_id=${applicationId}`)
         .then(response => response.json())
         .then(data => {
-            console.log("Fetched Data:", data); // Check response in DevTools Console
-
             if (data.success) {
                 let commentsSection = document.getElementById("comments-section");
-                if (!commentsSection) {
-                    console.error("Error: comments-section not found in DOM");
-                    return;
-                }
-
-                commentsSection.innerHTML = ""; // Clear previous comments
+                commentsSection.innerHTML = "";
 
                 if (data.comments.length === 0) {
                     commentsSection.innerHTML = "<p>No comments yet.</p>";
@@ -271,8 +264,6 @@ function fetchComments(applicationId) {
                 }
 
                 data.comments.forEach(comment => {
-                    console.log("Processing Comment:", comment); // Debug each comment
-
                     const commentDiv = document.createElement("div");
                     commentDiv.classList.add("border", "p-2");
                     commentDiv.setAttribute("id", `comment-${comment.id}`);
@@ -284,20 +275,49 @@ function fetchComments(applicationId) {
                         </p>
                         <small class="text-muted">
                             <button class="btn btn-sm" style="background:#008080 !important; color: white;"
-                                onclick="editComment('${comment.id}')">Edit</button>
+                                onclick="editComment('${comment.id}')" id="edit-btn-${comment.id}" disabled>Edit</button>
                             <button class="btn btn-sm" style="background:#AD4245 !important; color: white;"
-                                onclick="deleteComment('${comment.id}')">Delete</button>
+                                onclick="deleteComment('${comment.id}')" id="delete-btn-${comment.id}" disabled>Delete</button>
                         </small>
                     `;
 
                     commentsSection.appendChild(commentDiv);
                 });
+
+                disableInputs(); // Ensure inputs and buttons are disabled after fetching
             } else {
                 console.error("Failed to fetch comments:", data.message);
             }
         })
         .catch(error => console.error("Error fetching comments:", error));
 }
+
+
+// Function to disable rating input, comment box, and buttons
+function disableInputs() {
+    document.getElementById("rating").disabled = true;
+    document.getElementById("new-comment").disabled = true;
+
+    document.querySelectorAll("[id^='edit-btn-'], [id^='delete-btn-']").forEach(btn => {
+        btn.disabled = true;
+    });
+}
+
+// Function to enable editing
+function enableEditing() {
+    document.getElementById("rating").disabled = false;
+    document.getElementById("new-comment").disabled = false;
+
+    document.querySelectorAll("[id^='edit-btn-'], [id^='delete-btn-']").forEach(btn => {
+        btn.disabled = false;
+    });
+}
+
+// Add an "Edit Rating & Comments" button to enable editing
+document.body.insertAdjacentHTML("beforeend", `
+    <button id="edit-mode-btn" class="btn" onclick="enableEditing()"
+        style="background:#FFA500 !important; color: white; margin-top:10px;">Edit Rating & Comments</button>
+`);
 
 // // Function to edit a comment
 function editComment(commentId) {
