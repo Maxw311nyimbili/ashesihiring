@@ -476,7 +476,7 @@ def admin_dashboard():
 @app.route('/get_shortlisted_applicants')
 def get_shortlisted_applicants():
     conn = get_db_connection()
-    cur = conn.cursor()
+    cur = conn.cursor(dictionary=True)
     cur.execute("""
         SELECT a.id, CONCAT(a.first_name, ' ', a.last_name) AS name, c.rating, c.interest_prompt, c.comment
         FROM applicants a 
@@ -501,7 +501,7 @@ def schedule_interview():
     faculty_id = session["faculty_id"]
 
     conn = get_db_connection()
-    cur = conn.cursor()
+    cur = conn.cursor(dictionary=True)
     cur.execute("INSERT INTO interviews (applicant_id, faculty_id, interview_date) VALUES (?, ?, ?)",
                 (applicant_id, faculty_id, interview_date))
     conn.commit()
@@ -514,7 +514,7 @@ def schedule_interview():
 @app.route('/get_scheduled_interviews')
 def get_scheduled_interviews():
     conn = get_db_connection()
-    cur = conn.cursor()
+    cur = conn.cursor(dictionary=True)
     cur.execute("""
         SELECT i.interview_date, f.username as faculty_name, CONCAT(a.first_name, ' ', a.last_name) AS name
         FROM interviews i
