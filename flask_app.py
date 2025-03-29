@@ -378,7 +378,7 @@ def update_comment():
             return jsonify({'success': False, 'message': 'Comment not found.'}), 404
 
         cursor.execute("""
-            UPDATE comments SET rating = %s, interest_prompt = %s, comment = %s, faculty = %s WHERE id = %s
+            UPDATE comments SET rating = %s, interest_prompt = %s, comment = %s, faculty_id = %s WHERE id = %s
         """, (rating, interest_prompt, updated_comment, user_id, comment_id))
 
         conn.commit()
