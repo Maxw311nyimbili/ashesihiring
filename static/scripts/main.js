@@ -172,7 +172,7 @@ document.querySelectorAll("input[name='interest_prompt']").forEach((radio) => {
 
 // Function to post a comment
 document.getElementById("post-comment-btn").addEventListener("click", function () {
-    const applicationId = candidates[selectedIndex].id;
+    const applicationId = selectedIndex;
     const rating = document.getElementById("rating").value;
     const interestPrompt = document.querySelector("input[name='interest_prompt']:checked")?.value || "";
     const commentText = document.getElementById("new-comment").value.trim();
@@ -210,7 +210,7 @@ document.getElementById("post-comment-btn").addEventListener("click", function (
 });
 
 document.getElementById("final-subButton").addEventListener("click", function () {
-    const applicationId = candidates[selectedIndex].id;
+    const applicationId = selectedIndex;
     const rating = document.getElementById("rating").value;
     const interestPrompt = document.querySelector("input[name='interest_prompt']:checked")?.value || "";
     const commentText = document.getElementById("new-comment").value.trim();
