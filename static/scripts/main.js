@@ -201,7 +201,7 @@ document.getElementById("post-comment-btn").addEventListener("click", function (
         if (data.success) {
             alert("Comment posted successfully!");
             document.getElementById("new-comment").value = "";
-            fetchComments(applicationId); // Refresh comments display
+            fetchComments(applicationId - 1); // Refresh comments display
         } else {
             alert("Error: " + data.message + " id" + applicationId + " rating: " + rating + " interest prompt: " + interestPrompt + " comment" + commentText);
         }
