@@ -256,6 +256,8 @@ document.getElementById("final-subButton").addEventListener("click", function ()
 function fetchComments(applicationId) {
     console.log("Fetching comments for Application ID:", applicationId); // Debugging
 
+    let facultyName = document.getElementById("loggedInUser").value;
+
     fetch(`/get_comments?application_id=${applicationId}`)
         .then(response => response.json())
         .then(data => {
@@ -284,7 +286,7 @@ function fetchComments(applicationId) {
 
                     commentDiv.innerHTML = `
                         <p style="color:#236465 !important">
-                            <strong>User:</strong>
+                            <strong>${facultyName}:</strong>
                             <span id="commentText-${comment.id}" style="color: inherit;">${comment.comment}</span>
                         </p>
                         <small class="text-muted">

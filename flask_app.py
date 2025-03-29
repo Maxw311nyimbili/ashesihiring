@@ -153,7 +153,8 @@ def index():
 
 @app.route('/faculty_dashboard')
 def faculty_dashboard():
-    return render_template('faculty_dashboard.html')
+    faculty_name = session.get('faculty_name', 'Unknown')
+    return render_template('faculty_dashboard.html', faculty_name=faculty_name)
 
 @app.route('/candidate')
 def candidate_page():
@@ -288,6 +289,7 @@ def add_comment():
     if not data:
         return jsonify({'success': False, 'message': 'No data provided.'}), 400
 
+    user_id = session.get("faculty_id")  # Use faculty_id instead
     application_id = data.get('application_id')
     rating = data.get('rating')
     interest_prompt = data.get('interest_prompt')
@@ -298,17 +300,17 @@ def add_comment():
 
     # fix this when you wake up
 
-    # if 'user_id' not in session:
-    #     return jsonify({'success': False, 'message': 'You must be logged in to comment.'}), 403
+    if 'faculty_id' not in session:
+        return jsonify({'success': False, 'message': 'You must be logged in to comment.'}), 403
 
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
 
         cursor.execute("""
-            INSERT INTO comments (application_id, rating, interest_prompt, comment)
+            INSERT INTO comments (application_id, rating, interest_prompt, comment, faculty_id)
             VALUES (%s, %s, %s, %s)
-        """, (application_id, rating, interest_prompt, comment_text))
+        """, (application_id, rating, interest_prompt, comment_text, user_id))
 
         conn.commit()
         cursor.close()
@@ -351,6 +353,7 @@ def update_comment():
     if not data:
         return jsonify({'success': False, 'message': 'No data provided.'}), 400
 
+    user_id = session.get("faculty_id")
     comment_id = data.get('comment_id')
     rating = data.get('rating')
     interest_prompt = data.get('interest_prompt')
@@ -375,8 +378,8 @@ def update_comment():
             return jsonify({'success': False, 'message': 'Comment not found.'}), 404
 
         cursor.execute("""
-            UPDATE comments SET rating = %s, interest_prompt = %s, comment = %s WHERE id = %s
-        """, (rating, interest_prompt, updated_comment, comment_id))
+            UPDATE comments SET rating = %s, interest_prompt = %s, comment = %s, faculty = %s WHERE id = %s
+        """, (rating, interest_prompt, updated_comment, user_id, comment_id))
 
         conn.commit()
         cursor.close()
@@ -399,8 +402,8 @@ def delete_comment():
     if not comment_id:
         return jsonify({'success': False, 'message': 'Comment ID is required.'}), 400
 
-    # if 'user_id' not in session:
-    #     return jsonify({'success': False, 'message': 'You must be logged in to delete a comment.'}), 403
+    if 'faculty_id' not in session:
+        return jsonify({'success': False, 'message': 'You must be logged in to delete a comment.'}), 403
 
     try:
         conn = get_db_connection()
