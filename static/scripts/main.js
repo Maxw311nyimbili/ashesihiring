@@ -330,41 +330,6 @@ function deleteComment(commentId) {
     }
 }
 
-# SUBMITTING A RATING (WITHOUT A COMMENT)
-@app.route('/submit_rating', methods=['POST'])
-def submit_rating():
-    data = request.get_json()
-
-    if not data:
-        return jsonify({'success': False, 'message': 'No data provided.'}), 400
-
-    application_id = data.get('application_id')
-    rating = data.get('rating')
-
-    if not application_id or rating is None:
-        return jsonify({'success': False, 'message': 'Application ID and Rating are required.'}), 400
-
-    if 'user_id' not in session:
-        return jsonify({'success': False, 'message': 'You must be logged in to submit a rating.'}), 403
-
-    try:
-        conn = get_db_connection()
-        cursor = conn.cursor()
-
-        cursor.execute("""
-            INSERT INTO ratings (application_id, rating)
-            VALUES (%s, %s)
-        """, (application_id, rating))
-
-        conn.commit()
-        cursor.close()
-        conn.close()
-
-        return jsonify({'success': True, 'message': 'Rating submitted successfully.'})
-    except Exception as e:
-        return jsonify({'success': False, 'message': f'Error: {str(e)}'}), 500
-
-
 
 function closeRateModal() {
     rateModal.style.display = "none";
