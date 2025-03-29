@@ -5,7 +5,7 @@ import base64
 import os
 import mysql.connector
 import logging
-from flask_cors import CORS
+
 
 # Configure logging
 logging.basicConfig(
@@ -17,7 +17,7 @@ logging.basicConfig(
 
 app = Flask(__name__)
 app.secret_key = os.urandom(24)
-CORS(app)
+
 
 # Configure upload folder
 UPLOAD_FOLDER = 'static/uploads'
