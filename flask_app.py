@@ -296,8 +296,10 @@ def add_comment():
     if not application_id or rating is None or not interest_prompt:
         return jsonify({'success': False, 'message': 'Application ID, Rating, and Interest Prompt are required.'}), 400
 
-    if 'user_id' not in session:
-        return jsonify({'success': False, 'message': 'You must be logged in to comment.'}), 403
+    # fix this when you wake up
+
+    # if 'user_id' not in session:
+    #     return jsonify({'success': False, 'message': 'You must be logged in to comment.'}), 403
 
     try:
         conn = get_db_connection()
