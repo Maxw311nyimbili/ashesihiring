@@ -177,6 +177,10 @@ document.getElementById("post-comment-btn").addEventListener("click", function (
     const interestPrompt = document.querySelector("input[name='interest_prompt']:checked")?.value || "";
     const commentText = document.getElementById("new-comment").value.trim();
 
+    console.log("Candidates Array:", candidates);
+    console.log("Selected Index:", selectedIndex);
+
+
     if (!rating || !interestPrompt || commentText === "") {
         alert("All fields are required to post a comment.");
         return;
