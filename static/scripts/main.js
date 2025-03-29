@@ -1,5 +1,6 @@
 let candidates = [];
 let currentIndex = 0;
+let selectedIndex = null;
 const candidateCard = document.getElementById("candidateCard");
 const prevBtn = document.getElementById("prevBtn");
 const nextBtn = document.getElementById("nextBtn");
@@ -85,6 +86,7 @@ nextBtn.addEventListener("click", () => {
 
 // Function to open the modal
 function openModal(index) {
+
     let candidate = candidates[index];
 
     modalCandidateName.textContent = candidate.name;
@@ -113,10 +115,10 @@ function closeModal() {
 
 // Load candidates on page load
 fetchCandidates();
- let candidate;
+
 // Open the rating modal and load existing comments from the database
 function openRateModal(index) {
-    candidate = candidates[index];
+    selectedIndex = index;
     modalCandidateName_rating.textContent = candidate.name;
 
     if (candidate.interests && candidate.interests.length > 0) {
@@ -169,7 +171,7 @@ document.querySelectorAll("input[name='interest_prompt']").forEach((radio) => {
 
 // Function to post a comment
 document.getElementById("post-comment-btn").addEventListener("click", function () {
-    const applicationId = candidates.id; // Ensure correct ID
+    const applicationId = candidates[selectedIndex].id;
     const rating = document.getElementById("rating").value;
     const interestPrompt = document.querySelector("input[name='interest_prompt']:checked")?.value || "";
     const commentText = document.getElementById("new-comment").value.trim();
@@ -203,7 +205,7 @@ document.getElementById("post-comment-btn").addEventListener("click", function (
 });
 
 document.getElementById("final-subButton").addEventListener("click", function () {
-    const applicationId = candidates.id;
+    const applicationId = candidates[selectedIndex].id;
     const rating = document.getElementById("rating").value;
     const interestPrompt = document.querySelector("input[name='interest_prompt']:checked")?.value || "";
     const commentText = document.getElementById("new-comment").value.trim();
@@ -276,9 +278,6 @@ function fetchComments(applicationId) {
         })
         .catch(error => console.error("Error fetching comments:", error));
 }
-
-
-
 
 // // Function to edit a comment
 function editComment(commentId) {
