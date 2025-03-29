@@ -159,41 +159,20 @@ document.getElementById("rating").addEventListener("input", function () {
     }
 });
 
-// Handle radio button selection
-//document.querySelectorAll("input[name='interest_prompt']").forEach((radio) => {
-//    radio.addEventListener("change", function () {
-//        if (this.value === "yes") {
-//            document.getElementById("comment").style.display = "block";
-//        } else {
-//            document.getElementById("comment").style.display = "none";
-//        }
-//    });
-//});
-
+ //Handle radio button selection
 document.querySelectorAll("input[name='interest_prompt']").forEach((radio) => {
     radio.addEventListener("change", function () {
-        let commentSection = document.getElementById("comment");
         if (this.value === "yes") {
-            commentSection.style.display = "block";
-
-            // Fetch comments from the server (assuming `candidateId` is available)
-            let candidateId = document.getElementById("candidate_id").value; // Adjust this based on how you store candidate IDs
-
-            fetch(`/get_comments?candidate_id=${candidateId}`)
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        document.getElementById("commentInput").value = data.comment || ""; // Load existing comment
-                    } else {
-                        console.error("Failed to load comments.");
-                    }
-                })
-                .catch(error => console.error("Error fetching comments:", error));
+        let applicantId = selectedIndex + 1;
+            document.getElementById("comment").style.display = "block";
+            fetchComments(applicantId);
         } else {
-            commentSection.style.display = "none";
+            document.getElementById("comment").style.display = "none";
         }
     });
 });
+
+
 
 
 // Function to post a comment
