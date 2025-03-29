@@ -478,10 +478,11 @@ def get_shortlisted_applicants():
     conn = get_db_connection()
     cur = conn.cursor()
     cur.execute("""
-        SELECT a.id, a.name, c.rating, c.interest_prompt 
+        SELECT a.id, CONCAT(a.first_name, ' ', a.last_name) AS name, c.rating, c.interest_prompt, c.comment
         FROM applicants a 
         JOIN comments c ON a.id = c.application_id
-        WHERE c.rating >= 4 OR c.interest_prompt = 'Yes'
+        WHERE c.rating >= 4 OR c.interest_prompt = 'Yes';
+
     """)
     applicants = cur.fetchall()
     conn.close()
@@ -515,7 +516,7 @@ def get_scheduled_interviews():
     conn = get_db_connection()
     cur = conn.cursor()
     cur.execute("""
-        SELECT i.interview_date, f.username as faculty_name, a.name
+        SELECT i.interview_date, f.username as faculty_name, CONCAT(a.first_name, ' ', a.last_name) AS name
         FROM interviews i
         JOIN faculty f ON i.faculty_id = f.id
         JOIN applicants a ON i.applicant_id = a.id
