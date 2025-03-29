@@ -201,7 +201,7 @@ document.getElementById("post-comment-btn").addEventListener("click", function (
         if (data.success) {
             alert("Comment posted successfully!");
             document.getElementById("new-comment").value = "";
-            fetchComments(applicationId - 1); // Refresh comments display
+            fetchComments(applicationId); // Refresh comments display
         } else {
             alert("Error: " + data.message + " id" + applicationId + " rating: " + rating + " interest prompt: " + interestPrompt + " comment" + commentText);
         }
@@ -249,14 +249,30 @@ document.getElementById("final-subButton").addEventListener("click", function ()
 
 
 function fetchComments(applicationId) {
+    console.log("Fetching comments for Application ID:", applicationId); // Debugging
+
     fetch(`/get_comments?application_id=${applicationId}`)
         .then(response => response.json())
         .then(data => {
+            console.log("Fetched Data:", data); // Check response in DevTools Console
+
             if (data.success) {
                 let commentsSection = document.getElementById("comments-section");
+                if (!commentsSection) {
+                    console.error("Error: comments-section not found in DOM");
+                    return;
+                }
+
                 commentsSection.innerHTML = ""; // Clear previous comments
 
+                if (data.comments.length === 0) {
+                    commentsSection.innerHTML = "<p>No comments yet.</p>";
+                    return;
+                }
+
                 data.comments.forEach(comment => {
+                    console.log("Processing Comment:", comment); // Debug each comment
+
                     const commentDiv = document.createElement("div");
                     commentDiv.classList.add("border", "p-2");
                     commentDiv.setAttribute("id", `comment-${comment.id}`);
@@ -275,7 +291,6 @@ function fetchComments(applicationId) {
                     `;
 
                     commentsSection.appendChild(commentDiv);
-                    document.getElementById("new-comment").value = ""; // Clear input
                 });
             } else {
                 console.error("Failed to fetch comments:", data.message);
