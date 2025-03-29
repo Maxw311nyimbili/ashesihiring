@@ -436,9 +436,9 @@ def submit_rating():
         cursor = conn.cursor()
 
         cursor.execute("""
-            INSERT INTO ratings (application_id, rating)
-            VALUES (%s, %s)
-        """, (application_id, rating))
+                    UPDATE comments SET rating = %s WHERE application_id = %s
+                """, (rating, application_id))
+
 
         conn.commit()
         cursor.close()
