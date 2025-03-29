@@ -169,7 +169,7 @@ document.querySelectorAll("input[name='interest_prompt']").forEach((radio) => {
 
 // Function to post a comment
 document.getElementById("post-comment-btn").addEventListener("click", function () {
-    const applicationId = candidates[selectedCandidateIndex].id; // Ensure correct ID
+    const applicationId = candidates[index].id; // Ensure correct ID
     const rating = document.getElementById("rating").value;
     const interestPrompt = document.querySelector("input[name='interest_prompt']:checked")?.value || "";
     const commentText = document.getElementById("new-comment").value.trim();
