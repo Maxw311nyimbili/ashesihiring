@@ -160,15 +160,41 @@ document.getElementById("rating").addEventListener("input", function () {
 });
 
 // Handle radio button selection
+//document.querySelectorAll("input[name='interest_prompt']").forEach((radio) => {
+//    radio.addEventListener("change", function () {
+//        if (this.value === "yes") {
+//            document.getElementById("comment").style.display = "block";
+//        } else {
+//            document.getElementById("comment").style.display = "none";
+//        }
+//    });
+//});
+
 document.querySelectorAll("input[name='interest_prompt']").forEach((radio) => {
     radio.addEventListener("change", function () {
+        let commentSection = document.getElementById("comment");
         if (this.value === "yes") {
-            document.getElementById("comment").style.display = "block";
+            commentSection.style.display = "block";
+
+            // Fetch comments from the server (assuming `candidateId` is available)
+            let candidateId = document.getElementById("candidate_id").value; // Adjust this based on how you store candidate IDs
+
+            fetch(`/get_comments?candidate_id=${candidateId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        document.getElementById("commentInput").value = data.comment || ""; // Load existing comment
+                    } else {
+                        console.error("Failed to load comments.");
+                    }
+                })
+                .catch(error => console.error("Error fetching comments:", error));
         } else {
-            document.getElementById("comment").style.display = "none";
+            commentSection.style.display = "none";
         }
     });
 });
+
 
 // Function to post a comment
 document.getElementById("post-comment-btn").addEventListener("click", function () {
