@@ -359,8 +359,8 @@ def update_comment():
     if not comment_id or rating is None or not interest_prompt:
         return jsonify({'success': False, 'message': 'Comment ID, Rating, and Interest Prompt are required.'}), 400
 
-    if 'user_id' not in session:
-        return jsonify({'success': False, 'message': 'You must be logged in to update a comment.'}), 403
+    # if 'user_id' not in session:
+    #     return jsonify({'success': False, 'message': 'You must be logged in to update a comment.'}), 403
 
     try:
         conn = get_db_connection()
@@ -399,8 +399,8 @@ def delete_comment():
     if not comment_id:
         return jsonify({'success': False, 'message': 'Comment ID is required.'}), 400
 
-    if 'user_id' not in session:
-        return jsonify({'success': False, 'message': 'You must be logged in to delete a comment.'}), 403
+    # if 'user_id' not in session:
+    #     return jsonify({'success': False, 'message': 'You must be logged in to delete a comment.'}), 403
 
     try:
         conn = get_db_connection()
@@ -428,8 +428,8 @@ def submit_rating():
     if not application_id or rating is None:
         return jsonify({'success': False, 'message': 'Application ID and Rating are required.'}), 400
 
-    if 'user_id' not in session:
-        return jsonify({'success': False, 'message': 'You must be logged in to submit a rating.'}), 403
+    # if 'user_id' not in session:
+    #     return jsonify({'success': False, 'message': 'You must be logged in to submit a rating.'}), 403
 
     try:
         conn = get_db_connection()
