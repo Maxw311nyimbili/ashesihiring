@@ -168,7 +168,7 @@ document.querySelectorAll("input[name='interest_prompt']").forEach((radio) => {
 });
 
 // Function to post a comment
-document.getElementById("post-comment-btn").addEventListener("click", function () {
+document.getElementById("post-comment").addEventListener("click", function () {
     const applicationId = candidates[0].id; // Update to get the actual candidate ID
     const rating = document.getElementById("rating").value;
     const interestPrompt = document.querySelector("input[name='interest_prompt']:checked")?.value || "";
