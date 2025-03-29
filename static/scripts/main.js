@@ -119,6 +119,7 @@ fetchCandidates();
 // Open the rating modal and load existing comments from the database
 function openRateModal(index) {
     selectedIndex = index;
+    let candidate = candidates[index];
     modalCandidateName_rating.textContent = candidate.name;
 
     if (candidate.interests && candidate.interests.length > 0) {
