@@ -17,34 +17,40 @@
     </div>
 
     <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            fetch('/get_shortlisted_applicants')
-                .then(response => response.json())
-                .then(data => {
-                    const container = document.getElementById("applicants-list");
-                    data.forEach(applicant => {
-                        const card = document.createElement("div");
-                        card.classList.add("col-md-4");
-                        card.innerHTML = `
-                            <div class="card mb-3">
-                                <div class="card-body">
-                                    <h5 class="card-title">${applicant.name}</h5>
-                                    <p class="card-text">Rating: ${applicant.rating}</p>
-                                    <p class="card-text">Comment: ${applicant.comment}</p>
-                                    <input type="text" class="form-control datepicker" id="date-${applicant.id}" placeholder="Select Date">
-                                    <button class="btn btn-primary mt-2" onclick="scheduleInterview(${applicant.id})">Schedule</button>
-                                </div>
-                            </div>
-                        `;
-                        container.appendChild(card);
+        document.addEventListener("DOMContentLoaded", function () {
+    fetch('/get_shortlisted_applicants')
+        .then(response => response.json())
+        .then(data => {
+            const container = document.getElementById("applicants-list");
+            data.forEach(applicant => {
+                const card = document.createElement("div");
+                card.classList.add("col-md-4");
 
-                        flatpickr(`#date-${applicant.id}`, {
-                            enableTime: true,
-                            dateFormat: "Y-m-d H:i",
-                        });
-                    });
+                // Show comment section only if rating is >= 4
+                const commentSection = applicant.rating >= 4
+                    ? `<p class="card-text">Comment: ${applicant.comment || "No comment"}</p>`
+                    : "";
+
+                card.innerHTML = `
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <h5 class="card-title">${applicant.name}</h5>
+                            <p class="card-text">Rating: ${applicant.rating}</p>
+                            ${commentSection}
+                            <input type="text" class="form-control datepicker" id="date-${applicant.id}" placeholder="Select Date">
+                            <button class="btn btn-primary mt-2" onclick="scheduleInterview(${applicant.id})">Schedule</button>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+
+                flatpickr(`#date-${applicant.id}`, {
+                    enableTime: true,
+                    dateFormat: "Y-m-d H:i",
                 });
+            });
         });
+});
 
         function scheduleInterview(applicantId) {
             const date = document.getElementById(`date-${applicantId}`).value;
