@@ -532,7 +532,7 @@ def get_scheduled_interviews():
     cur.execute("""
         SELECT 
             i.interview_date, 
-            f.username AS faculty_name, 
+            f.username AS faculty_name, f.email,
             CONCAT(a.first_name, ' ', a.last_name) AS applicant_name,
             cp.course_name,
             cp.preference
