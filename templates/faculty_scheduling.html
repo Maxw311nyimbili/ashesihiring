@@ -27,7 +27,7 @@
                 card.classList.add("col-md-4");
 
                 // Show comment section only if rating is >= 4
-                const commentSection = applicant.rating >= 4
+                const commentSection = applicant.rating < 4
                     ? `<p class="card-text">Comment: ${applicant.comment || "No comment"}</p>`
                     : "";
 
