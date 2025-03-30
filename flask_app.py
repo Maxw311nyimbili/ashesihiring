@@ -505,8 +505,8 @@ def get_shortlisted_applicants():
 # Schedule interview
 @app.route('/schedule_interview', methods=['POST'])
 def schedule_interview():
-    if 'faculty_id' not in session:
-        return jsonify({"message": "Unauthorized"}), 403
+    # if 'faculty_id' not in session:
+    #     return jsonify({"message": "Unauthorized"}), 403
 
     data = request.json
     applicant_id = data.get("applicant_id")
