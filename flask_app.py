@@ -531,7 +531,7 @@ def get_scheduled_interviews():
     cur.execute("""
         SELECT i.interview_date, f.username as faculty_name, CONCAT(a.first_name, ' ', a.last_name) AS name
         FROM interviews i
-        JOIN faculty f ON i.faculty_id = f.id
+        JOIN faculty_users f ON i.faculty_id = f.id
         JOIN applicants a ON i.applicant_id = a.id
     """)
     interviews = cur.fetchall()
