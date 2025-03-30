@@ -309,9 +309,9 @@ def add_comment():
         # If rating is 4 or more, insert without `interest_prompt` and `comment`
         if rating >= 4:
             cursor.execute("""
-                INSERT INTO comments (application_id, rating, faculty_id)
-                VALUES (%s, %s, %s)
-            """, (application_id, rating, user_id))
+                            INSERT INTO comments (application_id, rating, faculty_id, interest_prompt, comment)
+                            VALUES (%s, %s, %s, NULL, NULL)
+                    """, (application_id, rating, user_id))
         else:
             # Otherwise, insert with `interest_prompt` and `comment`
             if not interest_prompt or not comment_text:
