@@ -294,7 +294,7 @@ def add_comment():
 
     user_id = session.get("faculty_id")
     application_id = data.get('application_id')
-    rating = data.get('rating')
+    rating = int(data.get('rating'))
     interest_prompt = data.get('interest_prompt')
     comment_text = data.get('comment')
 
@@ -305,10 +305,22 @@ def add_comment():
         conn = get_db_connection()
         cursor = conn.cursor()
 
-        cursor.execute("""
-            INSERT INTO comments (application_id, rating, interest_prompt, comment, faculty_id)
-            VALUES (%s, %s, %s, %s, %s)
-        """, (application_id, rating, interest_prompt, comment_text, user_id))
+
+        # If rating is 4 or more, insert without `interest_prompt` and `comment`
+        if rating >= 4:
+            cursor.execute("""
+                INSERT INTO comments (application_id, rating, faculty_id)
+                VALUES (%s, %s, %s)
+            """, (application_id, rating, user_id))
+        else:
+            # Otherwise, insert with `interest_prompt` and `comment`
+            if not interest_prompt or not comment_text:
+                return jsonify({'success': False, 'message': 'Interest Prompt and Comment are required for ratings below 4.'}), 400
+
+            cursor.execute("""
+                INSERT INTO comments (application_id, rating, interest_prompt, comment, faculty_id)
+                VALUES (%s, %s, %s, %s, %s)
+            """, (application_id, rating, interest_prompt, comment_text, user_id))
 
         conn.commit()
         cursor.close()
