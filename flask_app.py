@@ -515,7 +515,7 @@ def schedule_interview():
 
     conn = get_db_connection()
     cur = conn.cursor(dictionary=True)
-    cur.execute("INSERT INTO interviews (applicant_id, faculty_id, interview_date) VALUES (?, ?, ?)",
+    cur.execute("INSERT INTO interviews (applicant_id, faculty_id, interview_date) VALUES (%s, %s, %s)",
                 (applicant_id, faculty_id, interview_date))
     conn.commit()
     conn.close()
