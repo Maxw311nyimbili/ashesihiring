@@ -151,6 +151,10 @@ def logout():
 def index():
     return render_template('landing_page.html')
 
+@app.route('/demo')
+def demo():
+    return render_template('demo.html')
+
 @app.route('/faculty_dashboard')
 def faculty_dashboard():
     faculty_name = session.get('faculty_name', 'Unknown')

@@ -1,0 +1,83 @@
+/* General Styles */
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: #f4f6f9;
+    color: #333;
+}
+
+/* Navbar */
+.navbar {
+    background-color: #1A237E; /* Varsity blue */
+    padding: 15px 50px;
+}
+.navbar-brand img {
+    width: 150px;
+}
+.navbar-nav .nav-link {
+    color: white !important;
+    font-weight: 500;
+    margin: 0 10px;
+}
+.navbar-nav .nav-link:hover {
+    text-decoration: underline;
+}
+
+/* Main Container */
+.container {
+    max-width: 1200px;
+    margin: 40px auto;
+    text-align: center;
+}
+
+/* Candidate Card */
+.card-container {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+.custom-card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    width: 350px;
+    text-align: left;
+}
+.custom-card h2 {
+    font-size: 20px;
+    color: #1A237E;
+    font-weight: bold;
+}
+
+/* Buttons */
+.btn-1 {
+    background: #1A237E;
+    color: white;
+    padding: 10px 15px;
+    border-radius: 8px;
+    border: none;
+    font-size: 18px;
+}
+.btn-1:hover {
+    background: #3949AB;
+}
+
+/* Modal */
+.modal-content {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    width: 500px;
+    box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2);
+}
+.modal h2 {
+    font-size: 22px;
+    font-weight: bold;
+}
+.rating-subButton {
+    background: #FF6F00;
+    color: white;
+    padding: 10px;
+    border-radius: 8px;
+    font-size: 16px;
+}
