@@ -427,7 +427,6 @@ def delete_comment():
     except Exception as e:
         return jsonify({'success': False, 'message': f'Error: {str(e)}'}), 500
 
-# SUBMITTING A RATING (WITHOUT A COMMENT)
 @app.route('/submit_rating', methods=['POST'])
 def submit_rating():
     data = request.get_json()
@@ -441,23 +440,27 @@ def submit_rating():
     if not application_id or rating is None:
         return jsonify({'success': False, 'message': 'Application ID and Rating are required.'}), 400
 
-    # if 'user_id' not in session:
-    #     return jsonify({'success': False, 'message': 'You must be logged in to submit a rating.'}), 403
-
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
 
-        cursor.execute("""
-                    UPDATE comments SET rating = %s WHERE application_id = %s
-                """, (rating, application_id))
+        # Check if the record exists
+        cursor.execute("SELECT id FROM comments WHERE application_id = %s", (application_id,))
+        existing_comment = cursor.fetchone()
 
+        if existing_comment:
+            # If the record exists, update it
+            cursor.execute("UPDATE comments SET rating = %s WHERE application_id = %s", (rating, application_id))
+        else:
+            # If the record does not exist, insert a new one
+            cursor.execute("INSERT INTO comments (application_id, rating) VALUES (%s, %s)", (application_id, rating))
 
         conn.commit()
         cursor.close()
         conn.close()
 
-        return jsonify({'success': True, 'message': 'Rating submitted successfully.'})
+        return jsonify({'success': True, 'message': 'Rating processed successfully.'})
+
     except Exception as e:
         return jsonify({'success': False, 'message': f'Error: {str(e)}'}), 500
 
