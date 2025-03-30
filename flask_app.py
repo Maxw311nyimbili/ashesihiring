@@ -535,6 +535,7 @@ def get_scheduled_interviews():
         JOIN faculty_users f ON i.faculty_id = f.id
         JOIN applicants a ON i.applicant_id = a.id
     """)
+
     interviews = cur.fetchall()
     conn.close()
     return jsonify([dict(row) for row in interviews])
