@@ -530,10 +530,18 @@ def get_scheduled_interviews():
     cur = conn.cursor(dictionary=True)
 
     cur.execute("""
-        SELECT i.interview_date, f.username as faculty_name, CONCAT(a.first_name, ' ', a.last_name) AS name
+        SELECT 
+            i.interview_date, 
+            f.username AS faculty_name, 
+            CONCAT(a.first_name, ' ', a.last_name) AS applicant_name,
+            cp.course_name,
+            cp.preference
         FROM interviews i
         JOIN faculty_users f ON i.faculty_id = f.id
         JOIN applicants a ON i.applicant_id = a.id
+        LEFT JOIN course_preferences cp ON a.id = cp.applicant_id
+        ORDER BY i.interview_date;
+
     """)
 
     interviews = cur.fetchall()
