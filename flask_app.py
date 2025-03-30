@@ -528,6 +528,7 @@ def schedule_interview():
 def get_scheduled_interviews():
     conn = get_db_connection()
     cur = conn.cursor(dictionary=True)
+
     cur.execute("""
         SELECT i.interview_date, f.username as faculty_name, CONCAT(a.first_name, ' ', a.last_name) AS name
         FROM interviews i
