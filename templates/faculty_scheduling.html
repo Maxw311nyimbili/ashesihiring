@@ -114,7 +114,7 @@
         .rating-low { background-color: #dc3545; color: white; }   /* Red for low */
         .btn-schedule {
             width: 100%;
-            background: linear-gradient(135deg, #007bff, #0056b3);
+            background: #AD4245;
             color: white;
             border: none;
             padding: 10px;
@@ -122,14 +122,14 @@
             transition: 0.3s;
         }
         .btn-schedule:hover {
-            background: linear-gradient(135deg, #0056b3, #003f7f);
+          background: #AD4243;
         }
     </style>
 </head>
 <body>
 
     <div class="container mt-5">
-        <h2 class="mb-4 text-center">📝 Shortlisted Applicants</h2>
+        <h2 class="mb-4 text-center" style="color: white;">📝 Shortlisted Applicants</h2>
         <div id="applicants-list" class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
             <!-- Applicants will be dynamically added here -->
         </div>
@@ -166,7 +166,7 @@
                                     </p>
                                     ${commentSection}
                                     <input type="text" class="form-control datepicker mb-2" id="date-${applicant.id}" placeholder="📅 Select Date">
-                                    <button class="btn btn-schedule" onclick="scheduleInterview(${applicant.id})">Schedule Interview</button>
+                                    <button class="btn btn-schedule" onclick="scheduleInterview(${applicant.id})"  style="background: #AD4245; color: white;">Schedule Interview</button>
                                 </div>
                             </div>
                         `;
