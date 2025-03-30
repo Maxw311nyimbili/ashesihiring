@@ -289,6 +289,9 @@ def add_comment():
     if not data:
         return jsonify({'success': False, 'message': 'No data provided.'}), 400
 
+    if 'faculty_id' not in session:
+        return jsonify({'success': False, 'message': 'You must be logged in to comment.'}), 403
+
     user_id = session.get("faculty_id")  # Use faculty_id instead
     application_id = data.get('application_id')
     rating = data.get('rating')
@@ -297,11 +300,6 @@ def add_comment():
 
     if not application_id or rating is None or not interest_prompt:
         return jsonify({'success': False, 'message': 'Application ID, Rating, and Interest Prompt are required.'}), 400
-
-    # fix this when you wake up
-
-    if 'faculty_id' not in session:
-        return jsonify({'success': False, 'message': 'You must be logged in to comment.'}), 403
 
     try:
         conn = get_db_connection()
