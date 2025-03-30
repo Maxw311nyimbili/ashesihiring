@@ -292,7 +292,7 @@ def add_comment():
     if 'faculty_id' not in session:
         return jsonify({'success': False, 'message': 'You must be logged in to comment.'}), 403
 
-    user_id = session.get("faculty_id")  # Use faculty_id instead
+    user_id = session.get("faculty_id")
     application_id = data.get('application_id')
     rating = data.get('rating')
     interest_prompt = data.get('interest_prompt')
@@ -307,7 +307,7 @@ def add_comment():
 
         cursor.execute("""
             INSERT INTO comments (application_id, rating, interest_prompt, comment, faculty_id)
-            VALUES (%s, %s, %s, %s)
+            VALUES (%s, %s, %s, %s, %s)
         """, (application_id, rating, interest_prompt, comment_text, user_id))
 
         conn.commit()
