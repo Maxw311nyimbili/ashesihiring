@@ -209,17 +209,18 @@
                                             ${commentSection}
                                             <input type="text" class="form-control datepicker mb-2"
                                                 id="date-${applicant.id}"
-                                                placeholder=${isScheduled ? 'Date Already Selected' : '📅 Select Date'}
+                                                placeholder="${isScheduled ? 'Date Already Selected' : '📅 Select Date'}"
                                                 ${isScheduled ? 'disabled' : ''}>
                                             <button class="btn btn-schedule"
                                                 onclick="scheduleInterview(${applicant.id})"
                                                 style="background: ${isScheduled ? '#236465' : '#AD4245'}; color: #ffffff;"
                                                 ${isScheduled ? 'disabled' : ''}>
-                                                ${isScheduled ? 'Interview Scheduled' : 'Schedule Interview'}
+                                                ${isScheduled ? 'Interview Already Scheduled' : 'Schedule Interview'}
                                             </button>
                                         </div>
                                     </div>
                                 `;
+
 
                                 container.appendChild(card);
 
