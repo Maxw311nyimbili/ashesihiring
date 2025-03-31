@@ -197,10 +197,11 @@
                                         <span class="rating-badge ${ratingClass}">${applicant.rating}</span>
                                     </p>
                                     ${commentSection}
-                                    <input type="text" class="form-control datepicker mb-2" id="date-${applicant.id}" placeholder="📅 Select Date">
-                                     <button class="btn btn-schedule" onclick="scheduleInterview(${applicant.id})" style="background: ${isScheduled ? '#ccc' : '#AD4245'}; color: white;" ${isScheduled ? 'disabled' : ''}>
+                                    <input type="text" class="form-control datepicker mb-2" id="date-${applicant.id}" placeholder="📅 Select Date" ${isScheduled ? 'disabled' : ''} value="${applicant.interview_date || ''}">
+                                    <button class="btn btn-schedule" onclick="scheduleInterview(${applicant.id})" style="background: ${isScheduled ? '#ccc' : '#AD4245'}; color: white;" ${isScheduled ? 'disabled' : ''}>
                                         ${isScheduled ? 'Interview Scheduled' : 'Schedule Interview'}
                                     </button>
+
                                 </div>
                             </div>
                         `;
@@ -217,19 +218,36 @@
         });
 
         function scheduleInterview(applicantId) {
-            const date = document.getElementById(`date-${applicantId}`).value;
+            const dateInput = document.getElementById(`date-${applicantId}`);
+            const scheduleButton = document.querySelector(`#applicant-${applicantId} .btn-schedule`);
+            const date = dateInput.value;
+
             if (!date) {
                 alert("⚠️ Please select a date!");
                 return;
             }
+
             fetch('/schedule_interview', {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ applicant_id: applicantId, date: date })
             }).then(response => response.json())
-              .then(data => alert(data.message))
+              .then(data => {
+                  if (data.success) {
+                      alert(data.message);
+
+                      // Disable only this applicant's button and date input
+                      scheduleButton.disabled = true;
+                      scheduleButton.innerText = "Interview Scheduled";
+                      scheduleButton.style.background = "#ccc"; // Change button color
+                      dateInput.disabled = true;
+                  } else {
+                      alert("❌ Failed to schedule interview. Please try again.");
+                  }
+              })
               .catch(error => console.error("Error scheduling interview:", error));
         }
+
     </script>
 
 </body>
