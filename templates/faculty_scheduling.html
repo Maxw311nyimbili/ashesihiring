@@ -166,60 +166,72 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", function () {
-            fetch('/get_shortlisted_applicants')
+            let scheduledApplicants = new Set();  // Store applicants who have scheduled interviews
+
+            // Fetch scheduled interviews first
+            fetch('/get_scheduled_interviews')
                 .then(response => response.json())
-                .then(data => {
-                    const container = document.getElementById("applicants-list");
-                    container.innerHTML = ""; // Clear previous content
-
-                    data.forEach(applicant => {
-                        const card = document.createElement("div");
-                        card.classList.add("col");
-                        card.id = `applicant-${applicant.id}`;
-
-                        // Rating color classification
-                        let ratingClass = "rating-low";
-                        if (applicant.rating >= 4) ratingClass = "rating-high";
-                        else if (applicant.rating >= 3) ratingClass = "rating-medium";
-
-                        // Comment section (shown only for rating < 4)
-                        const commentSection = applicant.rating < 4
-                            ? `<p class="card-text"><strong>🗨️ Comment:</strong> ${applicant.comment || "No comment"}</p>`
-                            : "";
-
-                        const isScheduled = applicant.interview_date !== null;
-
-                        console.log("applicant id: ")
-                        console.log(applicant.id)
-                        console.log(applicant.interview_date)
-
-                        card.innerHTML = `
-                            <div class="card h-100">
-                                <div class="card-body">
-                                    <h5 class="card-title">${applicant.name}</h5>
-                                    <p class="card-text"><strong>⭐ Rating:</strong>
-                                        <span class="rating-badge ${ratingClass}">${applicant.rating}</span>
-                                    </p>
-                                    ${commentSection}
-                                    <input type="text" class="form-control datepicker mb-2" id="date-${applicant.id}" placeholder="📅 Select Date" ${isScheduled ? 'disabled' : ''} value="${applicant.interview_date || ''}">
-
-                                    <button class="btn btn-schedule" onclick="scheduleInterview(${applicant.id})" style="background: ${isScheduled ? '#ccc' : '#AD4245'}; color: white;" ${isScheduled ? 'disabled' : ''}>
-                                        ${isScheduled ? 'Interview Scheduled' : 'Schedule Interview'}
-                                    </button>
-
-                                </div>
-                            </div>
-                        `;
-
-                        container.appendChild(card);
-
-                        flatpickr(`#date-${applicant.id}`, {
-                            enableTime: true,
-                            dateFormat: "Y-m-d H:i",
-                        });
+                .then(interviews => {
+                    interviews.forEach(interview => {
+                        scheduledApplicants.add(interview.applicant_id);  // Store applicant_id
                     });
+
+                    // Now fetch applicants
+                    fetch('/get_shortlisted_applicants')
+                        .then(response => response.json())
+                        .then(data => {
+                            const container = document.getElementById("applicants-list");
+                            container.innerHTML = ""; // Clear previous content
+
+                            data.forEach(applicant => {
+                                const card = document.createElement("div");
+                                card.classList.add("col");
+                                card.id = `applicant-${applicant.id}`;
+
+                                // Check if this applicant has an interview scheduled
+                                const isScheduled = scheduledApplicants.has(applicant.id);
+
+                                let ratingClass = "rating-low";
+                                if (applicant.rating >= 4) ratingClass = "rating-high";
+                                else if (applicant.rating >= 3) ratingClass = "rating-medium";
+
+                                const commentSection = applicant.rating < 4
+                                    ? `<p class="card-text"><strong>🗨️ Comment:</strong> ${applicant.comment || "No comment"}</p>`
+                                    : "";
+
+                                card.innerHTML = `
+                                    <div class="card h-100">
+                                        <div class="card-body">
+                                            <h5 class="card-title">${applicant.name}</h5>
+                                            <p class="card-text"><strong>⭐ Rating:</strong>
+                                                <span class="rating-badge ${ratingClass}">${applicant.rating}</span>
+                                            </p>
+                                            ${commentSection}
+                                            <input type="text" class="form-control datepicker mb-2"
+                                                id="date-${applicant.id}"
+                                                placeholder="📅 Select Date"
+                                                ${isScheduled ? 'disabled' : ''}>
+                                            <button class="btn btn-schedule"
+                                                onclick="scheduleInterview(${applicant.id})"
+                                                style="background: ${isScheduled ? '#ccc' : '#AD4245'}; color: white;"
+                                                ${isScheduled ? 'disabled' : ''}>
+                                                ${isScheduled ? 'Interview Scheduled' : 'Schedule Interview'}
+                                            </button>
+                                        </div>
+                                    </div>
+                                `;
+
+                                container.appendChild(card);
+
+                                flatpickr(`#date-${applicant.id}`, {
+                                    enableTime: true,
+                                    dateFormat: "Y-m-d H:i",
+                                });
+                            });
+                        })
+                        .catch(error => console.error("Error fetching applicants:", error));
                 })
-                .catch(error => console.error("Error fetching applicants:", error));
+                .catch(error => console.error("Error fetching scheduled interviews:", error));
         });
 
         function scheduleInterview(applicantId) {

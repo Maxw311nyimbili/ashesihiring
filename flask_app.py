@@ -535,6 +535,7 @@ def get_scheduled_interviews():
 
     cur.execute("""
         SELECT 
+            i.applicant_id,
             i.interview_date, 
             f.username AS faculty_name, f.email,
             CONCAT(a.first_name, ' ', a.last_name) AS applicant_name,
@@ -545,12 +546,11 @@ def get_scheduled_interviews():
         JOIN applicants a ON i.applicant_id = a.id
         LEFT JOIN course_preferences cp ON a.id = cp.applicant_id
         ORDER BY i.interview_date;
-
     """)
 
     interviews = cur.fetchall()
     conn.close()
-    return jsonify([dict(row) for row in interviews])
+    return jsonify(interviews)  # No need to convert rows to dict manually
 
 if __name__ == '__main__':
     app.run(debug=True)
