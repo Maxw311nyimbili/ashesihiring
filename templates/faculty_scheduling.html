@@ -175,6 +175,7 @@
                     data.forEach(applicant => {
                         const card = document.createElement("div");
                         card.classList.add("col");
+                        card.id = `applicant-${applicant.id}`;
 
                         // Rating color classification
                         let ratingClass = "rating-low";
@@ -186,6 +187,8 @@
                             ? `<p class="card-text"><strong>🗨️ Comment:</strong> ${applicant.comment || "No comment"}</p>`
                             : "";
 
+                        const isScheduled = applicant.interview_date !== null;
+
                         card.innerHTML = `
                             <div class="card h-100">
                                 <div class="card-body">
@@ -195,7 +198,9 @@
                                     </p>
                                     ${commentSection}
                                     <input type="text" class="form-control datepicker mb-2" id="date-${applicant.id}" placeholder="📅 Select Date">
-                                    <button class="btn btn-schedule" onclick="scheduleInterview(${applicant.id})"  style="background: #AD4245; color: white;">Schedule Interview</button>
+                                     <button class="btn btn-schedule" onclick="scheduleInterview(${applicant.id})" style="background: ${isScheduled ? '#ccc' : '#AD4245'}; color: white;" ${isScheduled ? 'disabled' : ''}>
+                                        ${isScheduled ? 'Interview Scheduled' : 'Schedule Interview'}
+                                    </button>
                                 </div>
                             </div>
                         `;
