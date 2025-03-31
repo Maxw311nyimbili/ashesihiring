@@ -189,6 +189,9 @@
 
                         const isScheduled = applicant.interview_date !== null;
 
+                        console.log("applicant id: ")
+                        console.log(applicant.id)
+
                         card.innerHTML = `
                             <div class="card h-100">
                                 <div class="card-body">
@@ -198,6 +201,7 @@
                                     </p>
                                     ${commentSection}
                                     <input type="text" class="form-control datepicker mb-2" id="date-${applicant.id}" placeholder="📅 Select Date" ${isScheduled ? 'disabled' : ''} value="${applicant.interview_date || ''}">
+
                                     <button class="btn btn-schedule" onclick="scheduleInterview(${applicant.id})" style="background: ${isScheduled ? '#ccc' : '#AD4245'}; color: white;" ${isScheduled ? 'disabled' : ''}>
                                         ${isScheduled ? 'Interview Scheduled' : 'Schedule Interview'}
                                     </button>
