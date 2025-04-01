@@ -152,104 +152,6 @@
 
 </head>
     <body>
-<!--        <header>-->
-<!--    <nav class="navbar navbar-expand-lg bg-white shadow-sm">-->
-<!--        <div class="container">-->
-<!--            &lt;!&ndash; Logo &ndash;&gt;-->
-<!--            <a class="navbar-brand logo" href="/">-->
-<!--                <img src="../static/images/Group 13.png" alt="Logo" width="170px">-->
-<!--            </a>-->
-
-<!--            &lt;!&ndash; Mobile Toggle Button &ndash;&gt;-->
-<!--            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">-->
-<!--                <span class="navbar-toggler-icon"></span>-->
-<!--            </button>-->
-
-<!--            &lt;!&ndash; Navbar Links &ndash;&gt;-->
-<!--            <div class="collapse navbar-collapse" id="navbarNav">-->
-<!--                <ul class="navbar-nav ms-auto gap-3">-->
-<!--                     &lt;!&ndash; empty &ndash;&gt;-->
-<!--                </ul>-->
-<!--            </div>-->
-<!--        </div>-->
-<!--    </nav>-->
-<!--</header>-->
-
-
-<!--        <div class="main-container">-->
-<!--            &lt;!&ndash; Heading Section &ndash;&gt;-->
-<!--            <section class="heading-container">-->
-<!--                <div class="heading"><h1>CSIS NSS Application - 2025</h1></div>-->
-<!--                <div class="paragraph"><p>Kindly complete this form if you are interested in being an NSS FI for either the CS/MIS and/or Mathematics courses at the Computer Science and Information Systems Department.</p></div>-->
-<!--            </section>-->
-
-<!--            &lt;!&ndash; Form Heading &ndash;&gt;-->
-<!--            <div class="form-heading"><h2>General Information</h2></div>-->
-
-<!--        <form action="/submit" method="POST" enctype="multipart/form-data">-->
-
-<!--            <div class="candidate-section2">-->
-<!--                <div class="form">-->
-<!--                    <div><input type="text" name="first-name" placeholder="Enter first name"></div>-->
-<!--                    <div><input type="text" name="last-name" placeholder="Enter last name"></div>-->
-<!--                    <div><input type="tel" name="telephone" placeholder="+233"></div>-->
-<!--                    <label style="color: brown;">Select Gender</label>-->
-<!--                    <div><input type="radio" name="gender" value="Male"> Male</div>-->
-<!--                    <div><input type="radio" name="gender" value="Female"> Female</div>-->
-<!--                </div>-->
-
-<!--                <div class="outer-container">-->
-<!--                    <div class="notification"><p>Submit documents in PDF Ensure to name them properly-->
-<!--                        (SurnameFirstname)</p></div>-->
-<!--                    <div class="candidate-container">-->
-<!--                        <div class="candidate-card candidate-card1">-->
-<!--                            <button type="button" class="upload-btn" onclick="document.getElementById('cvInput').click()">Upload CV</button>-->
-<!--                            <input type="file" name="cv" id="cvInput" accept=".pdf,.doc,.docx" style="display: none;">-->
-<!--                            <p class="file-name" id="cvName" style="display: none;">No file selected</p>-->
-<!--                        </div>-->
-
-<!--                        <div class="candidate-card candidate-card2">-->
-<!--                            <button type="button" class="upload-btn" onclick="document.getElementById('coverLetterInput').click()">Upload Cover Letter</button>-->
-<!--                            <input type="file" name="cover_letter" id="coverLetterInput" accept=".pdf,.doc,.docx" style="display: none;">-->
-<!--                            <p class="file-name" id="coverLetterName" style="display: none;">No file selected</p>-->
-<!--                        </div>-->
-
-<!--                        <div class="candidate-card candidate-card3">-->
-<!--                            <button type="button" class="upload-btn" onclick="document.getElementById('transcriptInput').click()">Upload Transcript</button>-->
-<!--                            <input type="file" name="transcript" id="transcriptInput" accept=".pdf,.doc,.docx" style="display: none;">-->
-<!--                            <p class="file-name" id="transcriptName" style="display: none;">No file selected</p>-->
-<!--                        </div>-->
-<!--                    </div>-->
-
-
-<!--                    <div class="select" style="color: white; margin-top: 55px; line-height: 23px;">-->
-<!--                        <div class="select-heading">Which courses would you be interested in being a Faculty Intern?</div>-->
-<!--                        <br>-->
-<!--                        <div class="main">-->
-
-<!--                            <div><input type="radio" name="course_selection" id="CS/MIS courses" onclick="updateHiddenField('CS/MIS'); openModal1()"> CS/MIS courses</div>-->
-<!--                            <br>-->
-<!--                            <div><input type="radio" name="course_selection" id="Math Courses" onclick="updateHiddenField('Math'); openModal()"> Math courses</div>-->
-<!--                            <br>-->
-<!--                            <div><input type="radio" name="course_selection" id="Both" onclick="updateHiddenField('Both'); openModal2()"> Both (CS/MIS courses & Math Courses)</div>-->
-
-
-
-<!--                                &lt;!&ndash; Hidden field to store selected course ID &ndash;&gt;-->
-<!--                            <input type="hidden" name="course_selection_id" id="course_selection_id">-->
-
-
-
-<!--                        </div>-->
-
-<!--                    </div>-->
-
-<!--                </div>-->
-
-
-<!--            </div>-->
-
-<!--            <div><input type="submit" value="Submit"></div>-->
 
 <header>
         <nav class="navbar navbar-expand-lg bg-white shadow-sm">
@@ -364,86 +266,7 @@
     </div>
 
 
-
-
-        
-
-<!-- Modal Structure -->
-<!--<div id="modal" class="modal">-->
-<!--    <div class="modal-content">-->
-<!--        <span class="close" onclick="closeModal()">&times;</span>-->
-<!--        <h2 class="modal-heading">CSIS NSS Application - 2025</h2>-->
-<!--        <p><strong>Math Courses</strong></p>-->
-<!--        <p>Please indicate your preference for and experience with each of the following courses:</p>-->
-
-<!--        <table>-->
-<!--            <tr>-->
-<!--                <th>Math Courses</th>-->
-<!--                <th>Interested and have prior experience</th>-->
-<!--                <th>Interested but no prior experience</th>-->
-<!--                <th>Not preferred but able to teach</th>-->
-<!--                <th>Not interested and not able to teach</th>-->
-<!--            </tr>-->
-<!--            <tr>-->
-<!--                <td>College Algebra</td>-->
-<!--                <td><input type="radio" name="preference_college_algebra" value="Interested and have prior experience"></td>         -->
-<!--                <td><input type="radio" name="preference_college_algebra" value="Interested but no prior experience"></td>-->
-<!--                <td><input type="radio" name="preference_college_algebra" value="Not preferred but able to teach"></td>-->
-<!--                <td><input type="radio" name="preference_college_algebra" value="Not interested and not able to teach"></td>   -->
-<!--            </tr>-->
-<!--            <tr>-->
-<!--                <td>Pre-Calculus I & II</td>-->
-<!--                <td><input type="radio" name="preference_pre_calculus" value="Interested and have prior experience"></td>         -->
-<!--                <td><input type="radio" name="preference_pre_calculus" value="Interested but no prior experience"></td>-->
-<!--                <td><input type="radio" name="preference_pre_calculus" value="Not preferred but able to teach"></td>-->
-<!--                <td><input type="radio" name="preference_pre_calculus" value="Not interested and not able to teach"></td>   -->
-<!--            </tr>-->
-<!--            <tr>-->
-<!--                <td>Calculus I & II</td>-->
-<!--                <td><input type="radio" name="preference_calculus" value="Interested and have prior experience"></td>         -->
-<!--                <td><input type="radio" name="preference_calculus" value="Interested but no prior experience"></td>-->
-<!--                <td><input type="radio" name="preference_calculus" value="Not preferred but able to teach"></td>-->
-<!--                <td><input type="radio" name="preference_calculus" value="Not interested and not able to teach"></td>   -->
-<!--        </tr>-->
-<!--            <tr>-->
-<!--                <td>Applied Calculus</td>-->
-<!--                <td><input type="radio" name="preference_applied_calculus" value="Interested and have prior experience"></td>         -->
-<!--                <td><input type="radio" name="preference_applied_calculus" value="Interested but no prior experience"></td>-->
-<!--                <td><input type="radio" name="preference_applied_calculus" value="Not preferred but able to teach"></td>-->
-<!--                <td><input type="radio" name="preference_applied_calculus" value="Not interested and not able to teach"></td>   -->
-<!--        </tr>-->
-<!--            <tr>-->
-<!--                <td>Quantitative Methods</td>-->
-<!--                <td><input type="radio" name="preference_quantitative_methods" value="Interested and have prior experience"></td>         -->
-<!--                <td><input type="radio" name="preference_quantitative_methods" value="Interested but no prior experience"></td>-->
-<!--                <td><input type="radio" name="preference_quantitative_methods" value="Not preferred but able to teach"></td>-->
-<!--                <td><input type="radio" name="preference_quantitative_methods" value="Not interested and not able to teach"></td>   -->
-<!--            </tr>-->
-<!--            <tr>-->
-<!--                <td>Linear Algebra</td>-->
-<!--                <td><input type="radio" name="preference_linear_algebra" value="Interested and have prior experience"></td>         -->
-<!--                <td><input type="radio" name="preference_linear_algebra" value="Interested but no prior experience"></td>-->
-<!--                <td><input type="radio" name="preference_linear_algebra" value="Not preferred but able to teach"></td>-->
-<!--                <td><input type="radio" name="preference_linear_algebra" value="Not interested and not able to teach"></td>   -->
-<!--            </tr>-->
-<!--            <tr>-->
-<!--                <td>Statistics with Probability</td>-->
-<!--                <td><input type="radio" name="preference_statistics" value="Interested and have prior experience"></td>         -->
-<!--                <td><input type="radio" name="preference_statistics" value="Interested but no prior experience"></td>-->
-<!--                <td><input type="radio" name="preference_statistics" value="Not preferred but able to teach"></td>-->
-<!--                <td><input type="radio" name="preference_statistics" value="Not interested and not able to teach"></td>   -->
-<!--            </tr>-->
-<!--            <tr>-->
-<!--                <td>Discrete Structures & Theory</td>-->
-<!--                <td><input type="radio" name="preference_discrete_structures" value="Interested and have prior experience"></td>         -->
-<!--                <td><input type="radio" name="preference_discrete_structures" value="Interested but no prior experience"></td>-->
-<!--                <td><input type="radio" name="preference_discrete_structures" value="Not preferred but able to teach"></td>-->
-<!--                <td><input type="radio" name="preference_discrete_structures" value="Not interested and not able to teach"></td>   -->
-<!--        </tr>-->
-<!--        </table>-->
-<!--    </div>-->
-<!--</div>-->
-
+<!-------------------------Modal Stuff ----------------------------->
  <!-- Button to trigger modal -->
     <div class="container mt-4">
         <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#applicationModal">
@@ -459,6 +282,7 @@
         </button>
     </div>
 
+<!--Responsive Math Modal-->
 <div class="modal fade" id="applicationModal" tabindex="-1" aria-labelledby="applicationModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-xl">
             <div class="modal-content">
@@ -681,9 +505,6 @@
 
 
 
-
-
-
     <!-- Modal -->
     <div class="modal fade" id="courseSelectionModal" tabindex="-1" aria-labelledby="courseSelectionModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-xl">
@@ -779,8 +600,7 @@
                                         </div>
                                     </td>
                                 </tr>
-                                <!-- Additional semester 1 courses follow the same pattern -->
-                                <!-- Truncated for brevity in this example; you would add all courses here -->
+
                                 <tr>
                                     <td>Algorithm Design & Analysis</td>
                                     <td class="text-center">
@@ -850,7 +670,102 @@
                                         </div>
                                     </td>
                                 </tr>
-                                <!-- More courses would continue here -->
+
+                                <tr>
+                                    <td>Web Technologies</td>
+                                    <td class="text-center">
+                                        <div class="form-check d-flex justify-content-center">
+                                            <input class="form-check-input" type="radio" name="preference_web_tech" value="Interested and have prior experience">
+                                        </div>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="form-check d-flex justify-content-center">
+                                            <input class="form-check-input" type="radio" name="preference_web_tech" value="Interested but no prior experience">
+                                        </div>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="form-check d-flex justify-content-center">
+                                            <input class="form-check-input" type="radio" name="preference_web_tech" value="Not preferred but able to teach">
+                                        </div>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="form-check d-flex justify-content-center">
+                                            <input class="form-check-input" type="radio" name="preference_web_tech" value="Not interested and not able to teach">
+                                        </div>
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td>E-Commerce</td>
+                                    <td class="text-center">
+                                        <div class="form-check d-flex justify-content-center">
+                                            <input class="form-check-input" type="radio" name="preference_e_commerce" value="Interested and have prior experience">
+                                        </div>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="form-check d-flex justify-content-center">
+                                            <input class="form-check-input" type="radio" name="preference_e_commerce" value="Interested but no prior experience">
+                                        </div>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="form-check d-flex justify-content-center">
+                                            <input class="form-check-input" type="radio" name="preference_e_commerce" value="Not preferred but able to teach">
+                                        </div>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="form-check d-flex justify-content-center">
+                                            <input class="form-check-input" type="radio" name="preference_e_commerce" value="Not interested and not able to teach">
+                                        </div>
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td>Information & Systems Security</td>
+                                    <td class="text-center">
+                                        <div class="form-check d-flex justify-content-center">
+                                            <input class="form-check-input" type="radio" name="preference_Info_sec" value="Interested and have prior experience">
+                                        </div>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="form-check d-flex justify-content-center">
+                                            <input class="form-check-input" type="radio" name="preference_Info_sec" value="Interested but no prior experience">
+                                        </div>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="form-check d-flex justify-content-center">
+                                            <input class="form-check-input" type="radio" name="preference_Info_sec" value="Not preferred but able to teach">
+                                        </div>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="form-check d-flex justify-content-center">
+                                            <input class="form-check-input" type="radio" name="preference_Info_sec" value="Not interested and not able to teach">
+                                        </div>
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td>Operating Systems</td>
+                                    <td class="text-center">
+                                        <div class="form-check d-flex justify-content-center">
+                                            <input class="form-check-input" type="radio" name="preference_operating_system" value="Interested and have prior experience">
+                                        </div>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="form-check d-flex justify-content-center">
+                                            <input class="form-check-input" type="radio" name="preference_operating_system" value="Interested but no prior experience">
+                                        </div>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="form-check d-flex justify-content-center">
+                                            <input class="form-check-input" type="radio" name="preference_operating_system" value="Not preferred but able to teach">
+                                        </div>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="form-check d-flex justify-content-center">
+                                            <input class="form-check-input" type="radio" name="preference_operating_system" value="Not interested and not able to teach">
+                                        </div>
+                                    </td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>
@@ -892,7 +807,246 @@
                                         </div>
                                     </td>
                                 </tr>
-                                <!-- More semester 2 courses would be added here following the same pattern -->
+
+                                <tr>
+                                    <td>Computer Programming for Engineering</td>
+                                    <td class="text-center">
+                                        <div class="form-check d-flex justify-content-center">
+                                            <input class="form-check-input" type="radio" name="preference_computing_for_eng" value="Interested and have prior experience">
+                                        </div>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="form-check d-flex justify-content-center">
+                                            <input class="form-check-input" type="radio" name="preference_computing_for_eng" value="Interested but no prior experience">
+                                        </div>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="form-check d-flex justify-content-center">
+                                            <input class="form-check-input" type="radio" name="preference_computing_for_eng" value="Not preferred but able to teach">
+                                        </div>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="form-check d-flex justify-content-center">
+                                            <input class="form-check-input" type="radio" name="preference_computing_for_eng" value="Not interested and not able to teach">
+                                        </div>
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td>Database Systems</td>
+                                    <td class="text-center">
+                                        <div class="form-check d-flex justify-content-center">
+                                            <input class="form-check-input" type="radio" name="preference_database_systems" value="Interested and have prior experience">
+                                        </div>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="form-check d-flex justify-content-center">
+                                            <input class="form-check-input" type="radio" name="preference_database_systems" value="Interested but no prior experience">
+                                        </div>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="form-check d-flex justify-content-center">
+                                            <input class="form-check-input" type="radio" name="preference_database_systems" value="Not preferred but able to teach">
+                                        </div>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="form-check d-flex justify-content-center">
+                                            <input class="form-check-input" type="radio" name="preference_database_systems" value="Not interested and not able to teach">
+                                        </div>
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td>Data Structures & Algorithm</td>
+                                    <td class="text-center">
+                                        <div class="form-check d-flex justify-content-center">
+                                            <input class="form-check-input" type="radio" name="preference_data_structures_&_algorithm" value="Interested and have prior experience">
+                                        </div>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="form-check d-flex justify-content-center">
+                                            <input class="form-check-input" type="radio" name="preference_data_structures_&_algorithm" value="Interested but no prior experience">
+                                        </div>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="form-check d-flex justify-content-center">
+                                            <input class="form-check-input" type="radio" name="preference_data_structures_&_algorithm" value="Not preferred but able to teach">
+                                        </div>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="form-check d-flex justify-content-center">
+                                            <input class="form-check-input" type="radio" name="preference_data_structures_&_algorithm" value="Not interested and not able to teach">
+                                        </div>
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td>Introduction to AI</td>
+                                    <td class="text-center">
+                                        <div class="form-check d-flex justify-content-center">
+                                            <input class="form-check-input" type="radio" name="preference_intro_to_AI" value="Interested and have prior experience">
+                                        </div>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="form-check d-flex justify-content-center">
+                                            <input class="form-check-input" type="radio" name="preference_intro_to_AI" value="Interested but no prior experience">
+                                        </div>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="form-check d-flex justify-content-center">
+                                            <input class="form-check-input" type="radio" name="preference_intro_to_AI" value="Not preferred but able to teach">
+                                        </div>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="form-check d-flex justify-content-center">
+                                            <input class="form-check-input" type="radio" name="preference_intro_to_AI" value="Not interested and not able to teach">
+                                        </div>
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td>IT Infrastructure & Systems Admin Lab</td>
+                                    <td class="text-center">
+                                        <div class="form-check d-flex justify-content-center">
+                                            <input class="form-check-input" type="radio" name="preference_IT_infrastructure" value="Interested and have prior experience">
+                                        </div>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="form-check d-flex justify-content-center">
+                                            <input class="form-check-input" type="radio" name="preference_IT_infrastructure" value="Interested but no prior experience">
+                                        </div>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="form-check d-flex justify-content-center">
+                                            <input class="form-check-input" type="radio" name="preference_IT_infrastructure" value="Not preferred but able to teach">
+                                        </div>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="form-check d-flex justify-content-center">
+                                            <input class="form-check-input" type="radio" name="preference_IT_infrastructure" value="Not interested and not able to teach">
+                                        </div>
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td>IS Project Management</td>
+                                    <td class="text-center">
+                                        <div class="form-check d-flex justify-content-center">
+                                            <input class="form-check-input" type="radio" name="preference_project_management" value="Interested and have prior experience">
+                                        </div>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="form-check d-flex justify-content-center">
+                                            <input class="form-check-input" type="radio" name="preference_project_management" value="Interested but no prior experience">
+                                        </div>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="form-check d-flex justify-content-center">
+                                            <input class="form-check-input" type="radio" name="preference_project_management" value="Not preferred but able to teach">
+                                        </div>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="form-check d-flex justify-content-center">
+                                            <input class="form-check-input" type="radio" name="preference_project_management" value="Not interested and not able to teach">
+                                        </div>
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td>Software Engineering</td>
+                                    <td class="text-center">
+                                        <div class="form-check d-flex justify-content-center">
+                                            <input class="form-check-input" type="radio" name="preference_Software_Engineering" value="Interested and have prior experience">
+                                        </div>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="form-check d-flex justify-content-center">
+                                            <input class="form-check-input" type="radio" name="preference_Software_Engineering" value="Interested but no prior experience">
+                                        </div>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="form-check d-flex justify-content-center">
+                                            <input class="form-check-input" type="radio" name="preference_Software_Engineering" value="Not preferred but able to teach">
+                                        </div>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="form-check d-flex justify-content-center">
+                                            <input class="form-check-input" type="radio" name="preference_Software_Engineering" value="Not interested and not able to teach">
+                                        </div>
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td>Introduction to Modelling & Simulation</td>
+                                    <td class="text-center">
+                                        <div class="form-check d-flex justify-content-center">
+                                            <input class="form-check-input" type="radio" name="preference_modelling" value="Interested and have prior experience">
+                                        </div>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="form-check d-flex justify-content-center">
+                                            <input class="form-check-input" type="radio" name="preference_modelling" value="Interested but no prior experience">
+                                        </div>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="form-check d-flex justify-content-center">
+                                            <input class="form-check-input" type="radio" name="preference_modelling" value="Not preferred but able to teach">
+                                        </div>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="form-check d-flex justify-content-center">
+                                            <input class="form-check-input" type="radio" name="preference_modelling" value="Not interested and not able to teach">
+                                        </div>
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td>Networks and Data Communication</td>
+                                    <td class="text-center">
+                                        <div class="form-check d-flex justify-content-center">
+                                            <input class="form-check-input" type="radio" name="preference_network_data_communication" value="Interested and have prior experience">
+                                        </div>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="form-check d-flex justify-content-center">
+                                            <input class="form-check-input" type="radio" name="preference_network_data_communication" value="Interested but no prior experience">
+                                        </div>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="form-check d-flex justify-content-center">
+                                            <input class="form-check-input" type="radio" name="preference_network_data_communication" value="Not preferred but able to teach">
+                                        </div>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="form-check d-flex justify-content-center">
+                                            <input class="form-check-input" type="radio" name="preference_network_data_communication" value="Not interested and not able to teach">
+                                        </div>
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td>Computer Organization and Architecture</td>
+                                    <td class="text-center">
+                                        <div class="form-check d-flex justify-content-center">
+                                            <input class="form-check-input" type="radio" name="preference_Computer_Organization_&_Architecture" value="Interested and have prior experience">
+                                        </div>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="form-check d-flex justify-content-center">
+                                            <input class="form-check-input" type="radio" name="preference_Computer_Organization_&_Architecture" value="Interested but no prior experience">
+                                        </div>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="form-check d-flex justify-content-center">
+                                            <input class="form-check-input" type="radio" name="preference_Computer_Organization_&_Architecture" value="Not preferred but able to teach">
+                                        </div>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="form-check d-flex justify-content-center">
+                                            <input class="form-check-input" type="radio" name="preference_Computer_Organization_&_Architecture" value="Not interested and not able to teach">
+                                        </div>
+                                    </td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>
@@ -936,6 +1090,317 @@
                                     </td>
                                 </tr>
                                 <!-- More elective courses would be added here following the same pattern -->
+                                <tr>
+                                    <td>Data Science</td>
+                                    <td class="text-center">
+                                        <div class="form-check d-flex justify-content-center">
+                                            <input class="form-check-input" type="radio" name="preference_data_Science" value="Interested and have prior experience">
+                                        </div>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="form-check d-flex justify-content-center">
+                                            <input class="form-check-input" type="radio" name="preference_data_Science" value="Interested but no prior experience">
+                                        </div>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="form-check d-flex justify-content-center">
+                                            <input class="form-check-input" type="radio" name="preference_data_Science" value="Not preferred but able to teach">
+                                        </div>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="form-check d-flex justify-content-center">
+                                            <input class="form-check-input" type="radio" name="preference_data_Science" value="Not interested and not able to teach">
+                                        </div>
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td>Computer Vision</td>
+                                    <td class="text-center">
+                                        <div class="form-check d-flex justify-content-center">
+                                            <input class="form-check-input" type="radio" name="preference_computer_vision" value="Interested and have prior experience">
+                                        </div>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="form-check d-flex justify-content-center">
+                                            <input class="form-check-input" type="radio" name="preference_computer_vision" value="Interested but no prior experience">
+                                        </div>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="form-check d-flex justify-content-center">
+                                            <input class="form-check-input" type="radio" name="preference_computer_vision" value="Not preferred but able to teach">
+                                        </div>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="form-check d-flex justify-content-center">
+                                            <input class="form-check-input" type="radio" name="preference_computer_vision" value="Not interested and not able to teach">
+                                        </div>
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td>Applied Cryptography & Computer Security</td>
+                                    <td class="text-center">
+                                        <div class="form-check d-flex justify-content-center">
+                                            <input class="form-check-input" type="radio" name="preference_applied_cryptography_&_computer_security" value="Interested and have prior experience">
+                                        </div>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="form-check d-flex justify-content-center">
+                                            <input class="form-check-input" type="radio" name="preference_applied_cryptography_&_computer_security" value="Interested but no prior experience">
+                                        </div>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="form-check d-flex justify-content-center">
+                                            <input class="form-check-input" type="radio" name="preference_applied_cryptography_&_computer_security" value="Not preferred but able to teach">
+                                        </div>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="form-check d-flex justify-content-center">
+                                            <input class="form-check-input" type="radio" name="preference_applied_cryptography_&_computer_security" value="Not interested and not able to teach">
+                                        </div>
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td>Human Computer Interaction</td>
+                                    <td class="text-center">
+                                        <div class="form-check d-flex justify-content-center">
+                                            <input class="form-check-input" type="radio" name="preference_human_computer_interaction" value="Interested and have prior experience">
+                                        </div>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="form-check d-flex justify-content-center">
+                                            <input class="form-check-input" type="radio" name="preference_human_computer_interaction" value="Interested but no prior experience">
+                                        </div>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="form-check d-flex justify-content-center">
+                                            <input class="form-check-input" type="radio" name="preference_human_computer_interaction" value="Not preferred but able to teach">
+                                        </div>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="form-check d-flex justify-content-center">
+                                            <input class="form-check-input" type="radio" name="preference_human_computer_interaction" value="Not interested and not able to teach">
+                                        </div>
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td>Natural Language Processing</td>
+                                    <td class="text-center">
+                                        <div class="form-check d-flex justify-content-center">
+                                            <input class="form-check-input" type="radio" name="preference_Natural_Language_Processing" value="Interested and have prior experience">
+                                        </div>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="form-check d-flex justify-content-center">
+                                            <input class="form-check-input" type="radio" name="preference_Natural_Language_Processing" value="Interested but no prior experience">
+                                        </div>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="form-check d-flex justify-content-center">
+                                            <input class="form-check-input" type="radio" name="preference_Natural_Language_Processing" value="Not preferred but able to teach">
+                                        </div>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="form-check d-flex justify-content-center">
+                                            <input class="form-check-input" type="radio" name="preference_Natural_Language_Processing" value="Not interested and not able to teach">
+                                        </div>
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td>Concepts of Programming Language</td>
+                                    <td class="text-center">
+                                        <div class="form-check d-flex justify-content-center">
+                                            <input class="form-check-input" type="radio" name="preference_concepts_of_programming" value="Interested and have prior experience">
+                                        </div>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="form-check d-flex justify-content-center">
+                                            <input class="form-check-input" type="radio" name="preference_concepts_of_programming" value="Interested but no prior experience">
+                                        </div>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="form-check d-flex justify-content-center">
+                                            <input class="form-check-input" type="radio" name="preference_concepts_of_programming" value="Not preferred but able to teach">
+                                        </div>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="form-check d-flex justify-content-center">
+                                            <input class="form-check-input" type="radio" name="preference_concepts_of_programming" value="Not interested and not able to teach">
+                                        </div>
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td>Computer Graphics</td>
+                                    <td class="text-center">
+                                        <div class="form-check d-flex justify-content-center">
+                                            <input class="form-check-input" type="radio" name="preference_computer_graphics" value="Interested and have prior experience">
+                                        </div>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="form-check d-flex justify-content-center">
+                                            <input class="form-check-input" type="radio" name="preference_computer_graphics" value="Interested but no prior experience">
+                                        </div>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="form-check d-flex justify-content-center">
+                                            <input class="form-check-input" type="radio" name="preference_computer_graphics" value="Not preferred but able to teach">
+                                        </div>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="form-check d-flex justify-content-center">
+                                            <input class="form-check-input" type="radio" name="preference_computer_graphics" value="Not interested and not able to teach">
+                                        </div>
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td>Machine Learning</td>
+                                    <td class="text-center">
+                                        <div class="form-check d-flex justify-content-center">
+                                            <input class="form-check-input" type="radio" name="preference_machine_learning" value="Interested and have prior experience">
+                                        </div>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="form-check d-flex justify-content-center">
+                                            <input class="form-check-input" type="radio" name="preference_machine_learning" value="Interested but no prior experience">
+                                        </div>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="form-check d-flex justify-content-center">
+                                            <input class="form-check-input" type="radio" name="preference_machine_learning" value="Not preferred but able to teach">
+                                        </div>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="form-check d-flex justify-content-center">
+                                            <input class="form-check-input" type="radio" name="preference_machine_learning" value="Not interested and not able to teach">
+                                        </div>
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td>Mobile Application Development</td>
+                                    <td class="text-center">
+                                        <div class="form-check d-flex justify-content-center">
+                                            <input class="form-check-input" type="radio" name="preference_mobile_app_development" value="Interested and have prior experience">
+                                        </div>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="form-check d-flex justify-content-center">
+                                            <input class="form-check-input" type="radio" name="preference_mobile_app_development" value="Interested but no prior experience">
+                                        </div>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="form-check d-flex justify-content-center">
+                                            <input class="form-check-input" type="radio" name="preference_mobile_app_development" value="Not preferred but able to teach">
+                                        </div>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="form-check d-flex justify-content-center">
+                                            <input class="form-check-input" type="radio" name="preference_mobile_app_development" value="Not interested and not able to teach">
+                                        </div>
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td>Parallel & Distributed Computing</td>
+                                    <td class="text-center">
+                                        <div class="form-check d-flex justify-content-center">
+                                            <input class="form-check-input" type="radio" name="preference_parallel_&_distributed_computing" value="Interested and have prior experience">
+                                        </div>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="form-check d-flex justify-content-center">
+                                            <input class="form-check-input" type="radio" name="preference_parallel_&_distributed_computing" value="Interested but no prior experience">
+                                        </div>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="form-check d-flex justify-content-center">
+                                            <input class="form-check-input" type="radio" name="preference_parallel_&_distributed_computing" value="Not preferred but able to teach">
+                                        </div>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="form-check d-flex justify-content-center">
+                                            <input class="form-check-input" type="radio" name="preference_parallel_&_distributed_computing" value="Not interested and not able to teach">
+                                        </div>
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td>Introduction to AI Robotics</td>
+                                    <td class="text-center">
+                                        <div class="form-check d-flex justify-content-center">
+                                            <input class="form-check-input" type="radio" name="preference_intro_to_robotics" value="Interested and have prior experience">
+                                        </div>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="form-check d-flex justify-content-center">
+                                            <input class="form-check-input" type="radio" name="preference_intro_to_robotics" value="Interested but no prior experience">
+                                        </div>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="form-check d-flex justify-content-center">
+                                            <input class="form-check-input" type="radio" name="preference_intro_to_robotics" value="Not preferred but able to teach">
+                                        </div>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="form-check d-flex justify-content-center">
+                                            <input class="form-check-input" type="radio" name="preference_intro_to_robotics" value="Not interested and not able to teach">
+                                        </div>
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td>Computer Game Development</td>
+                                    <td class="text-center">
+                                        <div class="form-check d-flex justify-content-center">
+                                            <input class="form-check-input" type="radio" name="preference_game_dev" value="Interested and have prior experience">
+                                        </div>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="form-check d-flex justify-content-center">
+                                            <input class="form-check-input" type="radio" name="preference_game_dev" value="Interested but no prior experience">
+                                        </div>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="form-check d-flex justify-content-center">
+                                            <input class="form-check-input" type="radio" name="preference_game_dev" value="Not preferred but able to teach">
+                                        </div>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="form-check d-flex justify-content-center">
+                                            <input class="form-check-input" type="radio" name="preference_game_dev" value="Not interested and not able to teach">
+                                        </div>
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td>Deep Learning</td>
+                                    <td class="text-center">
+                                        <div class="form-check d-flex justify-content-center">
+                                            <input class="form-check-input" type="radio" name="preference_deep_learning" value="Interested and have prior experience">
+                                        </div>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="form-check d-flex justify-content-center">
+                                            <input class="form-check-input" type="radio" name="preference_deep_learning" value="Interested but no prior experience">
+                                        </div>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="form-check d-flex justify-content-center">
+                                            <input class="form-check-input" type="radio" name="preference_deep_learning" value="Not preferred but able to teach">
+                                        </div>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="form-check d-flex justify-content-center">
+                                            <input class="form-check-input" type="radio" name="preference_deep_learning" value="Not interested and not able to teach">
+                                        </div>
+                                    </td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>
