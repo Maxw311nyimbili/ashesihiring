@@ -132,32 +132,42 @@
 <body>
 
 <header>
-        <nav class="navbar navbar-expand-lg bg-white shadow-sm">
-            <div class="container-fluid">
-                <a class="navbar-brand logo" href="/">
-                    <img src="../static/images/Group 13.png" alt="Logo" width="170px" style="margin-left: 100px;">
-                </a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse" id="navbarNav">
-                    <ul class="navbar-nav ms-auto" style="margin-right: 80px">
+    <nav class="navbar navbar-expand-lg bg-white shadow-sm">
+        <div class="container">
+            <!-- Logo -->
+            <a class="navbar-brand logo" href="/">
+                <img src="../static/images/Group 13.png" alt="Logo" width="170px">
+            </a>
 
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('faculty_dashboard') }}" style="color:#AD4243; font-weight: bold;"> <i class="fa-solid fa-gauge-high"></i> Dashboard</a>
-                        </li>
+            <!-- Mobile Toggle Button -->
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
 
-                        <li class="nav-item" style="margin-left: 20px;">
-                            <a class="nav-link" href="{{ url_for('faculty_scheduling') }}" style="color:#AD4243;"> <i class="fa-solid fa-calendar-days"></i> Interview Scheduling</a>
-                        </li>
-                        <li class="nav-item" style="margin-left: 20px;">
-                            <a class="nav-link" href="{{ url_for('logout') }}" style="color:#AD4243; "> <i class="fa-solid fa-right-from-bracket"></i> Logout</a>
-                        </li>
-                    </ul>
-                </div>
+            <!-- Navbar Links -->
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto gap-3">
+                    <li class="nav-item">
+                        <a class="nav-link fw-bold text-danger" href="{{ url_for('faculty_dashboard') }}">
+                            <i class="fa-solid fa-gauge-high"></i> Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-danger" href="{{ url_for('faculty_scheduling') }}">
+                            <i class="fa-solid fa-calendar-days"></i> Interview Scheduling
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-danger" href="{{ url_for('logout') }}">
+                            <i class="fa-solid fa-right-from-bracket"></i> Logout
+                        </a>
+                    </li>
+                </ul>
             </div>
-        </nav>
-    </header>
+        </div>
+    </nav>
+</header>
+
 
     <div class="container mt-5">
         <h2 class="mb-4 text-center" style="color: white;">📝 Shortlisted Applicants</h2>
