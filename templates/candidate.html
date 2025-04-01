@@ -234,17 +234,17 @@
                                 <br>
                                 <div class="main">
                                     <div class="form-check">
-                                        <input class="form-check-input" type="radio" name="course_selection" id="csMis" value="CS/MIS" onclick="updateHiddenField('CS/MIS'); openModal1()">
+                                        <input class="form-check-input" type="radio" name="course_selection" id="csMis" value="CS/MIS" onclick="updateHiddenField('CS/MIS');" data-bs-target="#courseSelectionModal">
                                         <label class="form-check-label" for="csMis">CS/MIS courses</label>
                                     </div>
                                     <br>
                                     <div class="form-check">
-                                        <input class="form-check-input" type="radio" name="course_selection" id="math" value="Math" onclick="updateHiddenField('Math'); openModal()">
+                                        <input class="form-check-input" type="radio" name="course_selection" id="math" value="Math" data-bs-target="#applicationModal" onclick="updateHiddenField('Math');">
                                         <label class="form-check-label" for="math">Math courses</label>
                                     </div>
                                     <br>
                                     <div class="form-check">
-                                        <input class="form-check-input" type="radio" name="course_selection" id="both" value="Both" onclick="updateHiddenField('Both'); openModal2()">
+                                        <input class="form-check-input" type="radio" name="course_selection" id="both" value="Both" onclick="updateHiddenField('Both');" data-bs-target="#applicationModal">
                                         <label class="form-check-label" for="both">Both (CS/MIS courses & Math Courses)</label>
                                     </div>
 
@@ -268,19 +268,19 @@
 
 <!-------------------------Modal Stuff ----------------------------->
  <!-- Button to trigger modal -->
-    <div class="container mt-4">
-        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#applicationModal">
-            Open Application Form
-        </button>
-    </div>
+<!--    <div class="container mt-4">-->
+<!--        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#applicationModal">-->
+<!--            Open Application Form-->
+<!--        </button>-->
+<!--    </div>-->
 
 
  <!-- Button to trigger modal -->
-    <div class="container mt-4">
-        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#courseSelectionModal">
-            Open Course Selection Form
-        </button>
-    </div>
+<!--    <div class="container mt-4">-->
+<!--        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#courseSelectionModal">-->
+<!--            Open Course Selection Form-->
+<!--        </button>-->
+<!--    </div>-->
 
 <!--Responsive Math Modal-->
 <div class="modal fade" id="applicationModal" tabindex="-1" aria-labelledby="applicationModalLabel" aria-hidden="true">
@@ -496,7 +496,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary">Submit</button>
+                    <button type="button" class="btn btn-primary" style="display:none">Select CSIS Courses</button>
                 </div>
             </div>
         </div>
@@ -1412,405 +1412,6 @@
             </div>
         </div>
     </div>
-
-
-
-<!-- Modal Structure -->
-<div id="modal-1" class="modal">
-    <div class="modal-content">
-        <span class="close" onclick="closeModal1()">&times;</span>
-        <h2 class="modal-heading">Course Selection - 2025</h2>
-        <p><strong>CS & MIS Courses</strong></p>
-        <p>Please indicate your preference for and experience with each of the following courses</p>
-        
-        <br>
-        <!-- Semester 1 Courses -->
-        <h3>Semester 1 - Core Courses</h3>
-        <table>
-            <tr>
-                <th>CSIS Courses</th>
-                <th>Interested and have prior experience</th>
-                <th>Interested but no prior experience</th>
-                <th>Not preferred but able to teach</th>
-                <th>Not interested and not able to teach</th>
-            </tr>
-            <tr>
-                <td>Introduction to Computing & Information Systems</td>
-                <td><input type="radio" name="preference_intro_to_computing" value="Interested and have prior experience"></td>         
-                <td><input type="radio" name="preference_intro_to_computing" value="Interested but no prior experience"></td>
-                <td><input type="radio" name="preference_intro_to_computing" value="Not preferred but able to teach"></td>
-                <td><input type="radio" name="preference_intro_to_computing" value="Not interested and not able to teach"></td>       
-                <input type="hidden" name="debug_course_selection" id="debug_course_selection">
-            </tr>
-            <tr>
-                <td>Object Oriented Programming</td>
-                <td><input type="radio" name="preference_object_oriented_programming" value="Interested and have prior experience"></td>         
-                <td><input type="radio" name="preference_object_oriented_programming" value="Interested but no prior experience"></td>
-                <td><input type="radio" name="preference_object_oriented_programming" value="Not preferred but able to teach"></td>
-                <td><input type="radio" name="preference_object_oriented_programming" value="Not interested and not able to teach"></td>   
-            </tr>
-            <tr>
-                <td>Hardware & Systems Fundamentals</td>
-                <td><input type="radio" name="preference_Hardware" value="Interested and have prior experience"></td>         
-                <td><input type="radio" name="preference_Hardware" value="Interested but no prior experience"></td>
-                <td><input type="radio" name="preference_Hardware" value="Not preferred but able to teach"></td>
-                <td><input type="radio" name="preference_Hardware" value="Not interested and not able to teach"></td>   
-            </tr>
-            <tr>
-                <td>Algorithm Design & Analysis</td>
-                <td><input type="radio" name="preference_algorithm_design_&_analysis" value="Interested and have prior experience"></td>         
-                <td><input type="radio" name="preference_algorithm_design_&_analysis" value="Interested but no prior experience"></td>
-                <td><input type="radio" name="preference_algorithm_design_&_analysis" value="Not preferred but able to teach"></td>
-                <td><input type="radio" name="preference_algorithm_design_&_analysis" value="Not interested and not able to teach"></td>   </tr>
-            <tr>
-                <td>Intermediate Computer Programming(C++)</td>
-                <td><input type="radio" name="preference_intermediate_computer_programming" value="Interested and have prior experience"></td>         
-                <td><input type="radio" name="preference_intermediate_computer_programming" value="Interested but no prior experience"></td>
-                <td><input type="radio" name="preference_intermediate_computer_programming" value="Not preferred but able to teach"></td>
-                <td><input type="radio" name="preference_intermediate_computer_programming" value="Not interested and not able to teach"></td>   
-            </tr>
-            <tr>
-                <td>Systems Analysis & Design</td>
-                <td><input type="radio" name="preference_Systems_analysis_&_design" value="Interested and have prior experience"></td>         
-                <td><input type="radio" name="preference_Systems_analysis_&_design" value="Interested but no prior experience"></td>
-                <td><input type="radio" name="preference_Systems_analysis_&_design" value="Not preferred but able to teach"></td>
-                <td><input type="radio" name="preference_Systems_analysis_&_design" value="Not interested and not able to teach"></td>   
-            </tr>
-            <tr>
-                <td>Web Technologies</td>
-                <td><input type="radio" name="preference_web_tech" value="Interested and have prior experience"></td>         
-                <td><input type="radio" name="preference_web_tech" value="Interested but no prior experience"></td>
-                <td><input type="radio" name="preference_web_tech" value="Not preferred but able to teach"></td>
-                <td><input type="radio" name="preference_web_tech" value="Not interested and not able to teach"></td>   
-            </tr>
-            <tr>
-                <td>E-Commerce</td>
-                <td><input type="radio" name="preference_e_commerce" value="Interested and have prior experience"></td>         
-                <td><input type="radio" name="preference_e_commerce" value="Interested but no prior experience"></td>
-                <td><input type="radio" name="preference_e_commerce" value="Not preferred but able to teach"></td>
-                <td><input type="radio" name="preference_e_commerce" value="Not interested and not able to teach"></td>   
-            </tr>
-            <tr>
-                <td>Information & Systems Security</td>
-                <td><input type="radio" name="preference_Info_sec" value="Interested and have prior experience"></td>         
-                <td><input type="radio" name="preference_Info_sec" value="Interested but no prior experience"></td>
- 
-                <td><input type="radio" name="preference_Info_sec" value="Not preferred but able to teach"></td>
-                <td><input type="radio" name="preference_Info_sec" value="Not interested and not able to teach"></td>   
-            </tr>
-            <tr>
-                <td>Operating Systems</td>
-                <td><input type="radio" name="preference_operating_system" value="Interested and have prior experience"></td>         
-                <td><input type="radio" name="preference_operating_system" value="Interested but no prior experience"></td>
- 
-                <td><input type="radio" name="preference_operating_system" value="Not preferred but able to teach"></td>
-                <td><input type="radio" name="preference_operating_system" value="Not interested and not able to teach"></td>   
-            </tr>
-        </table>
-        
-        <br>
-        <!-- Semester 2 Courses -->
-        <h3>Semester 2 - Core Courses</h3>
-        <table>
-            <tr>
-                <th>CSIS Courses</th>
-                <th>Interested and have prior experience</th>
-                <th>Interested but no prior experience</th>
-                <th>Not preferred but able to teach</th>
-                <th>Not interested and not able to teach</th>
-            </tr>
-            <tr>
-                <td>Computer Programming for CS</td>
-                <td><input type="radio" name="preference_computing_for_cs" value="Interested and have prior experience"></td>         
-                <td><input type="radio" name="preference_computing_for_cs" value="Interested but no prior experience"></td>
-                <td><input type="radio" name="preference_computing_for_cs" value="Not preferred but able to teach"></td>
-                <td><input type="radio" name="preference_computing_for_cs" value="Not interested and not able to teach"></td>   
-            </tr>
-            <tr>
-                <td>Computer Programming for Engineering</td>
-                <td><input type="radio" name="preference_computing_for_eng" value="Interested and have prior experience"></td>         
-                <td><input type="radio" name="preference_computing_for_eng" value="Interested but no prior experience"></td>
-                <td><input type="radio" name="preference_computing_for_eng" value="Not preferred but able to teach"></td>
-                <td><input type="radio" name="preference_computing_for_eng" value="Not interested and not able to teach"></td>   
-            </tr>
-            <tr>
-                <td>Database Systems</td>
-                <td><input type="radio" name="preference_database_systems" value="Interested and have prior experience"></td>         
-                <td><input type="radio" name="preference_database_systems" value="Interested but no prior experience"></td>
-                <td><input type="radio" name="preference_database_systems" value="Not preferred but able to teach"></td>
-                <td><input type="radio" name="preference_database_systems" value="Not interested and not able to teach"></td>   
-            </tr>
-            <tr>
-                <td>Data Structures & Algorithm</td>
-                <td><input type="radio" name="preference_data_structures_&_algorithm" value="Interested and have prior experience"></td>         
-                <td><input type="radio" name="preference_data_structures_&_algorithm" value="Interested but no prior experience"></td>
-                <td><input type="radio" name="preference_data_structures_&_algorithm" value="Not preferred but able to teach"></td>
-                <td><input type="radio" name="preference_data_structures_&_algorithm" value="Not interested and not able to teach"></td>   
-            </tr>
-            <tr>
-                <td>Introduction to AI</td>
-                <td><input type="radio" name="preference_intro_to_AI" value="Interested and have prior experience"></td>         
-                <td><input type="radio" name="preference_intro_to_AI" value="Interested but no prior experience"></td>
-                <td><input type="radio" name="preference_intro_to_AI" value="Not preferred but able to teach"></td>
-                <td><input type="radio" name="preference_intro_to_AI" value="Not interested and not able to teach"></td>   
-            </tr>
-            <tr>
-                <td>IT Infrastructure & Systems Admin Lab</td>
-                <td><input type="radio" name="preference_IT_infrastructure" value="Interested and have prior experience"></td>         
-                <td><input type="radio" name="preference_IT_infrastructure" value="Interested but no prior experience"></td>
-                <td><input type="radio" name="preference_IT_infrastructure" value="Not preferred but able to teach"></td>
-                <td><input type="radio" name="preference_IT_infrastructure" value="Not interested and not able to teach"></td>   
-            </tr>
-            <tr>
-                <td>IS Project Management</td>
-                <td><input type="radio" name="preference_project_management" value="Interested and have prior experience"></td>         
-                <td><input type="radio" name="preference_project_management" value="Interested but no prior experience"></td>
-                <td><input type="radio" name="preference_project_management" value="Not preferred but able to teach"></td>
-                <td><input type="radio" name="preference_project_management" value="Not interested and not able to teach"></td>   
-            </tr>
-            <tr>
-                <td>Software Engineering</td>
-                <td><input type="radio" name="preference_Software_Engineering" value="Interested and have prior experience"></td>         
-                <td><input type="radio" name="preference_Software_Engineering" value="Interested but no prior experience"></td>
-                <td><input type="radio" name="preference_Software_Engineering" value="Not preferred but able to teach"></td>
-                <td><input type="radio" name="preference_Software_Engineering" value="Not interested and not able to teach"></td>   
-            </tr>
-            <tr>
-                <td>Introduction to Modelling & Simulation</td>
-                <td><input type="radio" name="preference_modelling" value="Interested and have prior experience"></td>         
-                <td><input type="radio" name="preference_modelling" value="Interested but no prior experience"></td>
-                <td><input type="radio" name="preference_modelling" value="Not preferred but able to teach"></td>
-                <td><input type="radio" name="preference_modelling" value="Not interested and not able to teach"></td>   
-            </tr>
-            <tr>
-                <td>Networks and Data Communication</td>
-                <td><input type="radio" name="preference_network_data_communication" value="Interested and have prior experience"></td>         
-                <td><input type="radio" name="preference_network_data_communication" value="Interested but no prior experience"></td>
-                <td><input type="radio" name="preference_network_data_communication" value="Not preferred but able to teach"></td>
-                <td><input type="radio" name="preference_network_data_communication" value="Not interested and not able to teach"></td>   
-            </tr>
-
-            <tr>
-                <td>Computer Organization and Architecture</td>
-                <td><input type="radio" name="preference_Computer_Organization_&_Architecture" value="Interested and have prior experience"></td>         
-                <td><input type="radio" name="preference_Computer_Organization_&_Architecture" value="Interested but no prior experience"></td>
-                <td><input type="radio" name="preference_Computer_Organization_&_Architecture" value="Not preferred but able to teach"></td>
-                <td><input type="radio" name="preference_Computer_Organization_&_Architecture" value="Not interested and not able to teach"></td>   
-            </tr>
-        </table>
-        
-        <!-- Elective Course Preferences -->
-         <br>
-        <h3>Elective Course Preferences</h3>
-        <p>Please indicate your preference for and experience with each of the following electives:</p>
-        <table>
-            <tr>
-                <th>Elective Courses</th>
-                <th>Interested & Experienced</th>
-                <th>Interested & No Experience</th>
-                <th>Not Preferred but Able</th>
-                <th>Not Interested</th>
-            </tr>
-            <tr>
-                <td>Advanced Database Systems</td>
-                <td><input type="radio" name="preference_advanced_database" value="Interested and have prior experience"></td>
-                <td><input type="radio" name="preference_advanced_database" value="Interested but no prior experience"></td>
-                <td><input type="radio" name="preference_advanced_database" value="Not preferred but able to teach"></td>
-                <td><input type="radio" name="preference_advanced_database" value="Not interested and not able to teach"></td>
-            </tr>
-            <tr>
-                <td>Data Science</td>
-                <td><input type="radio" name="preference_data_Science" value="Interested and have prior experience"></td>              
-                <td><input type="radio" name="preference_data_Science" value="Interested but no prior experience"></td>
-                 <td><input type="radio" name="preference_data_Science" value="Not preferred but able to teach"></td>
-                <td><input type="radio" name="preference_data_Science" value="Not interested and not able to teach"></td>
-            </tr>
-
-            <tr>
-                <td>Computer Vision</td>
-                <td><input type="radio" name="preference_computer_vision" value="Interested and have prior experience"></td>              
-                <td><input type="radio" name="preference_computer_vision" value="Interested but no prior experience"></td>
-                 <td><input type="radio" name="preference_computer_vision" value="Not preferred but able to teach"></td>
-                    <td><input type="radio" name="preference_computer_vision" value="Not interested and not able to teach"></td>
-            </tr>
-
-            <tr>
-                <td>Applied Cryptography & Computer Security</td>
-                <td><input type="radio" name="preference_applied_cryptography_&_computer_security" value="Interested and have prior experience"></td>              
-                <td><input type="radio" name="preference_applied_cryptography_&_computer_security" value="Interested but no prior experience"></td>
-                 <td><input type="radio" name="preference_applied_cryptography_&_computer_security" value="Not preferred but able to teach"></td>
-                    <td><input type="radio" name="preference_applied_cryptography_&_computer_security" value="Not interested and not able to teach"></td>
-            </tr>
-
-            <tr>
-                <td>Human Computer Interaction</td>
-                <td><input type="radio" name="preference_human_computer_interaction" value="Interested and have prior experience"></td>              
-                <td><input type="radio" name="preference_human_computer_interaction" value="Interested but no prior experience"></td>
-                 <td><input type="radio" name="preference_human_computer_interaction" value="Not preferred but able to teach"></td>
-                    <td><input type="radio" name="preference_human_computer_interaction" value="Not interested and not able to teach"></td>
-            </tr>
-
-            <tr>
-                <td>Natural Language Processing</td>
-                <td><input type="radio" name="preference_Natural_Language_Processing" value="Interested and have prior experience"></td>              
-                <td><input type="radio" name="preference_Natural_Language_Processing" value="Interested but no prior experience"></td>
-                 <td><input type="radio" name="preference_Natural_Language_Processing" value="Not preferred but able to teach"></td>
-                    <td><input type="radio" name="preference_Natural_Language_Processing" value="Not interested and not able to teach"></td>
-            </tr>
-
-            <tr>
-                <td>Concepts of Programming Language</td>
-                <td><input type="radio" name="preference_concepts_of_programming" value="Interested and have prior experience"></td>              
-                <td><input type="radio" name="preference_concepts_of_programming" value="Interested but no prior experience"></td>
-                 <td><input type="radio" name="preference_concepts_of_programming" value="Not preferred but able to teach"></td>
-                    <td><input type="radio" name="preference_concepts_of_programming" value="Not interested and not able to teach"></td>
-            </tr>
-
-            <tr>
-                <td>Computer Graphics</td>
-                <td><input type="radio" name="preference_computer_graphics" value="Interested and have prior experience"></td>              
-                <td><input type="radio" name="preference_computer_graphics" value="Interested but no prior experience"></td>
-                 <td><input type="radio" name="preference_computer_graphics" value="Not preferred but able to teach"></td>
-                    <td><input type="radio" name="preference_computer_graphics" value="Not interested and not able to teach"></td>
-            </tr>
-
-            <tr>
-                <td>Machine Learning</td>
-                <td><input type="radio" name="preference_machine_learning" value="Interested and have prior experience"></td>            
-                <td><input type="radio" name="preference_machine_learning" value="Interested but no prior experience"></td>
-                 <td><input type="radio" name="preference_machine_learning" value="Not preferred but able to teach"></td>
-                    <td><input type="radio" name="preference_machine_learning" value="Not interested and not able to teach"></td>
-            </tr>
-
-            <tr>
-                <td>Mobile Application Development</td>
-                <td><input type="radio" name="preference_mobile_app_development" value="Interested and have prior experience"></td>              
-                <td><input type="radio" name="preference_mobile_app_development" value="Interested but no prior experience"></td>
-                 <td><input type="radio" name="preference_mobile_app_development" value="Not preferred but able to teach"></td>
-                    <td><input type="radio" name="preference_mobile_app_development" value="Not interested and not able to teach"></td>
-            </tr>
-
-            <tr>
-                <td>Parallel & Distributed Computing</td>
-                <td><input type="radio" name="preference_parallel_&_distributed_computing" value="Interested and have prior experience"></td>              
-                <td><input type="radio" name="preference_parallel_&_distributed_computing" value="Interested but no prior experience"></td>
-                 <td><input type="radio" name="preference_parallel_&_distributed_computing" value="Not preferred but able to teach"></td>
-                    <td><input type="radio" name="preference_parallel_&_distributed_computing" value="Not interested and not able to teach"></td>
-            </tr>
-
-            <tr>
-                <td>Introduction to AI Robotics</td>
-                <td><input type="radio" name="preference_intro_to_robotics" value="Interested and have prior experience"></td>              
-                <td><input type="radio" name="preference_intro_to_robotics" value="Interested but no prior experience"></td>
-                 <td><input type="radio" name="preference_intro_to_robotics" value="Not preferred but able to teach"></td>
-                    <td><input type="radio" name="preference_intro_to_robotics" value="Not interested and not able to teach"></td>
-            </tr>
-
-            <tr>
-                <td>Computer Game Development</td>
-                <td><input type="radio" name="preference_game_dev" value="Interested and have prior experience"></td>              
-                <td><input type="radio" name="preference_game_dev" value="Interested but no prior experience"></td>
-                 <td><input type="radio" name="preference_game_dev" value="Not preferred but able to teach"></td>
-                    <td><input type="radio" name="preference_game_dev" value="Not interested and not able to teach"></td>
-            </tr>
-
-            <tr>
-                <td>Deep Learning</td>
-                <td><input type="radio" name="preference_deep_learning" value="Interested and have prior experience"></td>              
-                <td><input type="radio" name="preference_deep_learning" value="Interested but no prior experience"></td>
-                 <td><input type="radio" name="preference_deep_learning" value="Not preferred but able to teach"></td>
-                    <td><input type="radio" name="preference_deep_learning" value="Not interested and not able to teach"></td>
-            </tr>
-        </table>
-    </div>
-</div>
-
-
-<!-- BOTH MODAL -->
- <!-- Modal Structure -->
-<div id="modal-2" class="modal">
-    <div class="modal-content">
-        <span class="close" onclick="closeModal2()">&times;</span>
-        <h2 class="modal-heading">CSIS NSS Application - 2025</h2>
-        <p><strong>Math Courses</strong></p>
-        <p>Please indicate your preference for and experience with each of the following courses:</p>
-
-        <table>
-            <tr>
-                <th>Math Courses</th>
-                <th>Interested and have prior experience</th>
-                <th>Interested but no prior experience</th>
-                <th>Not preferred but able to teach</th>
-                <th>Not interested and not able to teach</th>
-            </tr>
-            <tr>
-                <td>College Algebra</td>
-                <td><input type="radio" name="preference_college_algebra" value="Interested and have prior experience"></td>         
-                <td><input type="radio" name="preference_college_algebra" value="Interested but no prior experience"></td>
- 
-                <td><input type="radio" name="preference_college_algebra" value="Not preferred but able to teach"></td>
-                <td><input type="radio" name="preference_college_algebra" value="Not interested and not able to teach"></td>   
-            </tr>
-            <tr>
-                <td>Pre-Calculus I & II</td>
-                <td><input type="radio" name="preference_pre_calculus" value="Interested and have prior experience"></td>         
-                <td><input type="radio" name="preference_pre_calculus" value="Interested but no prior experience"></td>
-                <td><input type="radio" name="preference_pre_calculus" value="Not preferred but able to teach"></td>
-                <td><input type="radio" name="preference_pre_calculus" value="Not interested and not able to teach"></td>   
-            </tr>
-            <tr>
-                <td>Calculus I & II</td>
-                <td><input type="radio" name="preference_calculus" value="Interested and have prior experience"></td>         
-                <td><input type="radio" name="preference_calculus" value="Interested but no prior experience"></td>
- 
-                <td><input type="radio" name="preference_calculus" value="Not preferred but able to teach"></td>
-                <td><input type="radio" name="preference_calculus" value="Not interested and not able to teach"></td>   
-            </tr>
-            <tr>
-                <td>Applied Calculus</td>
-                <td><input type="radio" name="preference_applied_calculus" value="Interested and have prior experience"></td>         
-                <td><input type="radio" name="preference_applied_calculus" value="Interested but no prior experience"></td>
- 
-                <td><input type="radio" name="preference_applied_calculus" value="Not preferred but able to teach"></td>
-                <td><input type="radio" name="preference_applied_calculus" value="Not interested and not able to teach"></td>   
-            </tr>
-            <tr>
-                <td>Quantitative Methods</td>
-                <td><input type="radio" name="preference_quantitative_methods" value="Interested and have prior experience"></td>         
-                <td><input type="radio" name="preference_quantitative_methods" value="Interested but no prior experience"></td>
- 
-                <td><input type="radio" name="preference_quantitative_methods" value="Not preferred but able to teach"></td>
-                <td><input type="radio" name="preference_quantitative_methods" value="Not interested and not able to teach"></td>   
-            </tr>
-            <tr>
-                <td>Linear Algebra</td>
-                <td><input type="radio" name="preference_linear_algebra" value="Interested and have prior experience"></td>         
-                <td><input type="radio" name="preference_linear_algebra" value="Interested but no prior experience"></td>
- 
-                <td><input type="radio" name="preference_linear_algebra" value="Not preferred but able to teach"></td>
-                <td><input type="radio" name="preference_linear_algebra" value="Not interested and not able to teach"></td>   
-            </tr>
-            <tr>
-                <td>Statistics with Probability</td>
-                <td><input type="radio" name="preference_statistics" value="Interested and have prior experience"></td>         
-                <td><input type="radio" name="preference_statistics" value="Interested but no prior experience"></td>
- 
-                <td><input type="radio" name="preference_statistics" value="Not preferred but able to teach"></td>
-                <td><input type="radio" name="preference_statistics" value="Not interested and not able to teach"></td>   
-            </tr>
-            <tr>
-                <td>Discrete Structures & Theory</td>
-                <td><input type="radio" name="preference_discrete_structures" value="Interested and have prior experience"></td>         
-                <td><input type="radio" name="preference_discrete_structures" value="Interested but no prior experience"></td>
-                <td><input type="radio" name="preference_discrete_structures" value="Not preferred but able to teach"></td>
-                <td><input type="radio" name="preference_discrete_structures" value="Not interested and not able to teach"></td>   
-        </tr>
-        </table>
-        <br>
-        <button class="btn" onclick="openModal3()" style="max-width: 50%;background: #AD4245;">Select CSIS Courses</button>
-
-    </div>
-</div>
 
 </form>
 
