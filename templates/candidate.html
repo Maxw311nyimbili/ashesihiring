@@ -8,13 +8,11 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css">
 
     <!-- Load Custom CSS after Bootstrap -->
-    <!-- <link rel="stylesheet" href="../static/css/styles.css"> -->
     <link rel="stylesheet" href="../static/css/candidate.css">
-    
-
 
     <!-- FontAwesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
     <!-- Math Modal -->
 <style>
 
@@ -124,118 +122,103 @@
 
 </head>
     <body>
-        <header>
+  <!-- Navbar -->
     <nav class="navbar navbar-expand-lg bg-white shadow-sm">
         <div class="container">
-            <!-- Logo -->
-            <a class="navbar-brand logo" href="/">
-                <img src="../static/images/Group 13.png" alt="Logo" width="170px">
+            <a class="navbar-brand" href="/">
+                <img src="../static/images/Group 13.png" alt="Logo" class="logo">
             </a>
-
-            <!-- Mobile Toggle Button -->
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
-
-            <!-- Navbar Links -->
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto gap-3">
-<!--                    <li class="nav-item">-->
-<!--                        <a class="nav-link fw-bold text-danger" href="{{ url_for('faculty_dashboard') }}">-->
-<!--                            <i class="fa-solid fa-gauge-high"></i> Dashboard-->
-<!--                        </a>-->
-<!--                    </li>-->
-<!--                    <li class="nav-item">-->
-<!--                        <a class="nav-link text-danger" href="{{ url_for('faculty_scheduling') }}">-->
-<!--                            <i class="fa-solid fa-calendar-days"></i> Interview Scheduling-->
-<!--                        </a>-->
-<!--                    </li>-->
-<!--                    <li class="nav-item">-->
-<!--                        <a class="nav-link text-danger" href="{{ url_for('logout') }}">-->
-<!--                            <i class="fa-solid fa-right-from-bracket"></i> Logout-->
-<!--                        </a>-->
-<!--                    </li>-->
+            <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+                <ul class="navbar-nav gap-3">
+                    <!-- Empty for now -->
                 </ul>
             </div>
         </div>
     </nav>
-</header>
 
+    <!-- Main Container -->
+    <div class="container text-center mt-5">
+        <h1 class="display-5 text-white">CSIS NSS Application - 2025</h1>
+        <p class="lead text-white">Kindly complete this form if you are interested in being an NSS FI for either the CS/MIS and/or Mathematics courses.</p>
+    </div>
 
-        <div class="main-container">
-            <!-- Heading Section -->
-            <section class="heading-container">
-                <div class="heading"><h1>CSIS NSS Application - 2025</h1></div>
-                <div class="paragraph"><p>Kindly complete this form if you are interested in being an NSS FI for either the CS/MIS and/or Mathematics courses at the Computer Science and Information Systems Department.</p></div>
-            </section>
+    <!-- Form Section -->
+    <div class="container mt-4">
+        <h2 class="text-primary text-center">General Information</h2>
+        <form action="/submit" method="POST" enctype="multipart/form-data" class="row g-3">
 
-            <!-- Form Heading -->
-            <div class="form-heading"><h2>General Information</h2></div>
-
-        <form action="/submit" method="POST" enctype="multipart/form-data">
-            
-            <div class="candidate-section2">
-                <div class="form">
-                    <div><input type="text" name="first-name" placeholder="Enter first name"></div>
-                    <div><input type="text" name="last-name" placeholder="Enter last name"></div>
-                    <div><input type="tel" name="telephone" placeholder="+233"></div>
-                    <label style="color: brown;">Select Gender</label>
-                    <div><input type="radio" name="gender" value="Male"> Male</div>
-                    <div><input type="radio" name="gender" value="Female"> Female</div>
-                </div>
-
-                <div class="outer-container">
-                    <div class="notification"><p>Submit documents in PDF Ensure to name them properly 
-                        (SurnameFirstname)</p></div>
-                    <div class="candidate-container">
-                        <div class="candidate-card candidate-card1">
-                            <button type="button" class="upload-btn" onclick="document.getElementById('cvInput').click()">Upload CV</button>
-                            <input type="file" name="cv" id="cvInput" accept=".pdf,.doc,.docx" style="display: none;">
-                            <p class="file-name" id="cvName" style="display: none;">No file selected</p>
-                        </div>
-            
-                        <div class="candidate-card candidate-card2">
-                            <button type="button" class="upload-btn" onclick="document.getElementById('coverLetterInput').click()">Upload Cover Letter</button>
-                            <input type="file" name="cover_letter" id="coverLetterInput" accept=".pdf,.doc,.docx" style="display: none;">
-                            <p class="file-name" id="coverLetterName" style="display: none;">No file selected</p>
-                        </div>
-            
-                        <div class="candidate-card candidate-card3">
-                            <button type="button" class="upload-btn" onclick="document.getElementById('transcriptInput').click()">Upload Transcript</button>
-                            <input type="file" name="transcript" id="transcriptInput" accept=".pdf,.doc,.docx" style="display: none;">
-                            <p class="file-name" id="transcriptName" style="display: none;">No file selected</p>
-                        </div>
-                    </div>
-
-
-                    <div class="select" style="color: white; margin-top: 55px; line-height: 23px;">
-                        <div class="select-heading">Which courses would you be interested in being a Faculty Intern?</div>
-                        <br>
-                        <div class="main">
-
-                            <div><input type="radio" name="course_selection" id="CS/MIS courses" onclick="updateHiddenField('CS/MIS'); openModal1()"> CS/MIS courses</div>
-                            <br>
-                            <div><input type="radio" name="course_selection" id="Math Courses" onclick="updateHiddenField('Math'); openModal()"> Math courses</div>
-                            <br>
-                            <div><input type="radio" name="course_selection" id="Both" onclick="updateHiddenField('Both'); openModal2()"> Both (CS/MIS courses & Math Courses)</div>
-
-                            
-
-                                <!-- Hidden field to store selected course ID -->
-                            <input type="hidden" name="course_selection_id" id="course_selection_id">
-                            
-                            
-                            
-                        </div>
-
-                    </div>
-
-                </div>
-                
-
+            <!-- Personal Details -->
+            <div class="col-md-6">
+                <input type="text" name="first-name" class="form-control" placeholder="Enter first name">
+            </div>
+            <div class="col-md-6">
+                <input type="text" name="last-name" class="form-control" placeholder="Enter last name">
+            </div>
+            <div class="col-md-6">
+                <input type="tel" name="telephone" class="form-control" placeholder="+233">
             </div>
 
-            <div><input type="submit" value="Submit"></div>
+            <!-- Gender Selection -->
+            <div class="col-12">
+                <label class="form-label text-white">Select Gender</label>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="gender" value="Male">
+                    <label class="form-check-label">Male</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="gender" value="Female">
+                    <label class="form-check-label">Female</label>
+                </div>
+            </div>
+
+            <!-- Upload Section -->
+            <div class="col-12 text-center text-white">
+                <p>Submit documents in PDF. Ensure to name them properly (SurnameFirstname).</p>
+            </div>
+
+            <div class="row justify-content-center">
+                <div class="col-md-3 text-center">
+                    <button type="button" class="btn btn-light w-100" onclick="document.getElementById('cvInput').click()">Upload CV</button>
+                    <input type="file" name="cv" id="cvInput" accept=".pdf,.doc,.docx" class="d-none">
+                </div>
+                <div class="col-md-3 text-center">
+                    <button type="button" class="btn btn-light w-100" onclick="document.getElementById('coverLetterInput').click()">Upload Cover Letter</button>
+                    <input type="file" name="cover_letter" id="coverLetterInput" accept=".pdf,.doc,.docx" class="d-none">
+                </div>
+                <div class="col-md-3 text-center">
+                    <button type="button" class="btn btn-light w-100" onclick="document.getElementById('transcriptInput').click()">Upload Transcript</button>
+                    <input type="file" name="transcript" id="transcriptInput" accept=".pdf,.doc,.docx" class="d-none">
+                </div>
+            </div>
+
+            <!-- Course Selection -->
+            <div class="col-12 text-center text-white mt-4">
+                <p>Which courses would you be interested in being a Faculty Intern?</p>
+            </div>
+            <div class="col-md-4 text-center">
+                <input type="radio" name="course_selection" id="CS/MIS courses" class="btn-check" onclick="updateHiddenField('CS/MIS'); openModal1()">
+                <label class="btn btn-outline-light w-100" for="CS/MIS courses">CS/MIS Courses</label>
+            </div>
+            <div class="col-md-4 text-center">
+                <input type="radio" name="course_selection" id="Math Courses" class="btn-check" onclick="updateHiddenField('Math'); openModal()">
+                <label class="btn btn-outline-light w-100" for="Math Courses">Math Courses</label>
+            </div>
+            <div class="col-md-4 text-center">
+                <input type="radio" name="course_selection" id="Both" class="btn-check" onclick="updateHiddenField('Both'); openModal2()">
+                <label class="btn btn-outline-light w-100" for="Both">Both</label>
+            </div>
+
+            <input type="hidden" name="course_selection_id" id="course_selection_id">
+
+            <!-- Submit Button -->
+            <div class="col-12 text-center mt-4">
+                <button type="submit" class="btn btn-primary w-50">Submit</button>
+            </div>
+        </form>
+    </div>
 
 
         
