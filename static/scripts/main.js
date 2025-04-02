@@ -555,7 +555,7 @@ function checkPreviousRating(applicationId) {
     fetch(`/get_comments?application_id=${applicationId}`)
         .then(response => response.json())
         .then(data => {
-            if (data.success && data.rating) {
+            if (data.rating) {
                 // Show the previous rating badge
                 const ratingBadge = document.getElementById("previousRatingBadge");
                 const ratingLabel = document.getElementById("previousRatingLabel");
