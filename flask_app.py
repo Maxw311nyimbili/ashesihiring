@@ -356,7 +356,7 @@ def get_comments():
                 c.comment, 
                 f.username AS faculty_name
             FROM comments c
-            JOIN faculty f ON c.faculty_id = f.id
+            JOIN faculty_users f ON c.faculty_id = f.id
             WHERE c.application_id = %s;
         """, (application_id,))
 
