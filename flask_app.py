@@ -347,8 +347,17 @@ def get_comments():
         cursor = conn.cursor(dictionary=True)
 
         cursor.execute("""
-            SELECT id, application_id, rating, interest_prompt, comment 
-            FROM comments WHERE application_id = %s
+            SELECT 
+                c.id, 
+                c.application_id, 
+                c.rating, 
+                c.interest_prompt, 
+                c.created_at AS timestamp,
+                c.comment, 
+                f.username AS faculty_name
+            FROM comments c
+            JOIN faculty f ON c.faculty_id = f.id
+            WHERE c.application_id = %s;
         """, (application_id,))
 
         comments = cursor.fetchall()
