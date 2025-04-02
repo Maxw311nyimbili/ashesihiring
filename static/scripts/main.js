@@ -534,6 +534,14 @@ function openRateModal(index) {
     document.getElementById("comment").style.display = "none";
     document.getElementById("comments-section").innerHTML = ""; // Clear previous comments
 
+    // Reset previous rating indicators
+    document.getElementById("previousRatingBadge").classList.add("d-none");
+    document.getElementById("previousRatingLabel").classList.add("d-none");
+    document.getElementById("previousCommentsLabel").classList.add("d-none");
+
+    // Fetch previous ratings and comments
+    checkPreviousRating(candidate.id);
+
     // Fetch and display existing comments for this application
     fetchComments(candidate.id);
 
@@ -541,6 +549,37 @@ function openRateModal(index) {
         rateModalObj.show(); // Show rating modal using Bootstrap method
     }, 500); // Small delay to ensure smooth transition
 }
+
+// Add this new function to check for previous ratings
+function checkPreviousRating(applicationId) {
+    fetch(`/get_comments?application_id=${applicationId}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success && data.rating) {
+                // Show the previous rating badge
+                const ratingBadge = document.getElementById("previousRatingBadge");
+                const ratingLabel = document.getElementById("previousRatingLabel");
+                const ratingValue = document.getElementById("previousRatingValue");
+
+                ratingBadge.classList.remove("d-none");
+                ratingLabel.classList.remove("d-none");
+                ratingValue.textContent = data.rating;
+
+                // Pre-fill the rating input with previous value
+                document.getElementById("rating").value = data.rating;
+
+                // If they also had comments before
+                if (data.has_comments) {
+                    document.getElementById("previousCommentsLabel").classList.remove("d-none");
+                }
+            }
+        })
+        .catch(error => {
+            console.error("Error checking previous rating:", error);
+        });
+}
+
+
 
 // Handle rating input
 document.getElementById("rating").addEventListener("input", function () {
@@ -657,6 +696,7 @@ function submitRating() {
 
 function fetchComments(applicationId) {
     let facultyName = document.getElementById("loggedInUser").value;
+    let userHasCommented = false;
 
     fetch(`/get_comments?application_id=${applicationId}`)
         .then(response => response.json())
@@ -679,17 +719,23 @@ function fetchComments(applicationId) {
                     const commentDiv = document.createElement("div");
                     commentDiv.setAttribute("id", `comment-${comment.id}`);
 
+                    // Check if this is the current user's comment
+                    if (comment.faculty_name === facultyName) {
+                        userHasCommented = true;
+                    }
+
                     commentDiv.innerHTML = `
                         <div class="comment-card mb-3 border-start border-3 ps-3" style="border-color: #236465 !important;">
                             <div class="d-flex justify-content-between align-items-start">
                                 <div class="comment-content">
                                     <p class="mb-1" style="color:#236465 !important">
-                                        <strong class="fw-bold">${facultyName}:</strong>
+                                        <strong class="fw-bold">${comment.faculty_name || facultyName}:</strong>
                                         <span id="commentText-${comment.id}" style="color: inherit;">${comment.comment}</span>
                                     </p>
                                     <small class="text-muted comment-time">${comment.timestamp || 'Just now'}</small>
                                 </div>
                                 <div class="comment-actions">
+                                    ${comment.faculty_name === facultyName ? `
                                     <button class="btn btn-sm rounded-pill me-1 shadow-sm" style="background:#008080 !important; color: white;"
                                         onclick="editComment('${comment.id}')">
                                         <i class="fas fa-edit me-1"></i> Edit
@@ -698,6 +744,7 @@ function fetchComments(applicationId) {
                                         onclick="deleteComment('${comment.id}')">
                                         <i class="fas fa-trash-alt me-1"></i> Delete
                                     </button>
+                                    ` : ''}
                                 </div>
                             </div>
                         </div>
@@ -705,6 +752,11 @@ function fetchComments(applicationId) {
 
                     commentsSection.appendChild(commentDiv);
                 });
+
+                // Show the "you've previously commented" indicator if applicable
+                if (userHasCommented) {
+                    document.getElementById("previousCommentsLabel").classList.remove("d-none");
+                }
             } else {
                 console.error("Failed to fetch comments:", data.message);
                 showToast("Failed to load comments", "error");
@@ -715,7 +767,6 @@ function fetchComments(applicationId) {
             showToast("Error loading comments", "error");
         });
 }
-
 // Function to edit a comment
 function editComment(commentId) {
     const commentSpan = document.getElementById(`commentText-${commentId}`);
