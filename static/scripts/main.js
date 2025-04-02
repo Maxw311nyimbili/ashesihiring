@@ -553,7 +553,7 @@ document.getElementById("rating").addEventListener("input", function () {
     } else {
         document.getElementById("first_display").style.display = "block";
         document.querySelector(".interest-prompt").style.display = "none";
-        document.getElementById("comment").style.display = "block";
+        document.getElementById("comment").style.display = "none";
     }
 });
 
