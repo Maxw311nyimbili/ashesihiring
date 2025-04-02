@@ -284,17 +284,41 @@ function fetchComments(applicationId) {
                     commentDiv.classList.add("border", "p-2");
                     commentDiv.setAttribute("id", `comment-${comment.id}`);
 
-                    commentDiv.innerHTML = `
-                        <p style="color:#236465 !important">
-                            <strong>${facultyName}:</strong>
-                            <span id="commentText-${comment.id}" style="color: inherit;">${comment.comment}</span>
-                        </p>
-                        <small class="text-muted">
-                            <button class="btn btn-sm" style="background:#008080 !important; color: white;"
-                                onclick="editComment('${comment.id}')">Edit</button>
-                            <button class="btn btn-sm" style="background:#AD4245 !important; color: white;"
-                                onclick="deleteComment('${comment.id}')">Delete</button>
-                        </small>
+//                    commentDiv.innerHTML = `
+//                        <p style="color:#236465 !important">
+//                            <strong>${facultyName}:</strong>
+//                            <span id="commentText-${comment.id}" style="color: inherit;">${comment.comment}</span>
+//                        </p>
+//                        <small class="text-muted">
+//                            <button class="btn btn-sm" style="background:#008080 !important; color: white;"
+//                                onclick="editComment('${comment.id}')">Edit</button>
+//                            <button class="btn btn-sm" style="background:#AD4245 !important; color: white;"
+//                                onclick="deleteComment('${comment.id}')">Delete</button>
+//                        </small>
+//                    `;
+
+                        commentDiv.innerHTML = `
+                        <div class="comment-card mb-3 border-start border-3 ps-3" style="border-color: #236465 !important;">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div class="comment-content">
+                                    <p class="mb-1" style="color:#236465 !important">
+                                        <strong class="fw-bold">${facultyName}:</strong>
+                                        <span id="commentText-${comment.id}" style="color: inherit;">${comment.comment}</span>
+                                    </p>
+                                    <small class="text-muted comment-time">${comment.timestamp || 'Just now'}</small>
+                                </div>
+                                <div class="comment-actions">
+                                    <button class="btn btn-sm rounded-pill me-1 shadow-sm" style="background:#008080 !important; color: white;"
+                                        onclick="editComment('${comment.id}')">
+                                        <i class="fas fa-edit me-1"></i> Edit
+                                    </button>
+                                    <button class="btn btn-sm rounded-pill shadow-sm" style="background:#AD4245 !important; color: white;"
+                                        onclick="deleteComment('${comment.id}')">
+                                        <i class="fas fa-trash-alt me-1"></i> Delete
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
                     `;
 
                     commentsSection.appendChild(commentDiv);

@@ -14,6 +14,151 @@
     <!-- FontAwesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
+    <style>
+        body {
+            font-family: "DM Sans", serif;
+            background-color: #AD4245;
+            min-height: 100vh;
+        }
+
+        .main-container {
+            position: relative;
+            min-height: 100vh;
+        }
+
+        .card-nav-container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100%;
+            max-width: 800px;
+        }
+
+        .nav-btn {
+            font-size: 2rem;
+            background: transparent;
+            color: white;
+            border: none;
+        }
+
+        .custom-card {
+            background: white;
+            border-radius: 2rem;
+            box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+            height: 450px;
+            transition: transform 0.6s ease-in-out, opacity 0.6s ease-in-out;
+            overflow: auto;
+        }
+
+        .custom-card.hidden-left {
+            transform: translateX(-100%);
+            opacity: 0;
+        }
+
+        .custom-card.hidden-right {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+
+        .custom-card.active {
+            transform: translateX(0);
+            opacity: 1;
+            transition: transform 0.4s ease-out, opacity 0.4s ease-out;
+        }
+
+        #candidateCard h3 {
+            color: #AD4245;
+            font-size: 1.5rem;
+        }
+
+        #candidateCard p {
+            line-height: 1.8;
+        }
+
+        #candidateCard button {
+            color: #236465;
+            font-weight: bold;
+            background: transparent;
+            border: none;
+        }
+
+        .modal-content-custom {
+            border-radius: 1.5rem;
+        }
+
+        .modal-close {
+            cursor: pointer;
+            background: #AD4245;
+            width: 34px;
+            height: 26px;
+            color: white;
+            text-align: center;
+            border: none;
+            font-size: 1.2rem;
+        }
+
+        .section-heading {
+            color: #AD4245;
+            font-size: 1.8rem;
+            font-weight: bold;
+        }
+
+        .section-divider {
+            border-left: 3px solid #AD4245;
+        }
+
+        .rate-btn, .submit-btn {
+            background-color: #AD4245;
+            color: white;
+            border: none;
+        }
+
+        .edit-btn {
+            background-color: #236465;
+            color: white;
+        }
+
+        .candidate-name {
+            color: #AD4245;
+        }
+
+        .candidate-interests-heading {
+            color: #236465 !important;
+        }
+
+        .comment-text {
+            color: #236465 !important;
+        }
+
+        @media (max-width: 992px) {
+            .section-divider {
+                border-left: none;
+                border-top: 3px solid #AD4245;
+                margin-top: 1rem;
+                padding-top: 1rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .custom-card {
+                height: auto;
+                min-height: 350px;
+            }
+
+            .card-nav-container {
+                position: relative;
+                top: 0;
+                left: 0;
+                transform: none;
+                margin: 2rem auto;
+            }
+
+            .nav-btn {
+                font-size: 1.5rem;
+            }
+        }
+        </style>
 </head>
 <body>
 <header>
@@ -54,103 +199,218 @@
 </header>
 
 
-
-    <section>
-        <div class="container-1">
-            <button id="prevBtn" class="btn-1">
-                <i class="fa-solid fa-chevron-left"></i>
-            </button>
-
-            <div class="card-container">
-                <!-- Candidate details will be dynamically inserted here -->
-                <div class="custom-card" id="candidateCard"></div>
-            </div>
-
-            <button id="nextBtn" class="btn-1">
-                <i class="fa-solid fa-chevron-right"></i>
-            </button>
-        </div>
-    </section>
-
-
-    <!-- Modal -->
-        <div id="detailsModal" class="modal">
-            <div class="modal-content-1">
-                <div><span class="close" onclick="closeModal()">&times;</span></div>
-
-                <div class="flex-div">
-                    <div class="section-1">
-                        <h1>Hiring Details:</h1>
-                        <h5>Name: </h5><h2 id="modalCandidateName"></h2>
-
-                        <h5>Interested to be an FI for:</h5>
-                        <ul id="modalCandidateInterests"></ul>
-                    </div>
-
-                    <div class="section-2">
-                        <h1>Summary</h1>
-                        <p class="summary" id="modalCandidateSummary"></p>
-                        <p id="modalCandidateDetails"></p>
-                        <div id="button"></div>
-
-                    </div>
-
-                </div>
-
-
-            </div>
-        </div>
-
-        <!-- Rating Modal -->
-        <div id="rateModal" class="modal">
-            <div class="modal-content">
-                <span class="close" onclick="closeRateModal()">&times;</span>
-                <h2 style="color: #AD4245; font-size: 24px; text-align: left; margin-top: 12px;">Candidate Rating</h2>
-                <div style="display: flex; color: #AD4245;"><label for="rating">Rating: </label>
-                <input type="number" id="rating" min="1" max="5" style=" margin-left: 5px; width: 50px;" placeholder="5 - excellent"></div>
-                <br>
-
-                <button id="edit-comment-btn" style="display: none; background:#236465; color: white;" class="btn btn-sm">
-                Edit Rating & Comment
+ <div class="main-container">
+        <div class="card-nav-container">
+            <div class="d-flex align-items-center justify-content-center">
+                <button id="prevBtn" class="nav-btn">
+                    <i class="fa-solid fa-chevron-left"></i>
                 </button>
 
-
-                <!-- This must be the first display we see -->
-                <div id="first_display">
-                    <!-- holds the name of the faculty -->
-                    <input type="hidden" id="loggedInUser" value="{{ faculty_name }}">
-
-                    <div class="name-area" style="display: flex;">
-                        <h5 style="color: #AD4245; text-align: left; ">Name: </h5> <h2 id="modalCandidateName-1" style="color: #AD4245; text-align: left; font-size: 20px; margin-left: 5px;"></h2>
-                    </div>
-
-                    <h5 style="color:#236465 !important; text-align: left;">Interested to be an FI for:</h5>
-                    <ul id="modalCandidateInterests-1" style="text-align: left;"></ul>
+                <div class="flex-grow-1 position-relative">
+                    <div class="custom-card p-4 p-md-5" id="candidateCard"></div>
                 </div>
 
-                <!-- when rating is less than 4, then show this message-->
-                <div class="interest-prompt">
-                    <p style="color: #AD4245; text-align: left;">Despite the low rating, does the candidate have qualities that make them a desirable FI?</p>
-                    
-                    <div class="prompt_display_flex" style="display: flex">
-                        <div><input type="radio" name="interest_prompt" value="yes"> Yes</div>
-                        <div><input type="radio" name="interest_prompt" value="no"> No</div>
-                    </div>
-                    <br>
-                </div>
-
-
-                <div class="modal-body" id="comment" style="align-items: left;">
-                    <div id="comments-section">
-                         <!-- Existing comments will be appended here -->
-                    </div>
-                    <textarea style="color:#236465 !important; text-align: left;" id="new-comment" class="form-control my-3" placeholder="Write your comment here..."></textarea>
-                    <button id="post-comment-btn" class="btn" style="background:#008080 !important; color: white; text-align: left;">Post Comment</button>
-                </div>
-
-                <button id="final-subButton" class="rating-subButton" onclick="submitRating()">Submit</button>
+                <button id="nextBtn" class="nav-btn">
+                    <i class="fa-solid fa-chevron-right"></i>
+                </button>
             </div>
         </div>
+    </div>
+
+    <!-- Details Modal -->
+    <div class="modal fade" id="detailsModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content modal-content-custom">
+                <div class="modal-header border-0">
+                    <button type="button" class="modal-close" onclick="closeModal()">&times;</button>
+                </div>
+
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-lg-4">
+                            <h2 class="section-heading mb-4">Hiring Details:</h2>
+                            <h5 class="text-danger mb-2">Name:</h5>
+                            <h4 id="modalCandidateName" class="mb-4"></h4>
+
+                            <h5 class="text-danger">Interested to be an FI for:</h5>
+                            <ul id="modalCandidateInterests" class="list-unstyled"></ul>
+                        </div>
+
+                        <div class="col-lg-8 section-divider">
+                            <h2 class="section-heading mb-3">Summary</h2>
+                            <p class="summary" id="modalCandidateSummary"></p>
+                            <p id="modalCandidateDetails"></p>
+                            <div id="button" class="mt-3">
+                                <button class="btn rate-btn">Rate Candidate</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Rating Modal -->
+    <div class="modal fade" id="rateModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header border-0">
+                    <h5 class="modal-title text-danger fs-4">Candidate Rating</h5>
+                    <button type="button" class="btn-close" onclick="closeRateModal()"></button>
+                </div>
+
+                <div class="modal-body">
+                    <div class="mb-3 d-flex align-items-center text-danger">
+                        <label for="rating" class="form-label mb-0 me-2">Rating:</label>
+                        <input type="number" class="form-control form-control-sm w-25" id="rating" min="1" max="5" placeholder="5 - excellent">
+                    </div>
+
+                    <button id="edit-comment-btn" class="btn btn-sm edit-btn d-none mb-3">
+                        Edit Rating & Comment
+                    </button>
+
+                    <div id="first_display">
+                        <input type="hidden" id="loggedInUser" value="{{ faculty_name }}">
+
+                        <div class="mb-3">
+                            <div class="d-flex align-items-center">
+                                <h5 class="text-danger mb-0">Name:</h5>
+                                <h4 id="modalCandidateName-1" class="candidate-name ms-2 mb-0"></h4>
+                            </div>
+                        </div>
+
+                        <h5 class="candidate-interests-heading">Interested to be an FI for:</h5>
+                        <ul id="modalCandidateInterests-1" class="list-unstyled"></ul>
+                    </div>
+
+                    <div class="interest-prompt mb-3">
+                        <p class="text-danger">Despite the low rating, does the candidate have qualities that make them a desirable FI?</p>
+
+                        <div class="d-flex gap-3">
+                            <div class="form-check">
+                                <input type="radio" id="yes" name="interest_prompt" value="yes" class="form-check-input">
+                                <label for="yes" class="form-check-label">Yes</label>
+                            </div>
+                            <div class="form-check">
+                                <input type="radio" id="no" name="interest_prompt" value="no" class="form-check-input">
+                                <label for="no" class="form-check-label">No</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal-body" id="comment">
+                        <div id="comments-section">
+                            <!-- Existing comments will be appended here -->
+                        </div>
+                        <textarea id="new-comment" class="form-control comment-text my-3" placeholder="Write your comment here..."></textarea>
+                        <button id="post-comment-btn" class="btn btn-sm" style="background-color: #008080; color: white;">Post Comment</button>
+                    </div>
+
+                    <div class="text-end mt-3">
+                        <button id="final-subButton" class="btn submit-btn" onclick="submitRating()">Submit</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+<!--    <section>-->
+<!--        <div class="container-1">-->
+<!--            <button id="prevBtn" class="btn-1">-->
+<!--                <i class="fa-solid fa-chevron-left"></i>-->
+<!--            </button>-->
+
+<!--            <div class="card-container">-->
+<!--                &lt;!&ndash; Candidate details will be dynamically inserted here &ndash;&gt;-->
+<!--                <div class="custom-card" id="candidateCard"></div>-->
+<!--            </div>-->
+
+<!--            <button id="nextBtn" class="btn-1">-->
+<!--                <i class="fa-solid fa-chevron-right"></i>-->
+<!--            </button>-->
+<!--        </div>-->
+<!--    </section>-->
+
+
+<!--    &lt;!&ndash; Modal &ndash;&gt;-->
+<!--        <div id="detailsModal" class="modal">-->
+<!--            <div class="modal-content-1">-->
+<!--                <div><span class="close" onclick="closeModal()">&times;</span></div>-->
+
+<!--                <div class="flex-div">-->
+<!--                    <div class="section-1">-->
+<!--                        <h1>Hiring Details:</h1>-->
+<!--                        <h5>Name: </h5><h2 id="modalCandidateName"></h2>-->
+
+<!--                        <h5>Interested to be an FI for:</h5>-->
+<!--                        <ul id="modalCandidateInterests"></ul>-->
+<!--                    </div>-->
+
+<!--                    <div class="section-2">-->
+<!--                        <h1>Summary</h1>-->
+<!--                        <p class="summary" id="modalCandidateSummary"></p>-->
+<!--                        <p id="modalCandidateDetails"></p>-->
+<!--                        <div id="button"></div>-->
+
+<!--                    </div>-->
+
+<!--                </div>-->
+
+
+<!--            </div>-->
+<!--        </div>-->
+
+<!--        &lt;!&ndash; Rating Modal &ndash;&gt;-->
+<!--        <div id="rateModal" class="modal">-->
+<!--            <div class="modal-content">-->
+<!--                <span class="close" onclick="closeRateModal()">&times;</span>-->
+<!--                <h2 style="color: #AD4245; font-size: 24px; text-align: left; margin-top: 12px;">Candidate Rating</h2>-->
+<!--                <div style="display: flex; color: #AD4245;"><label for="rating">Rating: </label>-->
+<!--                <input type="number" id="rating" min="1" max="5" style=" margin-left: 5px; width: 50px;" placeholder="5 - excellent"></div>-->
+<!--                <br>-->
+
+<!--                <button id="edit-comment-btn" style="display: none; background:#236465; color: white;" class="btn btn-sm">-->
+<!--                Edit Rating & Comment-->
+<!--                </button>-->
+
+
+<!--                &lt;!&ndash; This must be the first display we see &ndash;&gt;-->
+<!--                <div id="first_display">-->
+<!--                    &lt;!&ndash; holds the name of the faculty &ndash;&gt;-->
+<!--                    <input type="hidden" id="loggedInUser" value="{{ faculty_name }}">-->
+
+<!--                    <div class="name-area" style="display: flex;">-->
+<!--                        <h5 style="color: #AD4245; text-align: left; ">Name: </h5> <h2 id="modalCandidateName-1" style="color: #AD4245; text-align: left; font-size: 20px; margin-left: 5px;"></h2>-->
+<!--                    </div>-->
+
+<!--                    <h5 style="color:#236465 !important; text-align: left;">Interested to be an FI for:</h5>-->
+<!--                    <ul id="modalCandidateInterests-1" style="text-align: left;"></ul>-->
+<!--                </div>-->
+
+<!--                &lt;!&ndash; when rating is less than 4, then show this message&ndash;&gt;-->
+<!--                <div class="interest-prompt">-->
+<!--                    <p style="color: #AD4245; text-align: left;">Despite the low rating, does the candidate have qualities that make them a desirable FI?</p>-->
+<!--                    -->
+<!--                    <div class="prompt_display_flex" style="display: flex">-->
+<!--                        <div><input type="radio" name="interest_prompt" value="yes"> Yes</div>-->
+<!--                        <div><input type="radio" name="interest_prompt" value="no"> No</div>-->
+<!--                    </div>-->
+<!--                    <br>-->
+<!--                </div>-->
+
+
+<!--                <div class="modal-body" id="comment" style="align-items: left;">-->
+<!--                    <div id="comments-section">-->
+<!--                         &lt;!&ndash; Existing comments will be appended here &ndash;&gt;-->
+<!--                    </div>-->
+<!--                    <textarea style="color:#236465 !important; text-align: left;" id="new-comment" class="form-control my-3" placeholder="Write your comment here..."></textarea>-->
+<!--                    <button id="post-comment-btn" class="btn" style="background:#008080 !important; color: white; text-align: left;">Post Comment</button>-->
+<!--                </div>-->
+
+<!--                <button id="final-subButton" class="rating-subButton" onclick="submitRating()">Submit</button>-->
+<!--            </div>-->
+<!--        </div>-->
 
     <!-- JavaScript -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
