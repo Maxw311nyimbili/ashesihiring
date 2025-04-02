@@ -724,7 +724,7 @@ function fetchComments(applicationId) {
                         userHasCommented = true;
                     }
                     console.log("from db: ");
-                    console.log(comment.faculty);
+                    console.log(comment.faculty_name);
                     console.log("from session:");
                     console.log(facultyName);
 
