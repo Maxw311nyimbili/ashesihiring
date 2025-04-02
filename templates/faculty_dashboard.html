@@ -269,68 +269,93 @@
 
 
     <!-- Rating Modal -->
-    <div class="modal fade" id="rateModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header border-0">
-                    <h5 class="modal-title text-danger fs-4">Candidate Rating</h5>
+<div class="modal fade" id="rateModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content shadow-sm">
+            <div class="modal-header py-2 border-0 align-items-center">
+                <h5 class="modal-title text-danger fw-bold fs-5">Candidate Rating</h5>
+                <div class="ms-auto d-flex align-items-center">
+                    <!-- Previously rated indicator -->
+                    <div id="previousRatingBadge" class="badge bg-info text-white me-3 d-none">
+                        <i class="fas fa-check-circle me-1"></i> Previously Rated
+                    </div>
                     <button type="button" class="btn-close" onclick="closeRateModal()"></button>
                 </div>
+            </div>
 
-                <div class="modal-body">
-                    <div class="mb-3 d-flex align-items-center text-danger">
-                        <label for="rating" class="form-label mb-0 me-2">Rating:</label>
-                        <input type="number" class="form-control form-control-sm w-25" id="rating" min="1" max="5" placeholder="5 - excellent">
+            <div class="modal-body py-3 px-4">
+                <!-- Rating input with visual indicator -->
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <label for="rating" class="form-label text-danger mb-0 fw-medium">Rating:</label>
+                        <small id="previousRatingLabel" class="text-info d-none">
+                            <i class="fas fa-history"></i> Previous rating: <span id="previousRatingValue">4</span>
+                        </small>
+                    </div>
+                    <div class="d-flex align-items-center">
+                        <input type="number" class="form-control form-control-sm w-25" id="rating" min="1" max="5" placeholder="1-5">
+                        <small class="ms-2 text-muted">(5 - excellent)</small>
+                    </div>
+                </div>
+
+                <button id="edit-comment-btn" class="btn btn-sm btn-outline-secondary d-none mb-3">
+                    <i class="fas fa-pen me-1"></i> Edit Rating & Comment
+                </button>
+
+                <div id="first_display">
+                    <input type="hidden" id="loggedInUser" value="{{ faculty_name }}">
+
+                    <div class="mb-3">
+                        <div class="d-flex align-items-center">
+                            <h6 class="text-danger fw-medium mb-0">Name:</h6>
+                            <h5 id="modalCandidateName-1" class="candidate-name ms-2 mb-0 fw-semibold"></h5>
+                        </div>
                     </div>
 
-                    <button id="edit-comment-btn" class="btn btn-sm edit-btn d-none mb-3">
-                        Edit Rating & Comment
+                    <h6 class="text-danger fw-medium candidate-interests-heading">Interested to be an FI for:</h6>
+                    <ul id="modalCandidateInterests-1" class="list-unstyled ps-2"></ul>
+                </div>
+
+                <div class="interest-prompt mb-3">
+                    <p class="text-danger mb-2 fw-medium">Despite the low rating, does the candidate have qualities that make them a desirable FI?</p>
+
+                    <div class="d-flex gap-3">
+                        <div class="form-check">
+                            <input type="radio" id="yes" name="interest_prompt" value="yes" class="form-check-input">
+                            <label for="yes" class="form-check-label">Yes</label>
+                        </div>
+                        <div class="form-check">
+                            <input type="radio" id="no" name="interest_prompt" value="no" class="form-check-input">
+                            <label for="no" class="form-check-label">No</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="comment">
+                    <!-- Previous comments indicator -->
+                    <div id="commentsHeader" class="d-flex justify-content-between align-items-center mb-2">
+                        <h6 class="text-danger fw-medium mb-0">Comments</h6>
+                        <small id="previousCommentsLabel" class="text-info d-none">
+                            <i class="fas fa-comment-dots me-1"></i> You've previously commented
+                        </small>
+                    </div>
+
+                    <div id="comments-section" class="mb-3">
+                        <!-- Existing comments will be appended here -->
+                    </div>
+                    <textarea id="new-comment" class="form-control comment-text mb-2" placeholder="Write your comment here..."></textarea>
+                    <button id="post-comment-btn" class="btn btn-sm px-3" style="background-color: #008080; color: white;">
+                        <i class="fas fa-comment me-1"></i> Post Comment
                     </button>
+                </div>
 
-                    <div id="first_display">
-                        <input type="hidden" id="loggedInUser" value="{{ faculty_name }}">
-
-                        <div class="mb-3">
-                            <div class="d-flex align-items-center">
-                                <h5 class="text-danger mb-0">Name:</h5>
-                                <h4 id="modalCandidateName-1" class="candidate-name ms-2 mb-0"></h4>
-                            </div>
-                        </div>
-
-                        <h5 class="candidate-interests-heading">Interested to be an FI for:</h5>
-                        <ul id="modalCandidateInterests-1" class="list-unstyled"></ul>
-                    </div>
-
-                    <div class="interest-prompt mb-3">
-                        <p class="text-danger">Despite the low rating, does the candidate have qualities that make them a desirable FI?</p>
-
-                        <div class="d-flex gap-3">
-                            <div class="form-check">
-                                <input type="radio" id="yes" name="interest_prompt" value="yes" class="form-check-input">
-                                <label for="yes" class="form-check-label">Yes</label>
-                            </div>
-                            <div class="form-check">
-                                <input type="radio" id="no" name="interest_prompt" value="no" class="form-check-input">
-                                <label for="no" class="form-check-label">No</label>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="modal-body" id="comment">
-                        <div id="comments-section">
-                            <!-- Existing comments will be appended here -->
-                        </div>
-                        <textarea id="new-comment" class="form-control comment-text my-3" placeholder="Write your comment here..."></textarea>
-                        <button id="post-comment-btn" class="btn btn-sm" style="background-color: #008080; color: white;">Post Comment</button>
-                    </div>
-
-                    <div class="text-end mt-3">
-                        <button id="final-subButton" class="btn submit-btn" onclick="submitRating()">Submit</button>
-                    </div>
+                <div class="text-end mt-3 border-top pt-3">
+                    <button id="final-subButton" class="btn px-4" style="background-color: #236465; color: white;" onclick="submitRating()">Submit</button>
                 </div>
             </div>
         </div>
     </div>
+</div>
 
 
 <!--    <section>-->
