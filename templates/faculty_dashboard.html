@@ -221,17 +221,22 @@
     </div>
 
 <!-- Details Modal -->
+<!-- Details Modal -->
 <div class="modal fade" id="detailsModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-dialog modal-dialog-centered">
+        <!-- Changed from modal-lg to default size -->
         <div class="modal-content modal-content-custom shadow">
-            <div class="modal-header py-2 px-3 border-0 d-flex justify-content-end">
-                <button type="button" class="btn-close" onclick="closeModal()" aria-label="Close"></button>
+            <div class="modal-header py-2 px-3 border-0">
+                <!-- Removed justify-content-end and adjusted padding -->
+                <button type="button" class="btn-close me-1" onclick="closeModal()" aria-label="Close"></button>
             </div>
 
             <div class="modal-body py-3 px-4">
-                <div class="row g-4">
+                <div class="row g-3">
+                    <!-- Reduced gap from g-4 to g-3 -->
                     <!-- Candidate Info Section -->
-                    <div class="col-lg-4">
+                    <div class="col-md-4">
+                        <!-- Changed from col-lg-4 to col-md-4 -->
                         <h3 class="fw-bold fs-5 mb-3">Hiring Details</h3>
 
                         <div class="mb-3">
@@ -246,12 +251,14 @@
                     </div>
 
                     <!-- Summary Section -->
-                    <div class="col-lg-8 border-start ps-lg-4">
+                    <div class="col-md-8 border-start ps-md-4">
+                        <!-- Changed from col-lg-8 to col-md-8 -->
                         <h3 class="fw-bold fs-5 mb-3">Summary</h3>
                         <p class="summary fw-medium mb-2" id="modalCandidateSummary"></p>
                         <p id="modalCandidateDetails" class="mb-3"></p>
                         <div id="button">
-                            <button class="btn btn-danger px-4 py-2 rate-btn">Rate Candidate</button>
+                            <button class="btn btn-danger px-3 py-1 rate-btn">Rate Candidate</button>
+                            <!-- Reduced button padding -->
                         </div>
                     </div>
                 </div>
@@ -259,7 +266,6 @@
         </div>
     </div>
 </div>
-
 <!--    &lt;!&ndash; Details Modal &ndash;&gt;-->
 <!--    <div class="modal fade" id="detailsModal" tabindex="-1" aria-hidden="true">-->
 <!--        <div class="modal-dialog modal-dialog-centered modal-lg">-->
