@@ -239,7 +239,7 @@
                                     </div>
                                     <br>
                                     <div class="form-check">
-                                        <input class="form-check-input" type="radio" name="course_selection" id="math" value="Math" data-bs-target="#applicationModal" data-bs-toggle="modal" onclick="updateHiddenField('Math');">
+                                        <input class="form-check-input" type="radio" name="course_selection" id="math" value="Math" data-bs-target="#applicationModal" data-bs-toggle="modal" onclick="updateHiddenField('Math');closeModal()">
                                         <label class="form-check-label" for="math">Math courses</label>
                                     </div>
                                     <br>
@@ -1421,7 +1421,7 @@
         document.getElementById("visible").style.display = "block";
     }
     function closeModal() {
-        document.getElementById("modal").style.display = "none";
+        document.getElementById("visible").style.display = "none";
     }
 
     function openModal1() {
