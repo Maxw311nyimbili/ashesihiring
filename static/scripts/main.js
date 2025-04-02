@@ -723,6 +723,10 @@ function fetchComments(applicationId) {
                     if (comment.faculty_name === facultyName) {
                         userHasCommented = true;
                     }
+                    console.log("from db: ");
+                    console.log(comment.faculty);
+                    console.log("from session:");
+                    console.log(facultyName);
 
                     commentDiv.innerHTML = `
                         <div class="comment-card mb-3 border-start border-3 ps-3" style="border-color: #236465 !important;">
