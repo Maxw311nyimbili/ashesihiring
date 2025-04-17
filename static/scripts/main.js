@@ -624,6 +624,10 @@ function openRateModal(index) {
     document.getElementById("previousRatingBadge").classList.add("d-none");
     document.getElementById("previousRatingLabel").classList.add("d-none");
     document.getElementById("previousCommentsLabel").classList.add("d-none");
+    document.getElementById("edit-rating-container").classList.add("d-none");
+    
+    // Make sure submit button is visible
+    document.getElementById("final-subButton").classList.remove("d-none");
     
     // Check for previous rating
     checkPreviousRating(candidate.id);
@@ -658,6 +662,7 @@ function checkPreviousRating(applicationId) {
                 const ratingLabel = document.getElementById("previousRatingLabel");
                 const ratingValue = document.getElementById("previousRatingValue");
                 const editRatingContainer = document.getElementById("edit-rating-container");
+                const submitButton = document.getElementById("final-subButton");
 
                 ratingBadge.classList.remove("d-none");
                 ratingLabel.classList.remove("d-none");
@@ -672,7 +677,6 @@ function checkPreviousRating(applicationId) {
                 // If they also had comments before
                 if (data.has_comments) {
                     document.getElementById("previousCommentsLabel").classList.remove("d-none");
-                    document.getElementById("new-comment-container").classList.remove("d-none");
                     
                     // Show edit button if they've already rated
                     editRatingContainer.classList.remove("d-none");
@@ -697,6 +701,14 @@ function checkPreviousRating(applicationId) {
                             }
                         }
                     }
+                } else {
+                    // For high ratings, show comment section
+                    document.getElementById("new-comment-container").classList.remove("d-none");
+                }
+                
+                // If we're in edit mode, hide the submit button
+                if (editRatingContainer && !editRatingContainer.classList.contains("d-none")) {
+                    submitButton.classList.add("d-none");
                 }
             }
         })
@@ -756,10 +768,18 @@ document.getElementById("rating").addEventListener("input", function () {
     // Update star rating
     updateStarRating(rating);
 
+    // Handle visibility of sections based on rating
     if (rating < 4) {
+        // For low ratings (1-3), show interest prompt and hide comment section initially
         document.getElementById("interest-prompt-section").classList.remove("d-none");
         document.getElementById("new-comment-container").classList.add("d-none");
+        
+        // Reset radio buttons when rating changes
+        document.querySelectorAll("input[name='interest_prompt']").forEach(radio => {
+            radio.checked = false;
+        });
     } else {
+        // For high ratings (4-5), hide interest prompt and show comment section
         document.getElementById("interest-prompt-section").classList.add("d-none");
         document.getElementById("new-comment-container").classList.remove("d-none");
     }
@@ -769,10 +789,15 @@ document.getElementById("rating").addEventListener("input", function () {
 document.querySelectorAll("input[name='interest_prompt']").forEach((radio) => {
     radio.addEventListener("change", function () {
         if (this.value === "yes") {
-            let applicantId = candidates[selectedIndex].id;
+            // If "yes" is selected, show comment section
             document.getElementById("new-comment-container").classList.remove("d-none");
-            fetchComments(applicantId);
+            
+            // Fetch comments if we have a valid candidate
+            if (selectedIndex !== null && candidates[selectedIndex]) {
+                fetchComments(candidates[selectedIndex].id);
+            }
         } else {
+            // If "no" is selected, hide comment section
             document.getElementById("new-comment-container").classList.add("d-none");
         }
     });
@@ -875,6 +900,12 @@ function editComment(commentId) {
             yesRadioButton.checked = true;
         }
         
+        // Show the comment section when editing
+        document.getElementById("new-comment-container").classList.remove("d-none");
+        
+        // Hide the submit button when editing
+        document.getElementById("final-subButton").classList.add("d-none");
+        
         fetch("/comment", {
             method: "PUT",
             headers: { "Content-Type": "application/json" },
@@ -890,6 +921,9 @@ function editComment(commentId) {
             if (data.success) {
                 commentSpan.textContent = newComment;
                 showToast("Comment updated successfully!");
+                
+                // Show the submit button again after successful edit
+                document.getElementById("final-subButton").classList.remove("d-none");
             } else {
                 showToast("Error: " + data.message, "error");
             }
@@ -936,14 +970,19 @@ function submitRating() {
         return;
     }
     
-    if (rating < 4 && !interestPrompt) {
-        showToast("Please answer the interest prompt", "error");
-        return;
-    }
-    
-    if (rating < 4 && interestPrompt === "yes" && !comment) {
-        showToast("Please provide a comment for low ratings with positive qualities", "error");
-        return;
+    // Validate based on rating value
+    if (parseInt(rating) < 4) {
+        // For low ratings, require interest prompt
+        if (!interestPrompt) {
+            showToast("Please answer the interest prompt", "error");
+            return;
+        }
+        
+        // If interest prompt is "yes", require a comment
+        if (interestPrompt === "yes" && !comment) {
+            showToast("Please provide a comment for low ratings with positive qualities", "error");
+            return;
+        }
     }
     
     const candidate = candidates[selectedIndex];
