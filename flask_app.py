@@ -347,7 +347,7 @@ def get_comments():
         cursor = conn.cursor(dictionary=True)
 
         # First check if the application exists
-        cursor.execute("SELECT id FROM applications WHERE id = %s", (application_id,))
+        cursor.execute("SELECT id FROM applicants WHERE id = %s", (application_id,))
         application = cursor.fetchone()
         
         if not application:
