@@ -264,7 +264,7 @@ function displayCandidate(index, direction) {
         });
 
         // Load ratings and comments for this candidate
-        loadExistingRatingAndComments(candidate.id);
+        loadExistingRatingAndComments(candidate.application_id);
 
         isAnimating = false;
     }, 500); // Match this to your animation duration
