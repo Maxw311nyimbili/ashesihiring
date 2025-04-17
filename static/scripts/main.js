@@ -25,6 +25,7 @@ const clearFilters = document.getElementById('clearFilters');
 const activeFiltersContainer = document.getElementById('activeFilters');
 const noResults = document.getElementById('noResults');
 const resetFilters = document.getElementById('resetFilters');
+const filterPanel = document.querySelector('.filter-panel');
 
 // Touch swipe variables
 let touchStartX = 0;
@@ -50,35 +51,31 @@ document.addEventListener('DOMContentLoaded', function() {
 // Adjust layout for mobile devices
 function adjustForMobile() {
     const cardContainer = document.querySelector('.card-container');
-    const cardBody = document.querySelector('.card-body');
     
     // Add event listener for window resize
     window.addEventListener('resize', function() {
         if (window.innerWidth <= 768) {
-            // Mobile adjustments - using fixed height instead of auto
+            // Mobile adjustments
             cardContainer.style.height = '600px';
             cardContainer.style.minHeight = '500px';
             cardContainer.style.maxHeight = '600px';
             
-            if (cardBody) {
-                cardBody.style.padding = '1rem';
-                cardBody.style.height = 'calc(100% - 60px)';
-            }
+            // Make filter panel more compact
+            filterPanel.style.padding = '1rem';
+            filterPanel.style.marginBottom = '1rem';
             
-            // Make tabs more compact
-            const tabs = document.querySelectorAll('.nav-tabs .nav-link');
-            tabs.forEach(tab => {
-                tab.style.padding = '0.5rem 0.75rem';
-                tab.style.fontSize = '0.9rem';
+            // Adjust filter options for better mobile display
+            const filterOptions = document.querySelectorAll('.filter-option');
+            filterOptions.forEach(option => {
+                option.style.padding = '0.3rem 0.6rem';
+                option.style.fontSize = '0.8rem';
             });
             
-            // Adjust spacing in card content
-            const cardContent = document.querySelectorAll('.card-body h6, .card-body p');
-            cardContent.forEach(element => {
-                if (element.classList.contains('mb-3')) {
-                    element.classList.remove('mb-3');
-                    element.classList.add('mb-2');
-                }
+            // Adjust filter badges
+            const filterBadges = document.querySelectorAll('.filter-badge');
+            filterBadges.forEach(badge => {
+                badge.style.padding = '0.2rem 0.5rem';
+                badge.style.fontSize = '0.75rem';
             });
         } else {
             // Desktop adjustments
@@ -86,10 +83,23 @@ function adjustForMobile() {
             cardContainer.style.minHeight = '500px';
             cardContainer.style.maxHeight = '600px';
             
-            if (cardBody) {
-                cardBody.style.padding = '1.5rem';
-                cardBody.style.height = 'calc(100% - 70px)';
-            }
+            // Reset filter panel styles
+            filterPanel.style.padding = '1.5rem';
+            filterPanel.style.marginBottom = '2rem';
+            
+            // Reset filter options
+            const filterOptions = document.querySelectorAll('.filter-option');
+            filterOptions.forEach(option => {
+                option.style.padding = '0.4rem 0.8rem';
+                option.style.fontSize = '0.85rem';
+            });
+            
+            // Reset filter badges
+            const filterBadges = document.querySelectorAll('.filter-badge');
+            filterBadges.forEach(badge => {
+                badge.style.padding = '0.3rem 0.6rem';
+                badge.style.fontSize = '0.8rem';
+            });
         }
     });
     
@@ -108,9 +118,9 @@ async function fetchCandidates() {
 
         if (candidates.length > 0) {
             // Create navigation dots
-            createNavDots(candidates.length);
+            createNavigationDots();
             displayCandidate(currentIndex, "right"); // Initial display
-            updateNavDots();
+            updateNavigationDots();
             populateCourseFilters();
         }
     } catch (error) {
@@ -120,9 +130,9 @@ async function fetchCandidates() {
 }
 
 // Create navigation dots based on candidate count
-function createNavDots(count) {
+function createNavigationDots() {
     navDots.innerHTML = '';
-    for (let i = 0; i < count; i++) {
+    for (let i = 0; i < filteredCandidates.length; i++) {
         const dot = document.createElement('div');
         dot.className = 'nav-dot';
         dot.setAttribute('data-index', i);
@@ -131,14 +141,14 @@ function createNavDots(count) {
             const direction = index > currentIndex ? "right" : "left";
             currentIndex = index;
             displayCandidate(currentIndex, direction);
-            updateNavDots();
+            updateNavigationDots();
         });
         navDots.appendChild(dot);
     }
 }
 
 // Update active state of navigation dots
-function updateNavDots() {
+function updateNavigationDots() {
     document.querySelectorAll('.nav-dot').forEach((dot, index) => {
         if (index === currentIndex) {
             dot.classList.add('active');
@@ -148,142 +158,61 @@ function updateNavDots() {
     });
 }
 
-// Function to display a candidate with animation
-function displayCandidate(index, direction) {
-    if (candidates.length === 0 || isAnimating) return;
-
+// Display candidate
+function displayCandidate(index) {
+    if (isAnimating || index < 0 || index >= filteredCandidates.length) return;
+    
     isAnimating = true;
-    let candidate = candidates[index];
-
-    // Create a new card element that will slide in
+    const candidate = filteredCandidates[index];
+    const direction = index > currentIndex ? 'next' : 'prev';
+    
+    // Create new card
     const newCard = document.createElement('div');
     newCard.className = 'candidate-card';
-    newCard.id = 'newCandidateCard';
-
-    // Add appropriate animation class based on direction
-    // For "right" direction (next), new card slides in from right, current slides out to left
-    // For "left" direction (previous), new card slides in from left, current slides out to right
-    newCard.classList.add(direction === "left" ? "card-enter-from-left" : "card-enter-from-right");
-
-    // Prepare card content
+    
+    // Extract first and last name from the candidate name
+    const nameParts = candidate.name.split(' ');
+    const firstName = nameParts[0] || '';
+    const lastName = nameParts.slice(1).join(' ') || '';
+    
+    // Format interests for display
+    const interests = candidate.interests && candidate.interests.length > 0 
+        ? candidate.interests.map(interest => `<span class="tag-pill">${interest}</span>`).join('')
+        : `<span class="tag-pill">${candidate.summary.replace('Interested in ', '').replace('.', '')}</span>`;
+    
     newCard.innerHTML = `
-        <div class="card-header d-flex justify-content-between align-items-center">
-            <h4 class="mb-0 fw-bold">${candidate.name}</h4>
-            <span class="badge bg-light text-dark rounded-pill">${index + 1}/${candidates.length}</span>
+        <div class="card-header">
+            <h3 class="mb-0">${firstName} ${lastName}</h3>
         </div>
         <div class="card-body">
-            <ul class="nav nav-tabs mb-3" id="candidateTabs" role="tablist">
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link active" id="info-tab" data-bs-toggle="tab" data-bs-target="#info-pane" type="button" role="tab">
-                        <i class="fas fa-user-circle me-1"></i> Summary
-                    </button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="details-tab" data-bs-toggle="tab" data-bs-target="#details-pane" type="button" role="tab">
-                        <i class="fas fa-clipboard-list me-1"></i> Details
-                    </button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="rate-tab" data-bs-toggle="tab" data-bs-target="#rate-pane" type="button" role="tab">
-                        <i class="fas fa-star me-1"></i> Rate
-                    </button>
-                </li>
-            </ul>
-
-            <div class="tab-content">
-                <!-- Summary Tab -->
-                <div class="tab-pane fade show active" id="info-pane" role="tabpanel" tabindex="0">
-                    <div class="candidate-info-box">
-                        <div class="mb-3">
-                            <h6 class="text-danger mb-1">Interested to be an FI for:</h6>
-                            <div class="interests-container">
-                                ${candidate.interests && candidate.interests.length > 0 ?
-                                  candidate.interests.map(interest => `<span class="tag-pill">${interest}</span>`).join('') :
-                                  "<span class='text-muted fst-italic'>No interests specified</span>"}
-                            </div>
-                        </div>
-                    </div>
-
-                    <h6 class="fw-bold">Summary</h6>
-                    <p>${candidate.summary}</p>
-                </div>
-
-                <!-- Details Tab -->
-                <div class="tab-pane fade" id="details-pane" role="tabpanel" tabindex="0">
-                    <h6 class="fw-bold mb-3">Detailed Information</h6>
-                    <div>${candidate.details}</div>
-                </div>
-
-                <!-- Rate Tab -->
-                <div class="tab-pane fade" id="rate-pane" role="tabpanel" tabindex="0">
-                    <div class="rating-card p-3 mb-3" id="ratingStatusCard">
-                        <h6 class="fw-bold text-secondary mb-3">Candidate Rating</h6>
-                        <div class="d-flex align-items-center justify-content-between">
-                            <div id="ratingStatus">
-                                <span class="text-muted">You haven't rated this candidate yet</span>
-                            </div>
-                            <button class="btn btn-primary" onclick="openRateModal(${index})">
-                                <i class="fas fa-star me-1"></i> Rate Now
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="mt-4" id="candidateCommentsSection">
-                        <h6 class="fw-bold text-secondary mb-3">Faculty Comments</h6>
-                        <div id="commentsList" class="comment-list">
-                            <!-- Will be populated via JavaScript -->
-                            <p class="text-muted fst-italic">No comments yet</p>
-                        </div>
-                    </div>
-                </div>
+            <div class="candidate-info-box">
+                <p><strong>Summary:</strong> ${candidate.summary}</p>
+            </div>
+            <h6 class="text-danger fw-medium">Courses of Interest:</h6>
+            <div class="mb-3">
+                ${interests}
+            </div>
+            <div class="text-end">
+                <button class="btn btn-primary" onclick="openRateModal(${candidate.id || index})">
+                    Rate Candidate
+                </button>
             </div>
         </div>
     `;
 
-    // Add the new card
-    cardWrapper.appendChild(newCard);
+    // Add animation classes
+    newCard.classList.add(direction === 'next' ? 'slide-in-from-right' : 'slide-in-from-left');
+    candidateCard.classList.add(direction === 'next' ? 'slide-out-to-left' : 'slide-out-to-right');
 
-    // Get the current card
-    const currentCard = document.getElementById('candidateCard');
-
-    // Apply opposite animation to the current card
-    currentCard.className = 'candidate-card';
-    void currentCard.offsetWidth; // Force reflow
-    currentCard.classList.add(direction === "left" ? "card-leave-to-right" : "card-leave-to-left");
-
-    // After animation completes
+    // Replace card after animation
     setTimeout(() => {
-        // Remove the old card
-        cardWrapper.removeChild(currentCard);
-
-        // Make the new card the current card
-        newCard.id = 'candidateCard';
-        newCard.classList.remove('card-enter-from-left', 'card-enter-from-right');
-
-        // Initialize Bootstrap tabs in the new card
-        const tabs = newCard.querySelectorAll('[data-bs-toggle="tab"]');
-        tabs.forEach(tab => {
-            tab.addEventListener('click', function() {
-                const target = newCard.querySelector(this.dataset.bsTarget);
-                newCard.querySelectorAll('.tab-pane').forEach(pane => {
-                    pane.classList.remove('show', 'active');
-                });
-                newCard.querySelectorAll('.nav-link').forEach(link => {
-                    link.classList.remove('active');
-                });
-                this.classList.add('active');
-                target.classList.add('show', 'active');
-            });
-        });
-
-        // Load ratings and comments for this candidate
-        loadExistingRatingAndComments(candidate.id);
-
+        candidateCard.innerHTML = newCard.innerHTML;
+        candidateCard.classList.remove('slide-out-to-left', 'slide-out-to-right');
+        newCard.classList.remove('slide-in-from-right', 'slide-in-from-left');
+        currentIndex = index;
+        updateNavigationDots();
         isAnimating = false;
-    }, 500); // Match this to your animation duration
-
-    // Update navigation dots
-    updateNavDots();
+    }, 300);
 }
 
 // Load existing rating and comments for the current candidate
@@ -901,10 +830,20 @@ function showToast(message, type = "success") {
 // Populate course filters
 function populateCourseFilters() {
     const courses = new Set();
+    
+    // Extract courses from candidates
     candidates.forEach(candidate => {
-        candidate.course_selection.split(',').forEach(course => {
-            courses.add(course.trim());
-        });
+        if (candidate.interests && candidate.interests.length > 0) {
+            candidate.interests.forEach(course => {
+                courses.add(course.trim());
+            });
+        } else if (candidate.summary) {
+            // Extract course from summary if interests not available
+            const courseMatch = candidate.summary.match(/Interested in (.+?)\./);
+            if (courseMatch && courseMatch[1]) {
+                courses.add(courseMatch[1].trim());
+            }
+        }
     });
 
     courseFilters.innerHTML = Array.from(courses).map(course => `
@@ -947,13 +886,29 @@ function applyFilters() {
     
     filteredCandidates = candidates.filter(candidate => {
         // Search filter
-        if (activeFilters.searchQuery && !`${candidate.first_name} ${candidate.last_name}`.toLowerCase().includes(activeFilters.searchQuery)) {
+        if (activeFilters.searchQuery && !candidate.name.toLowerCase().includes(activeFilters.searchQuery)) {
             return false;
         }
 
         // Course filter
         if (activeFilters.courses.size > 0) {
-            const candidateCourses = new Set(candidate.course_selection.split(',').map(c => c.trim()));
+            const candidateCourses = new Set();
+            
+            // Add courses from interests array
+            if (candidate.interests && candidate.interests.length > 0) {
+                candidate.interests.forEach(course => {
+                    candidateCourses.add(course.trim());
+                });
+            }
+            
+            // Add course from summary if interests not available
+            if (candidate.summary) {
+                const courseMatch = candidate.summary.match(/Interested in (.+?)\./);
+                if (courseMatch && courseMatch[1]) {
+                    candidateCourses.add(courseMatch[1].trim());
+                }
+            }
+            
             if (!Array.from(activeFilters.courses).some(course => candidateCourses.has(course))) {
                 return false;
             }
