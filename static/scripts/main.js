@@ -869,13 +869,19 @@ function editComment(commentId) {
     const newComment = prompt("Edit your comment:", commentSpan.textContent);
 
     if (newComment !== null && newComment.trim() !== "") {
+        // Pre-select the "yes" radio button for interest_prompt
+        const yesRadioButton = document.querySelector("input[name='interest_prompt'][value='yes']");
+        if (yesRadioButton) {
+            yesRadioButton.checked = true;
+        }
+        
         fetch("/comment", {
             method: "PUT",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
                 comment_id: commentId,
                 rating: document.getElementById("rating").value, // Include updated rating
-                interest_prompt: document.querySelector("input[name='interest_prompt']:checked")?.value || "",
+                interest_prompt: "yes", // Always set to "yes" when editing
                 comment: newComment
             })
         })
