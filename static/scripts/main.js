@@ -140,6 +140,7 @@ function displayCandidate(index, direction) {
 
     isAnimating = true;
     let candidate = candidates[index];
+    selectedIndex = index;  // Set the selectedIndex to the current index
 
     // Create a new card element that will slide in
     const newCard = document.createElement('div');
