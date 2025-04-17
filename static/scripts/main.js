@@ -1,14 +1,14 @@
 
-//let candidates = [];
-//let currentIndex = 0;
-//let selectedIndex = null;
-//const candidateCard = document.getElementById("candidateCard");
-//const prevBtn = document.getElementById("prevBtn");
-//const nextBtn = document.getElementById("nextBtn");
-//const navDots = document.getElementById("nav-dots");
-//
-//// Bootstrap modal objects
-//let rateModalObj;
+let candidates = [];
+let currentIndex = 0;
+let selectedIndex = null;
+const candidateCard = document.getElementById("candidateCard");
+const prevBtn = document.getElementById("prevBtn");
+const nextBtn = document.getElementById("nextBtn");
+const navDots = document.getElementById("nav-dots");
+
+// Bootstrap modal objects
+let rateModalObj;
 //
 //// Rating modal elements
 //const rateModal = document.getElementById("rateModal");
