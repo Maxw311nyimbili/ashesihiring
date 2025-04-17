@@ -4,6 +4,13 @@ let currentIndex = 0;
 let selectedIndex = null;
 let rateModalObj;
 let isAnimating = false;
+let filteredCandidates = [];
+let activeFilters = {
+    courses: new Set(),
+    ratingStatus: null,
+    ratingValue: null,
+    searchQuery: ''
+};
 
 // DOM elements
 const prevBtn = document.getElementById("prevBtn");
@@ -11,6 +18,13 @@ const nextBtn = document.getElementById("nextBtn");
 const navDots = document.getElementById("nav-dots");
 const candidateCard = document.getElementById("candidateCard");
 const cardWrapper = document.querySelector('.card-wrapper');
+const searchInput = document.getElementById('searchInput');
+const courseFilters = document.getElementById('courseFilters');
+const filterCount = document.getElementById('filterCount');
+const clearFilters = document.getElementById('clearFilters');
+const activeFiltersContainer = document.getElementById('activeFilters');
+const noResults = document.getElementById('noResults');
+const resetFilters = document.getElementById('resetFilters');
 
 // Touch swipe variables
 let touchStartX = 0;
@@ -89,12 +103,15 @@ async function fetchCandidates() {
         let response = await fetch("/api/candidates");
         let data = await response.json();
         candidates = data;
+        filteredCandidates = [...candidates];
+        updateFilterCount();
 
         if (candidates.length > 0) {
             // Create navigation dots
             createNavDots(candidates.length);
             displayCandidate(currentIndex, "right"); // Initial display
             updateNavDots();
+            populateCourseFilters();
         }
     } catch (error) {
         console.error("Error fetching candidates:", error);
@@ -879,4 +896,196 @@ function showToast(message, type = "success") {
         delay: 3000
     });
     bsToast.show();
+}
+
+// Populate course filters
+function populateCourseFilters() {
+    const courses = new Set();
+    candidates.forEach(candidate => {
+        candidate.course_selection.split(',').forEach(course => {
+            courses.add(course.trim());
+        });
+    });
+
+    courseFilters.innerHTML = Array.from(courses).map(course => `
+        <div class="filter-option" data-filter="course" data-value="${course}">
+            <i class="fas fa-book"></i> ${course}
+        </div>
+    `).join('');
+}
+
+// Toggle course filter
+function toggleCourseFilter(option) {
+    const course = option.dataset.value;
+    if (activeFilters.courses.has(course)) {
+        activeFilters.courses.delete(course);
+        option.classList.remove('active');
+    } else {
+        activeFilters.courses.add(course);
+        option.classList.add('active');
+    }
+    applyFilters();
+}
+
+// Toggle filter
+function toggleFilter(filterType, value, option) {
+    const currentValue = activeFilters[filterType];
+    if (currentValue === value) {
+        activeFilters[filterType] = null;
+        option.classList.remove('active');
+    } else {
+        activeFilters[filterType] = value;
+        option.classList.remove('active');
+        option.classList.add('active');
+    }
+    applyFilters();
+}
+
+// Apply filters
+function applyFilters() {
+    activeFilters.searchQuery = searchInput.value.toLowerCase();
+    
+    filteredCandidates = candidates.filter(candidate => {
+        // Search filter
+        if (activeFilters.searchQuery && !`${candidate.first_name} ${candidate.last_name}`.toLowerCase().includes(activeFilters.searchQuery)) {
+            return false;
+        }
+
+        // Course filter
+        if (activeFilters.courses.size > 0) {
+            const candidateCourses = new Set(candidate.course_selection.split(',').map(c => c.trim()));
+            if (!Array.from(activeFilters.courses).some(course => candidateCourses.has(course))) {
+                return false;
+            }
+        }
+
+        // Rating status filter
+        if (activeFilters.ratingStatus) {
+            const hasRating = candidate.rating !== undefined;
+            if (activeFilters.ratingStatus === 'rated' && !hasRating) return false;
+            if (activeFilters.ratingStatus === 'not-rated' && hasRating) return false;
+        }
+
+        // Rating value filter
+        if (activeFilters.ratingValue && candidate.rating !== parseInt(activeFilters.ratingValue)) {
+            return false;
+        }
+
+        return true;
+    });
+
+    updateFilterUI();
+    updateFilterCount();
+    
+    if (filteredCandidates.length === 0) {
+        noResults.classList.remove('d-none');
+        candidateCard.parentElement.classList.add('d-none');
+    } else {
+        noResults.classList.add('d-none');
+        candidateCard.parentElement.classList.remove('d-none');
+        if (currentIndex >= filteredCandidates.length) {
+            currentIndex = 0;
+        }
+        displayCandidate(currentIndex);
+        createNavigationDots();
+    }
+}
+
+// Update filter UI
+function updateFilterUI() {
+    // Update active filter badges
+    activeFiltersContainer.innerHTML = '';
+    
+    // Course filters
+    activeFilters.courses.forEach(course => {
+        addFilterBadge('course', course, 'book');
+    });
+
+    // Rating status
+    if (activeFilters.ratingStatus) {
+        addFilterBadge('rating-status', activeFilters.ratingStatus === 'rated' ? 'Rated' : 'Not Rated', 'star');
+    }
+
+    // Rating value
+    if (activeFilters.ratingValue) {
+        addFilterBadge('rating-value', `${activeFilters.ratingValue} Stars`, 'star');
+    }
+
+    // Search query
+    if (activeFilters.searchQuery) {
+        addFilterBadge('search', `Search: ${activeFilters.searchQuery}`, 'search');
+    }
+}
+
+// Add filter badge
+function addFilterBadge(type, value, icon) {
+    const badge = document.createElement('div');
+    badge.className = 'filter-badge';
+    badge.innerHTML = `
+        ${value}
+        <i class="fas fa-${icon} fa-times" onclick="removeFilter('${type}', '${value}')"></i>
+    `;
+    activeFiltersContainer.appendChild(badge);
+}
+
+// Remove filter
+function removeFilter(type, value) {
+    if (type === 'course') {
+        activeFilters.courses.delete(value);
+        const option = courseFilters.querySelector(`[data-value="${value}"]`);
+        if (option) option.classList.remove('active');
+    } else if (type === 'search') {
+        searchInput.value = '';
+        activeFilters.searchQuery = '';
+    } else {
+        activeFilters[type] = null;
+        const option = document.querySelector(`[data-filter="${type}"][data-value="${value}"]`);
+        if (option) option.classList.remove('active');
+    }
+    applyFilters();
+}
+
+// Reset all filters
+function resetAllFilters() {
+    // Reset course filters
+    activeFilters.courses.clear();
+    courseFilters.querySelectorAll('.filter-option').forEach(option => {
+        option.classList.remove('active');
+    });
+
+    // Reset rating filters
+    activeFilters.ratingStatus = null;
+    activeFilters.ratingValue = null;
+    document.querySelectorAll('.filter-option[data-filter]').forEach(option => {
+        option.classList.remove('active');
+    });
+
+    // Reset search
+    searchInput.value = '';
+    activeFilters.searchQuery = '';
+
+    // Apply filters
+    applyFilters();
+}
+
+// Update filter count
+function updateFilterCount() {
+    const count = activeFilters.courses.size + 
+        (activeFilters.ratingStatus ? 1 : 0) + 
+        (activeFilters.ratingValue ? 1 : 0) + 
+        (activeFilters.searchQuery ? 1 : 0);
+    filterCount.textContent = count;
+}
+
+// Debounce function
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
 } 
