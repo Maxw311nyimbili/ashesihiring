@@ -255,6 +255,7 @@ def get_candidates():
 
             candidates.append({
                 "name": f"{applicant['first_name']} {applicant['last_name']}",
+                "id" : f"{applicant["id"]}",
                 "summary": f"Interested in {applicant.get('course_selection', 'Unknown Course')}.",
                 "details": f"""
                     <a href='{base_url}{applicant['cv_path']}' target='_blank'>Resume</a> | 
