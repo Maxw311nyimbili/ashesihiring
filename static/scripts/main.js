@@ -430,16 +430,31 @@ function addSwipeStyles() {
             user-select: none;
             -webkit-user-select: none;
             touch-action: pan-y;
+            position: relative;
+            width: 100%;
+            max-width: 1000px;
+            margin: 0 auto;
+            height: 600px;
         }
 
         .card-wrapper {
             position: relative;
             overflow: hidden;
+            height: 100%;
         }
 
         .candidate-card {
             user-select: none;
             -webkit-user-select: none;
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 1rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            background: white;
+            overflow: hidden;
+            transition: transform 0.4s ease-out, opacity 0.4s ease-out;
         }
 
         /* Enhanced animations for card transitions */
@@ -485,11 +500,13 @@ function addSwipeStyles() {
                 height: auto;
                 min-height: 500px;
                 max-height: 600px;
+                margin-bottom: 2rem;
             }
             
             .card-body {
                 padding: 1rem;
                 height: calc(100% - 60px);
+                overflow-y: auto;
             }
             
             .nav-tabs .nav-link {
@@ -515,6 +532,29 @@ function addSwipeStyles() {
             .comment-card {
                 padding: 0.75rem;
                 margin-bottom: 0.75rem;
+            }
+            
+            .nav-controls {
+                position: absolute;
+                top: 50%;
+                width: 100%;
+                transform: translateY(-50%);
+                z-index: 20;
+                pointer-events: none;
+            }
+            
+            .nav-btn {
+                width: 35px;
+                height: 35px;
+                pointer-events: auto;
+            }
+            
+            .prev-btn {
+                left: 5px;
+            }
+            
+            .next-btn {
+                right: 5px;
             }
         }
     `;
