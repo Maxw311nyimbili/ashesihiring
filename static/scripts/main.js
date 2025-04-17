@@ -41,8 +41,8 @@ function adjustForMobile() {
     // Add event listener for window resize
     window.addEventListener('resize', function() {
         if (window.innerWidth <= 768) {
-            // Mobile adjustments
-            cardContainer.style.height = 'auto';
+            // Mobile adjustments - using fixed height instead of auto
+            cardContainer.style.height = '600px';
             cardContainer.style.minHeight = '500px';
             cardContainer.style.maxHeight = '600px';
             
@@ -69,8 +69,8 @@ function adjustForMobile() {
         } else {
             // Desktop adjustments
             cardContainer.style.height = '600px';
-            cardContainer.style.minHeight = 'auto';
-            cardContainer.style.maxHeight = 'none';
+            cardContainer.style.minHeight = '500px';
+            cardContainer.style.maxHeight = '600px';
             
             if (cardBody) {
                 cardBody.style.padding = '1.5rem';
@@ -497,10 +497,11 @@ function addSwipeStyles() {
         /* Mobile optimizations */
         @media (max-width: 768px) {
             .card-container {
-                height: auto;
+                height: 600px;
                 min-height: 500px;
                 max-height: 600px;
                 margin-bottom: 2rem;
+                cursor: grab;
             }
             
             .card-body {
