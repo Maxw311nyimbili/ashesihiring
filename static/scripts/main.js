@@ -22,6 +22,9 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize Bootstrap modals
     rateModalObj = new bootstrap.Modal(document.getElementById("rateModal"));
     
+    // Initialize star rating functionality
+    initStarRating();
+    
     // Load candidates on page load
     fetchCandidates();
     
@@ -575,21 +578,30 @@ function openRateModal(index) {
         interestsList.innerHTML = candidate.interests
             .map(interest => `<li class="mb-1">${interest}</li>`)
             .join("");
-            } else {
+    } else {
         interestsList.innerHTML = "<li>No interests specified.</li>";
     }
 
     // Reset modal elements
     document.getElementById("rating").value = "";
-    document.getElementById("first_display").style.display = "block";
-    document.querySelector(".interest-prompt").style.display = "none";
-    document.getElementById("comment").style.display = "none";
+    document.getElementById("interest-prompt-section").classList.add("d-none");
+    document.getElementById("new-comment-container").classList.add("d-none");
     document.getElementById("comments-section").innerHTML = ""; // Clear previous comments
+    document.getElementById("new-comment").value = ""; // Clear new comment input
 
     // Reset previous rating indicators
     document.getElementById("previousRatingBadge").classList.add("d-none");
     document.getElementById("previousRatingLabel").classList.add("d-none");
     document.getElementById("previousCommentsLabel").classList.add("d-none");
+    document.getElementById("edit-rating-container").classList.add("d-none");
+
+    // Reset radio buttons
+    document.querySelectorAll("input[name='interest_prompt']").forEach(radio => {
+        radio.checked = false;
+    });
+
+    // Reset star rating
+    updateStarRating(0);
 
     // Fetch previous ratings and comments
     checkPreviousRating(candidate.id);
@@ -613,6 +625,7 @@ function checkPreviousRating(applicationId) {
                 const ratingBadge = document.getElementById("previousRatingBadge");
                 const ratingLabel = document.getElementById("previousRatingLabel");
                 const ratingValue = document.getElementById("previousRatingValue");
+                const editRatingContainer = document.getElementById("edit-rating-container");
 
                 ratingBadge.classList.remove("d-none");
                 ratingLabel.classList.remove("d-none");
@@ -620,10 +633,38 @@ function checkPreviousRating(applicationId) {
 
                 // Pre-fill the rating input with previous value
                 document.getElementById("rating").value = data.rating;
+                
+                // Update star rating
+                updateStarRating(parseInt(data.rating));
 
                 // If they also had comments before
                 if (data.has_comments) {
                     document.getElementById("previousCommentsLabel").classList.remove("d-none");
+                    document.getElementById("new-comment-container").classList.remove("d-none");
+                    
+                    // Show edit button if they've already rated
+                    editRatingContainer.classList.remove("d-none");
+                    
+                    // Fetch and display existing comments
+                    fetchComments(applicationId);
+                }
+                
+                // Check if rating is low to show interest prompt
+                if (parseInt(data.rating) < 4) {
+                    document.getElementById("interest-prompt-section").classList.remove("d-none");
+                    
+                    // If they had an interest prompt answer before, pre-select it
+                    if (data.interest_prompt) {
+                        const radioButton = document.querySelector(`input[name='interest_prompt'][value='${data.interest_prompt}']`);
+                        if (radioButton) {
+                            radioButton.checked = true;
+                            
+                            // If they answered "yes", show the comment section
+                            if (data.interest_prompt === "yes") {
+                                document.getElementById("new-comment-container").classList.remove("d-none");
+                            }
+                        }
+                    }
                 }
             }
         })
@@ -632,18 +673,62 @@ function checkPreviousRating(applicationId) {
         });
 }
 
+// Update star rating display
+function updateStarRating(rating) {
+    const stars = document.querySelectorAll('.star');
+    stars.forEach((star, index) => {
+        if (index < rating) {
+            star.classList.remove('far');
+            star.classList.add('fas');
+            star.style.color = '#AD4245';
+        } else {
+            star.classList.remove('fas');
+            star.classList.add('far');
+            star.style.color = '#ccc';
+        }
+    });
+}
+
+// Initialize star rating functionality
+function initStarRating() {
+    const stars = document.querySelectorAll('.star');
+    const ratingInput = document.getElementById('rating');
+    
+    stars.forEach(star => {
+        star.addEventListener('click', function() {
+            const rating = parseInt(this.getAttribute('data-rating'));
+            ratingInput.value = rating;
+            updateStarRating(rating);
+            
+            // Trigger the input event to handle showing/hiding sections
+            ratingInput.dispatchEvent(new Event('input'));
+        });
+        
+        star.addEventListener('mouseover', function() {
+            const rating = parseInt(this.getAttribute('data-rating'));
+            updateStarRating(rating);
+        });
+        
+        star.addEventListener('mouseout', function() {
+            const currentRating = parseInt(ratingInput.value) || 0;
+            updateStarRating(currentRating);
+        });
+    });
+}
+
 // Handle rating input
 document.getElementById("rating").addEventListener("input", function () {
     let rating = parseInt(this.value, 10);
+    
+    // Update star rating
+    updateStarRating(rating);
 
     if (rating < 4) {
-        document.getElementById("first_display").style.display = "none";
-        document.querySelector(".interest-prompt").style.display = "block";
-        document.getElementById("comment").style.display = "none";
+        document.getElementById("interest-prompt-section").classList.remove("d-none");
+        document.getElementById("new-comment-container").classList.add("d-none");
     } else {
-        document.getElementById("first_display").style.display = "block";
-        document.querySelector(".interest-prompt").style.display = "none";
-        document.getElementById("comment").style.display = "block";
+        document.getElementById("interest-prompt-section").classList.add("d-none");
+        document.getElementById("new-comment-container").classList.remove("d-none");
     }
 });
 
@@ -652,143 +737,143 @@ document.querySelectorAll("input[name='interest_prompt']").forEach((radio) => {
     radio.addEventListener("change", function () {
         if (this.value === "yes") {
             let applicantId = candidates[selectedIndex].id;
-            document.getElementById("comment").style.display = "block";
+            document.getElementById("new-comment-container").classList.remove("d-none");
             fetchComments(applicantId);
         } else {
-            document.getElementById("comment").style.display = "none";
+            document.getElementById("new-comment-container").classList.add("d-none");
         }
     });
 });
 
 // Fetch comments for a candidate
 function fetchComments(applicationId) {
-let facultyName = document.getElementById("loggedInUser").value;
-let userHasCommented = false;
+    let facultyName = document.getElementById("loggedInUser").value;
+    let userHasCommented = false;
 
-fetch(`/get_comments?application_id=${applicationId}`)
-.then(response => response.json())
-.then(data => {
-    if (data.success) {
-        let commentsSection = document.getElementById("comments-section");
-        if (!commentsSection) {
-            console.error("Error: comments-section not found in DOM");
-            return;
-        }
+    fetch(`/get_comments?application_id=${applicationId}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                let commentsSection = document.getElementById("comments-section");
+                if (!commentsSection) {
+                    console.error("Error: comments-section not found in DOM");
+                    return;
+                }
 
-        commentsSection.innerHTML = ""; // Clear previous comments
+                commentsSection.innerHTML = ""; // Clear previous comments
 
-        if (data.comments.length === 0) {
-            commentsSection.innerHTML = "<p class='text-muted'>No comments yet.</p>";
-            return;
-        }
+                if (data.comments.length === 0) {
+                    commentsSection.innerHTML = "<p class='text-muted'>No comments yet.</p>";
+                    return;
+                }
 
-        data.comments.forEach(comment => {
-            const commentDiv = document.createElement("div");
-            commentDiv.setAttribute("id", `comment-${comment.id}`);
+                data.comments.forEach(comment => {
+                    const commentDiv = document.createElement("div");
+                    commentDiv.setAttribute("id", `comment-${comment.id}`);
 
-            // Check if this is the current user's comment
-            if (comment.faculty_name === facultyName) {
-                userHasCommented = true;
+                    // Check if this is the current user's comment
+                    if (comment.faculty_name === facultyName) {
+                        userHasCommented = true;
+                    }
+
+                    commentDiv.innerHTML = `
+                        <div class="comment-card mb-3 border-start border-3 ps-3" style="border-color: #236465 !important;">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div class="comment-content">
+                                    <p class="mb-1" style="color:#236465 !important">
+                                        <strong class="fw-bold">${comment.faculty_name || facultyName}:</strong>
+                                        <span id="commentText-${comment.id}" style="color: inherit;">${comment.comment}</span>
+                                    </p>
+                                    <small class="text-muted comment-time">${comment.timestamp || 'Just now'}</small>
+                                </div>
+                                <div class="comment-actions">
+                                    ${comment.faculty_name === facultyName ? `
+                                    <button class="btn btn-sm rounded-pill me-1 shadow-sm" style="background:#008080 !important; color: white;"
+                                        onclick="editComment('${comment.id}')">
+                                        <i class="fas fa-edit me-1"></i> Edit
+                                    </button>
+                                    <button class="btn btn-sm rounded-pill shadow-sm" style="background:#AD4245 !important; color: white;"
+                                        onclick="deleteComment('${comment.id}')">
+                                        <i class="fas fa-trash-alt me-1"></i> Delete
+                                    </button>
+                                    ` : ''}
+                                </div>
+                            </div>
+                        </div>
+                    `;
+
+                    commentsSection.appendChild(commentDiv);
+                });
+
+                // Show the "you've previously commented" indicator if applicable
+                if (userHasCommented) {
+                    document.getElementById("previousCommentsLabel").classList.remove("d-none");
+                }
+            } else {
+                console.error("Failed to fetch comments:", data.message);
+                showToast("Failed to load comments", "error");
             }
-
-            commentDiv.innerHTML = `
-                <div class="comment-card mb-3 border-start border-3 ps-3" style="border-color: #236465 !important;">
-                    <div class="d-flex justify-content-between align-items-start">
-                        <div class="comment-content">
-                            <p class="mb-1" style="color:#236465 !important">
-                                <strong class="fw-bold">${comment.faculty_name || facultyName}:</strong>
-                                <span id="commentText-${comment.id}" style="color: inherit;">${comment.comment}</span>
-                            </p>
-                            <small class="text-muted comment-time">${comment.timestamp || 'Just now'}</small>
-                        </div>
-                        <div class="comment-actions">
-                            ${comment.faculty_name === facultyName ? `
-                            <button class="btn btn-sm rounded-pill me-1 shadow-sm" style="background:#008080 !important; color: white;"
-                                onclick="editComment('${comment.id}')">
-                                <i class="fas fa-edit me-1"></i> Edit
-                            </button>
-                            <button class="btn btn-sm rounded-pill shadow-sm" style="background:#AD4245 !important; color: white;"
-                                onclick="deleteComment('${comment.id}')">
-                                <i class="fas fa-trash-alt me-1"></i> Delete
-                            </button>
-                            ` : ''}
-                        </div>
-                    </div>
-                </div>
-            `;
-
-            commentsSection.appendChild(commentDiv);
+        })
+        .catch(error => {
+            console.error("Error fetching comments:", error);
+            showToast("Error loading comments", "error");
         });
-
-        // Show the "you've previously commented" indicator if applicable
-        if (userHasCommented) {
-            document.getElementById("previousCommentsLabel").classList.remove("d-none");
-        }
-    } else {
-        console.error("Failed to fetch comments:", data.message);
-        showToast("Failed to load comments", "error");
-    }
-})
-.catch(error => {
-    console.error("Error fetching comments:", error);
-    showToast("Error loading comments", "error");
-});
 }
 
 // Function to edit a comment
 function editComment(commentId) {
-const commentSpan = document.getElementById(`commentText-${commentId}`);
-const newComment = prompt("Edit your comment:", commentSpan.textContent);
+    const commentSpan = document.getElementById(`commentText-${commentId}`);
+    const newComment = prompt("Edit your comment:", commentSpan.textContent);
 
-if (newComment !== null && newComment.trim() !== "") {
-fetch("/comment", {
-    method: "PUT",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-        comment_id: commentId,
-        rating: document.getElementById("rating").value, // Include updated rating
-        interest_prompt: document.querySelector("input[name='interest_prompt']:checked")?.value || "",
-        comment: newComment
-    })
-})
-.then(response => response.json())
-.then(data => {
-    if (data.success) {
-        commentSpan.textContent = newComment;
-        showToast("Comment updated successfully!");
-    } else {
-        showToast("Error: " + data.message, "error");
+    if (newComment !== null && newComment.trim() !== "") {
+        fetch("/comment", {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                comment_id: commentId,
+                rating: document.getElementById("rating").value, // Include updated rating
+                interest_prompt: document.querySelector("input[name='interest_prompt']:checked")?.value || "",
+                comment: newComment
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                commentSpan.textContent = newComment;
+                showToast("Comment updated successfully!");
+            } else {
+                showToast("Error: " + data.message, "error");
+            }
+        })
+        .catch(error => {
+            console.error("Error updating comment:", error);
+            showToast("Error updating comment", "error");
+        });
     }
-})
-.catch(error => {
-    console.error("Error updating comment:", error);
-    showToast("Error updating comment", "error");
-});
-}
 }
 
 // Function to delete a comment
 function deleteComment(commentId) {
-if (confirm("Are you sure you want to delete this comment?")) {
-fetch("/delete_comment", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ comment_id: commentId })
-})
-.then(response => response.json())
-.then(data => {
-    if (data.success) {
-        document.getElementById(`comment-${commentId}`).remove();
-        showToast("Comment deleted successfully!");
-    } else {
-        showToast("Error: " + data.message, "error");
+    if (confirm("Are you sure you want to delete this comment?")) {
+        fetch("/delete_comment", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ comment_id: commentId })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                document.getElementById(`comment-${commentId}`).remove();
+                showToast("Comment deleted successfully!");
+            } else {
+                showToast("Error: " + data.message, "error");
+            }
+        })
+        .catch(error => {
+            console.error("Error deleting comment:", error);
+            showToast("Error deleting comment", "error");
+        });
     }
-})
-.catch(error => {
-    console.error("Error deleting comment:", error);
-    showToast("Error deleting comment", "error");
-});
-}
 }
 
 // Submit rating and comment
@@ -807,8 +892,8 @@ function submitRating() {
         return;
     }
     
-    if (rating < 4 && !comment) {
-        showToast("Please provide a comment for low ratings", "error");
+    if (rating < 4 && interestPrompt === "yes" && !comment) {
+        showToast("Please provide a comment for low ratings with positive qualities", "error");
         return;
     }
     
@@ -844,39 +929,39 @@ function submitRating() {
 
 // Toast notification helper
 function showToast(message, type = "success") {
-// Create toast container if it doesn't exist
-let toastContainer = document.getElementById("toast-container");
-if (!toastContainer) {
-toastContainer = document.createElement("div");
-toastContainer.id = "toast-container";
-toastContainer.className = "position-fixed bottom-0 end-0 p-3";
-document.body.appendChild(toastContainer);
-}
+    // Create toast container if it doesn't exist
+    let toastContainer = document.getElementById("toast-container");
+    if (!toastContainer) {
+        toastContainer = document.createElement("div");
+        toastContainer.id = "toast-container";
+        toastContainer.className = "position-fixed bottom-0 end-0 p-3";
+        document.body.appendChild(toastContainer);
+    }
 
-// Create toast element
-const toastId = "toast-" + Date.now();
-const toast = document.createElement("div");
-toast.id = toastId;
-toast.className = `toast align-items-center text-white bg-${type === "success" ? "success" : type === "error" ? "danger" : "warning"} border-0`;
-toast.setAttribute("role", "alert");
-toast.setAttribute("aria-live", "assertive");
-toast.setAttribute("aria-atomic", "true");
+    // Create toast element
+    const toastId = "toast-" + Date.now();
+    const toast = document.createElement("div");
+    toast.id = toastId;
+    toast.className = `toast align-items-center text-white bg-${type === "success" ? "success" : type === "error" ? "danger" : "warning"} border-0`;
+    toast.setAttribute("role", "alert");
+    toast.setAttribute("aria-live", "assertive");
+    toast.setAttribute("aria-atomic", "true");
 
-toast.innerHTML = `
-<div class="d-flex">
-    <div class="toast-body">
-        ${message}
+    toast.innerHTML = `
+    <div class="d-flex">
+        <div class="toast-body">
+            ${message}
+        </div>
+        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
     </div>
-    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
-</div>
-`;
+    `;
 
-toastContainer.appendChild(toast);
+    toastContainer.appendChild(toast);
 
-// Initialize and show toast
-const bsToast = new bootstrap.Toast(toast, {
-autohide: true,
-delay: 3000
-});
-bsToast.show();
+    // Initialize and show toast
+    const bsToast = new bootstrap.Toast(toast, {
+        autohide: true,
+        delay: 3000
+    });
+    bsToast.show();
 }
