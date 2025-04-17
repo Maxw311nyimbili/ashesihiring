@@ -142,6 +142,8 @@ function displayCandidate(index, direction) {
     let candidate = candidates[index];
     selectedIndex = index;  // Set the selectedIndex to the current index
 
+    
+
     // Create a new card element that will slide in
     const newCard = document.createElement('div');
     newCard.className = 'candidate-card';
@@ -265,6 +267,7 @@ function displayCandidate(index, direction) {
 
         // Load ratings and comments for this candidate
         loadExistingRatingAndComments(candidate.application_id);
+        console.log(candidate);
 
         isAnimating = false;
     }, 500); // Match this to your animation duration
