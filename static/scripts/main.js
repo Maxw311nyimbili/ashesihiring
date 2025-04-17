@@ -810,77 +810,93 @@ function addSwipeStyles() {
     document.head.appendChild(styleElement);
 }
 
-// Update the existing fetchCandidates function to initialize swipe functionality
-const originalFetchCandidates = fetchCandidates;
-fetchCandidates = async function() {
-    await originalFetchCandidates();
+// Setup swipe functionality after DOM is loaded
+document.addEventListener('DOMContentLoaded', function() {
+    // The original DOMContentLoaded will run first and initialize fetchCandidates
+    // This will run after that, and we'll enhance it with our additional functions
 
-    // Add swipe hints to the wrapper
-    const cardWrapper = document.querySelector('.candidate-card-wrapper') ||
-                        document.createElement('div');
+    // Store reference to the original fetchCandidates function
+    const originalFetchCandidates = window.fetchCandidates;
 
-    if (!cardWrapper.classList.contains('candidate-card-wrapper')) {
-        cardWrapper.className = 'candidate-card-wrapper position-relative';
-        candidateCard.parentNode.insertBefore(cardWrapper, candidateCard);
-        cardWrapper.appendChild(candidateCard);
-    }
+    // Replace fetchCandidates with our enhanced version
+    window.fetchCandidates = async function() {
+        // Call the original function first and await its completion
+        await originalFetchCandidates();
 
-    // Add swipe hint indicators if they don't exist
-    if (!document.querySelector('.swipe-hint-left')) {
-        const leftHint = document.createElement('div');
-        leftHint.className = 'swipe-hint-left';
-        leftHint.innerHTML = '<i class="fas fa-chevron-left"></i>';
-        cardWrapper.appendChild(leftHint);
+        // Then add our enhancements
+        // Add swipe hints to the wrapper
+        const cardWrapper = document.querySelector('.candidate-card-wrapper') ||
+                            document.createElement('div');
 
-        const rightHint = document.createElement('div');
-        rightHint.className = 'swipe-hint-right';
-        rightHint.innerHTML = '<i class="fas fa-chevron-right"></i>';
-        cardWrapper.appendChild(rightHint);
-    }
-
-    // Initialize swipe listeners
-    initSwipeListeners();
-
-    // Add the CSS styles
-    addSwipeStyles();
-};
-
-// Update navigation button event listeners
-prevBtn.addEventListener("click", () => {
-    if (currentIndex > 0 && !isAnimating) {
-        currentIndex--;
-        displayCandidate(currentIndex, "left");
-    } else if (!isAnimating) {
-        animateBounce("left");
-    }
-});
-
-nextBtn.addEventListener("click", () => {
-    if (currentIndex < candidates.length - 1 && !isAnimating) {
-        currentIndex++;
-        displayCandidate(currentIndex, "right");
-    } else if (!isAnimating) {
-        animateBounce("right");
-    }
-});
-
-// Add keyboard navigation
-document.addEventListener('keydown', (e) => {
-    if (e.key === 'ArrowLeft' && !isAnimating) {
-        if (currentIndex > 0) {
-            currentIndex--;
-            displayCandidate(currentIndex, "left");
-        } else {
-            animateBounce("left");
+        if (!cardWrapper.classList.contains('candidate-card-wrapper')) {
+            cardWrapper.className = 'candidate-card-wrapper position-relative';
+            candidateCard.parentNode.insertBefore(cardWrapper, candidateCard);
+            cardWrapper.appendChild(candidateCard);
         }
-    } else if (e.key === 'ArrowRight' && !isAnimating) {
-        if (currentIndex < candidates.length - 1) {
-            currentIndex++;
-            displayCandidate(currentIndex, "right");
-        } else {
-            animateBounce("right");
+
+        // Add swipe hint indicators if they don't exist
+        if (!document.querySelector('.swipe-hint-left')) {
+            const leftHint = document.createElement('div');
+            leftHint.className = 'swipe-hint-left';
+            leftHint.innerHTML = '<i class="fas fa-chevron-left"></i>';
+            cardWrapper.appendChild(leftHint);
+
+            const rightHint = document.createElement('div');
+            rightHint.className = 'swipe-hint-right';
+            rightHint.innerHTML = '<i class="fas fa-chevron-right"></i>';
+            cardWrapper.appendChild(rightHint);
         }
+
+        // Initialize swipe listeners
+        initSwipeListeners();
+
+        // Add the CSS styles
+        addSwipeStyles();
+    };
+
+    // Fetch candidates will now be called from the original DOMContentLoaded event
+
+    // Update navigation button event listeners
+    if (prevBtn) {
+        prevBtn.addEventListener("click", () => {
+            if (currentIndex > 0 && !isAnimating) {
+                currentIndex--;
+                displayCandidate(currentIndex, "left");
+            } else if (!isAnimating) {
+                animateBounce("left");
+            }
+        });
     }
+
+    if (nextBtn) {
+        nextBtn.addEventListener("click", () => {
+            if (currentIndex < candidates.length - 1 && !isAnimating) {
+                currentIndex++;
+                displayCandidate(currentIndex, "right");
+            } else if (!isAnimating) {
+                animateBounce("right");
+            }
+        });
+    }
+
+    // Add keyboard navigation
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowLeft' && !isAnimating) {
+            if (currentIndex > 0) {
+                currentIndex--;
+                displayCandidate(currentIndex, "left");
+            } else {
+                animateBounce("left");
+            }
+        } else if (e.key === 'ArrowRight' && !isAnimating) {
+            if (currentIndex < candidates.length - 1) {
+                currentIndex++;
+                displayCandidate(currentIndex, "right");
+            } else {
+                animateBounce("right");
+            }
+        }
+    });
 });
 
 
