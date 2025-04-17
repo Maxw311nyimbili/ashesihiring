@@ -542,7 +542,7 @@ let touchEndX = 0;
 const swipeThreshold = 50; // Minimum distance required for a swipe
 let isAnimating = false;
 
-// Enhance the display candidate function with better animations
+// Enhanced displayCandidate function with animation matching your HTML classes
 function displayCandidate(index, direction) {
     if (candidates.length === 0 || isAnimating) return;
 
@@ -551,12 +551,11 @@ function displayCandidate(index, direction) {
 
     // Create a new card element that will slide in
     const newCard = document.createElement('div');
-    newCard.className = 'candidate-card position-absolute';
-    newCard.style.width = '100%';
+    newCard.className = 'candidate-card';
+    newCard.id = 'newCandidateCard';
 
-    // Position the new card off-screen based on direction
-    newCard.style.transform = direction === "left" ?
-        'translateX(-100%)' : 'translateX(100%)';
+    // Add appropriate animation class based on direction
+    newCard.classList.add(direction === "left" ? "card-enter-active" : "card-leave-active");
 
     // Prepare card content
     newCard.innerHTML = `
@@ -633,57 +632,51 @@ function displayCandidate(index, direction) {
         </div>
     `;
 
-    // Create a wrapper div if it doesn't exist
-    let cardWrapper = document.querySelector('.candidate-card-wrapper');
-    if (!cardWrapper) {
-        cardWrapper = document.createElement('div');
-        cardWrapper.className = 'candidate-card-wrapper position-relative';
-        candidateCard.parentNode.insertBefore(cardWrapper, candidateCard);
-        cardWrapper.appendChild(candidateCard);
-    }
+    // Get reference to the card wrapper
+    const cardWrapper = document.querySelector('.card-wrapper');
 
-    // Add the new card to the wrapper
+    // Add the new card
     cardWrapper.appendChild(newCard);
 
-    // Animate the current card out and the new card in
+    // Get the current card
+    const currentCard = document.getElementById('candidateCard');
+
+    // Apply opposite animation to the current card
+    currentCard.className = 'candidate-card';
+    void currentCard.offsetWidth; // Force reflow
+    currentCard.classList.add(direction === "left" ? "card-leave-active" : "card-enter-active");
+
+    // After animation completes
     setTimeout(() => {
-        candidateCard.style.transition = 'transform 0.3s ease-out';
-        newCard.style.transition = 'transform 0.3s ease-out';
+        // Remove the old card
+        cardWrapper.removeChild(currentCard);
 
-        candidateCard.style.transform = direction === "left" ?
-            'translateX(100%)' : 'translateX(-100%)';
-        newCard.style.transform = 'translateX(0)';
+        // Make the new card the current card
+        newCard.id = 'candidateCard';
+        newCard.classList.remove('card-enter-active', 'card-leave-active');
+        candidateCard = newCard;
 
-        // After animation completes
-        setTimeout(() => {
-            // Remove the old card
-            cardWrapper.removeChild(candidateCard);
-            // Make the new card the current card
-            newCard.id = 'candidateCard';
-            candidateCard = newCard;
-
-            // Initialize Bootstrap tabs in the new card
-            const tabs = candidateCard.querySelectorAll('[data-bs-toggle="tab"]');
-            tabs.forEach(tab => {
-                tab.addEventListener('click', function() {
-                    const target = document.querySelector(this.dataset.bsTarget);
-                    candidateCard.querySelectorAll('.tab-pane').forEach(pane => {
-                        pane.classList.remove('show', 'active');
-                    });
-                    candidateCard.querySelectorAll('.nav-link').forEach(link => {
-                        link.classList.remove('active');
-                    });
-                    this.classList.add('active');
-                    target.classList.add('show', 'active');
+        // Initialize Bootstrap tabs in the new card
+        const tabs = candidateCard.querySelectorAll('[data-bs-toggle="tab"]');
+        tabs.forEach(tab => {
+            tab.addEventListener('click', function() {
+                const target = document.querySelector(this.dataset.bsTarget);
+                candidateCard.querySelectorAll('.tab-pane').forEach(pane => {
+                    pane.classList.remove('show', 'active');
                 });
+                candidateCard.querySelectorAll('.nav-link').forEach(link => {
+                    link.classList.remove('active');
+                });
+                this.classList.add('active');
+                target.classList.add('show', 'active');
             });
+        });
 
-            // Load ratings and comments for this candidate
-            loadExistingRatingAndComments(candidate.id);
+        // Load ratings and comments for this candidate
+        loadExistingRatingAndComments(candidate.id);
 
-            isAnimating = false;
-        }, 300);
-    }, 10);
+        isAnimating = false;
+    }, 500); // Match this to your animation duration
 
     // Update navigation dots
     updateNavDots();
@@ -691,7 +684,7 @@ function displayCandidate(index, direction) {
 
 // Add touch event listeners for swipe functionality
 function initSwipeListeners() {
-    const cardContainer = document.querySelector('.candidate-card-wrapper') || candidateCard.parentElement;
+    const cardContainer = document.querySelector('.card-container');
 
     cardContainer.addEventListener('touchstart', (e) => {
         touchStartX = e.changedTouches[0].screenX;
@@ -705,11 +698,13 @@ function initSwipeListeners() {
     // Also add mouse events for desktop testing
     cardContainer.addEventListener('mousedown', (e) => {
         touchStartX = e.screenX;
+        cardContainer.style.cursor = 'grabbing';
         e.preventDefault();
     }, false);
 
     cardContainer.addEventListener('mouseup', (e) => {
         touchEndX = e.screenX;
+        cardContainer.style.cursor = 'grab';
         handleSwipe();
     }, false);
 }
@@ -759,27 +754,46 @@ function animateBounce(direction) {
     }, 150);
 }
 
+// Add swipe indicators to the card container
+function addSwipeIndicators() {
+    const cardContainer = document.querySelector('.card-container');
+
+    // Add left indicator if it doesn't exist
+    if (!document.querySelector('.swipe-hint-left')) {
+        const leftHint = document.createElement('div');
+        leftHint.className = 'swipe-hint-left';
+        leftHint.innerHTML = '<i class="fas fa-chevron-left"></i>';
+        cardContainer.appendChild(leftHint);
+    }
+
+    // Add right indicator if it doesn't exist
+    if (!document.querySelector('.swipe-hint-right')) {
+        const rightHint = document.createElement('div');
+        rightHint.className = 'swipe-hint-right';
+        rightHint.innerHTML = '<i class="fas fa-chevron-right"></i>';
+        cardContainer.appendChild(rightHint);
+    }
+}
+
 // Add CSS to the document
 function addSwipeStyles() {
     const styleElement = document.createElement('style');
     styleElement.textContent = `
-        .candidate-card-wrapper {
-            overflow: hidden;
-            position: relative;
-            height: 100%;
+        .card-container {
+            cursor: grab;
+            user-select: none;
+            -webkit-user-select: none;
             touch-action: pan-y;
+        }
+
+        .card-wrapper {
+            position: relative;
+            overflow: hidden;
         }
 
         .candidate-card {
-            transition: transform 0.3s ease-out;
-            touch-action: pan-y;
             user-select: none;
             -webkit-user-select: none;
-        }
-
-        /* Better visual feedback for swipe actions */
-        .candidate-card:active {
-            cursor: grabbing;
         }
 
         /* Visual indicators for swipe direction */
@@ -788,23 +802,43 @@ function addSwipeStyles() {
             top: 50%;
             transform: translateY(-50%);
             font-size: 2rem;
-            color: #0d6efd;
+            color: #AD4245;
             opacity: 0;
             transition: opacity 0.2s ease;
             pointer-events: none;
+            z-index: 30;
         }
 
         .swipe-hint-left {
-            left: 15px;
+            left: 20px;
         }
 
         .swipe-hint-right {
-            right: 15px;
+            right: 20px;
         }
 
-        .candidate-card-wrapper:hover .swipe-hint-left,
-        .candidate-card-wrapper:hover .swipe-hint-right {
+        .card-container:hover .swipe-hint-left,
+        .card-container:hover .swipe-hint-right {
             opacity: 0.5;
+        }
+
+        /* Enhanced animations for card transitions */
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @keyframes slideOut {
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(-100%); opacity: 0; }
+        }
+
+        .card-enter-active {
+            animation: slideIn 0.5s forwards;
+        }
+
+        .card-leave-active {
+            animation: slideOut 0.5s forwards;
         }
     `;
     document.head.appendChild(styleElement);
@@ -812,49 +846,25 @@ function addSwipeStyles() {
 
 // Setup swipe functionality after DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
-    // The original DOMContentLoaded will run first and initialize fetchCandidates
-    // This will run after that, and we'll enhance it with our additional functions
+    // The original DOMContentLoaded handler will still execute
 
     // Store reference to the original fetchCandidates function
     const originalFetchCandidates = window.fetchCandidates;
 
     // Replace fetchCandidates with our enhanced version
     window.fetchCandidates = async function() {
-        // Call the original function first and await its completion
+        // Call the original function first
         await originalFetchCandidates();
 
-        // Then add our enhancements
-        // Add swipe hints to the wrapper
-        const cardWrapper = document.querySelector('.candidate-card-wrapper') ||
-                            document.createElement('div');
-
-        if (!cardWrapper.classList.contains('candidate-card-wrapper')) {
-            cardWrapper.className = 'candidate-card-wrapper position-relative';
-            candidateCard.parentNode.insertBefore(cardWrapper, candidateCard);
-            cardWrapper.appendChild(candidateCard);
-        }
-
-        // Add swipe hint indicators if they don't exist
-        if (!document.querySelector('.swipe-hint-left')) {
-            const leftHint = document.createElement('div');
-            leftHint.className = 'swipe-hint-left';
-            leftHint.innerHTML = '<i class="fas fa-chevron-left"></i>';
-            cardWrapper.appendChild(leftHint);
-
-            const rightHint = document.createElement('div');
-            rightHint.className = 'swipe-hint-right';
-            rightHint.innerHTML = '<i class="fas fa-chevron-right"></i>';
-            cardWrapper.appendChild(rightHint);
-        }
-
-        // Initialize swipe listeners
+        // Add our enhancements
+        addSwipeIndicators();
         initSwipeListeners();
-
-        // Add the CSS styles
         addSwipeStyles();
-    };
 
-    // Fetch candidates will now be called from the original DOMContentLoaded event
+        // Make the card container grabbable
+        const cardContainer = document.querySelector('.card-container');
+        cardContainer.style.cursor = 'grab';
+    };
 
     // Update navigation button event listeners
     if (prevBtn) {
