@@ -539,6 +539,7 @@
 // Add these variables to your existing variables section
 let touchStartX = 0;
 let touchEndX = 0;
+let currentIndex = 0;
 const swipeThreshold = 50; // Minimum distance required for a swipe
 let isAnimating = false;
 
