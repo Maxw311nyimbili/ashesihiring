@@ -1,3 +1,369 @@
+<!--<!DOCTYPE html>-->
+<!--<html lang="en">-->
+<!--<head>-->
+<!--    <meta charset="UTF-8">-->
+<!--    <meta name="viewport" content="width=device-width, initial-scale=1.0">-->
+<!--    <title>Candidate Review</title>-->
+
+<!--    &lt;!&ndash; Load Bootstrap CSS first to avoid overriding custom styles &ndash;&gt;-->
+<!--    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css">-->
+
+
+<!--    &lt;!&ndash; FontAwesome for icons &ndash;&gt;-->
+<!--    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin="anonymous" referrerpolicy="no-referrer" />-->
+
+<!--    &lt;!&ndash; Google Fonts &ndash;&gt;-->
+<!--    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap" rel="stylesheet">-->
+
+<!--    <style>-->
+<!--        body {-->
+<!--            font-family: "DM Sans", serif;-->
+<!--            background-color: #AD4245;-->
+<!--            min-height: 100vh;-->
+<!--        }-->
+
+<!--        .main-container {-->
+<!--            position: relative;-->
+<!--            min-height: 100vh;-->
+<!--        }-->
+
+<!--        .card-nav-container {-->
+<!--            position: absolute;-->
+<!--            top: 50%;-->
+<!--            left: 50%;-->
+<!--            transform: translate(-50%, -50%);-->
+<!--            width: 100%;-->
+<!--            max-width: 800px;-->
+<!--        }-->
+
+<!--        .nav-btn {-->
+<!--            font-size: 2rem;-->
+<!--            background: transparent;-->
+<!--            color: white;-->
+<!--            border: none;-->
+<!--        }-->
+
+<!--        .custom-card {-->
+<!--            background: white;-->
+<!--            border-radius: 2rem;-->
+<!--            box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;-->
+<!--            height: 450px;-->
+<!--            transition: transform 0.6s ease-in-out, opacity 0.6s ease-in-out;-->
+<!--            overflow: auto;-->
+<!--        }-->
+
+<!--        .custom-card.hidden-left {-->
+<!--            transform: translateX(-100%);-->
+<!--            opacity: 0;-->
+<!--        }-->
+
+<!--        .custom-card.hidden-right {-->
+<!--            transform: translateX(100%);-->
+<!--            opacity: 0;-->
+<!--        }-->
+
+<!--        .custom-card.active {-->
+<!--            transform: translateX(0);-->
+<!--            opacity: 1;-->
+<!--            transition: transform 0.4s ease-out, opacity 0.4s ease-out;-->
+<!--        }-->
+
+<!--        #candidateCard h3 {-->
+<!--            color: #AD4245;-->
+<!--            font-size: 1.5rem;-->
+<!--        }-->
+
+<!--        #candidateCard p {-->
+<!--            line-height: 1.8;-->
+<!--        }-->
+
+<!--        #candidateCard button {-->
+<!--            color: #236465;-->
+<!--            font-weight: bold;-->
+<!--            background: transparent;-->
+<!--            border: none;-->
+<!--        }-->
+
+<!--        .modal-content-custom {-->
+<!--            border-radius: 1rem;-->
+<!--        }-->
+
+<!--        .modal-close {-->
+<!--            cursor: pointer;-->
+<!--            background: #AD4245;-->
+<!--            width: 34px;-->
+<!--            height: 26px;-->
+<!--            color: white;-->
+<!--            text-align: center;-->
+<!--            border: none;-->
+<!--            font-size: 1.2rem;-->
+<!--        }-->
+
+<!--        .section-heading {-->
+<!--            color: #AD4245;-->
+<!--            font-size: 1.8rem;-->
+<!--            font-weight: bold;-->
+<!--        }-->
+
+<!--        .section-divider {-->
+<!--            border-left: 3px solid #AD4245;-->
+<!--        }-->
+
+<!--        .rate-btn, .submit-btn {-->
+<!--            background-color: #AD4245;-->
+<!--            color: white;-->
+<!--            border: none;-->
+<!--        }-->
+
+<!--        .edit-btn {-->
+<!--            background-color: #236465;-->
+<!--            color: white;-->
+<!--        }-->
+
+<!--        .candidate-name {-->
+<!--            color: #AD4245;-->
+<!--        }-->
+
+<!--        .candidate-interests-heading {-->
+<!--            color: #236465 !important;-->
+<!--        }-->
+
+<!--        .comment-text {-->
+<!--            color: #236465 !important;-->
+<!--        }-->
+
+<!--        @media (max-width: 992px) {-->
+<!--            .section-divider {-->
+<!--                border-left: none;-->
+<!--                border-top: 3px solid #AD4245;-->
+<!--                margin-top: 1rem;-->
+<!--                padding-top: 1rem;-->
+<!--            }-->
+<!--        }-->
+
+<!--        @media (max-width: 768px) {-->
+<!--            .custom-card {-->
+<!--                height: auto;-->
+<!--                min-height: 350px;-->
+<!--            }-->
+
+<!--            .card-nav-container {-->
+<!--                position: relative;-->
+<!--                top: 0;-->
+<!--                left: 0;-->
+<!--                transform: none;-->
+<!--                margin: 2rem auto;-->
+<!--            }-->
+
+<!--            .nav-btn {-->
+<!--                font-size: 1.5rem;-->
+<!--            }-->
+<!--        }-->
+<!--        </style>-->
+<!--</head>-->
+<!--<body>-->
+<!--<header>-->
+<!--    <nav class="navbar navbar-expand-lg bg-white shadow-sm">-->
+<!--        <div class="container">-->
+<!--            &lt;!&ndash; Logo &ndash;&gt;-->
+<!--            <a class="navbar-brand logo" href="/">-->
+<!--                <img src="../static/images/Group 13.png" alt="Logo" width="170px">-->
+<!--            </a>-->
+
+<!--            &lt;!&ndash; Mobile Toggle Button &ndash;&gt;-->
+<!--            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">-->
+<!--                <span class="navbar-toggler-icon"></span>-->
+<!--            </button>-->
+
+<!--            &lt;!&ndash; Navbar Links &ndash;&gt;-->
+<!--            <div class="collapse navbar-collapse" id="navbarNav">-->
+<!--                <ul class="navbar-nav ms-auto gap-3">-->
+<!--                    <li class="nav-item">-->
+<!--                        <a class="nav-link fw-bold text-danger" href="{{ url_for('faculty_dashboard') }}">-->
+<!--                            <i class="fa-solid fa-gauge-high"></i> Dashboard-->
+<!--                        </a>-->
+<!--                    </li>-->
+<!--                    <li class="nav-item">-->
+<!--                        <a class="nav-link text-danger" href="{{ url_for('faculty_scheduling') }}">-->
+<!--                            <i class="fa-solid fa-calendar-days"></i> Interview Scheduling-->
+<!--                        </a>-->
+<!--                    </li>-->
+<!--                    <li class="nav-item">-->
+<!--                        <a class="nav-link text-danger" href="{{ url_for('logout') }}">-->
+<!--                            <i class="fa-solid fa-right-from-bracket"></i> Logout-->
+<!--                        </a>-->
+<!--                    </li>-->
+<!--                </ul>-->
+<!--            </div>-->
+<!--        </div>-->
+<!--    </nav>-->
+<!--</header>-->
+
+
+<!-- <div class="main-container">-->
+<!--        <div class="card-nav-container">-->
+<!--            <div class="d-flex align-items-center justify-content-center">-->
+<!--                <button id="prevBtn" class="nav-btn">-->
+<!--                    <i class="fa-solid fa-chevron-left"></i>-->
+<!--                </button>-->
+
+<!--                <div class="flex-grow-1 position-relative">-->
+<!--                    <div class="custom-card p-4 p-md-5" id="candidateCard"></div>-->
+<!--                </div>-->
+
+<!--                <button id="nextBtn" class="nav-btn">-->
+<!--                    <i class="fa-solid fa-chevron-right"></i>-->
+<!--                </button>-->
+<!--            </div>-->
+<!--        </div>-->
+<!--    </div>-->
+
+<!--&lt;!&ndash; Details Modal &ndash;&gt;-->
+<!--&lt;!&ndash; Details Modal &ndash;&gt;-->
+<!--<div class="modal fade" id="detailsModal" tabindex="-1" aria-hidden="true">-->
+<!--    <div class="modal-dialog modal-dialog-centered modal-lg">-->
+<!--        &lt;!&ndash; Changed from modal-lg to default size &ndash;&gt;-->
+<!--        <div class="modal-content modal-content-custom shadow">-->
+<!--            <div class="modal-header py-2 px-3 border-0">-->
+<!--                &lt;!&ndash; Removed justify-content-end and adjusted padding &ndash;&gt;-->
+<!--                <button type="button" class="btn-close me-1" onclick="closeModal()" aria-label="Close"></button>-->
+<!--            </div>-->
+
+<!--            <div class="modal-body py-3 px-4">-->
+<!--                <div class="row g-4">-->
+<!--                    &lt;!&ndash; Reduced gap from g-4 to g-3 &ndash;&gt;-->
+<!--                    &lt;!&ndash; Candidate Info Section &ndash;&gt;-->
+<!--                    <div class="col-lg-4">-->
+<!--                        &lt;!&ndash; Changed from col-lg-4 to col-md-4 &ndash;&gt;-->
+<!--                        <h3 class="fw-bold fs-5 mb-3">Hiring Details</h3>-->
+
+<!--                        <div class="mb-3">-->
+<!--                            <h6 class="text-danger mb-1">Name:</h6>-->
+<!--                            <h5 id="modalCandidateName" class="fw-semibold"></h5>-->
+<!--                        </div>-->
+
+<!--                        <div>-->
+<!--                            <h6 class="text-danger mb-1">Interested to be an FI for:</h6>-->
+<!--                            <ul id="modalCandidateInterests" class="list-unstyled ps-0"></ul>-->
+<!--                        </div>-->
+<!--                    </div>-->
+
+<!--                    &lt;!&ndash; Summary Section &ndash;&gt;-->
+<!--                    <div class="col-lg-8 border-start ps-md-4">-->
+<!--                        &lt;!&ndash; Changed from col-lg-8 to col-md-8 &ndash;&gt;-->
+<!--                        <h3 class="fw-bold fs-5 mb-3">Summary</h3>-->
+<!--                        <p class="summary fw-medium mb-2" id="modalCandidateSummary"></p>-->
+<!--                        <p id="modalCandidateDetails" class="mb-3"></p>-->
+<!--                        <div id="button">-->
+<!--                            <button class="btn btn-danger px-3 py-1 rate-btn">Rate Candidate</button>-->
+<!--                            &lt;!&ndash; Reduced button padding &ndash;&gt;-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--        </div>-->
+<!--    </div>-->
+<!--</div>-->
+
+
+<!--    &lt;!&ndash; Rating Modal &ndash;&gt;-->
+<!--<div class="modal fade" id="rateModal" tabindex="-1" aria-hidden="true">-->
+<!--    <div class="modal-dialog modal-dialog-centered">-->
+<!--        <div class="modal-content shadow-sm">-->
+<!--            <div class="modal-header py-2 border-0 align-items-center">-->
+<!--                <h5 class="modal-title text-danger fw-bold fs-5">Candidate Rating</h5>-->
+<!--                <div class="ms-auto d-flex align-items-center">-->
+<!--                    &lt;!&ndash; Previously rated indicator &ndash;&gt;-->
+<!--                    <div id="previousRatingBadge" class="badge bg-info text-white me-3 d-none">-->
+<!--                        <i class="fas fa-check-circle me-1"></i> Previously Rated-->
+<!--                    </div>-->
+<!--                    <button type="button" class="btn-close" onclick="closeRateModal()"></button>-->
+<!--                </div>-->
+<!--            </div>-->
+
+<!--            <div class="modal-body py-3 px-4">-->
+<!--                &lt;!&ndash; Rating input with visual indicator &ndash;&gt;-->
+<!--                <div class="mb-3">-->
+<!--                    <div class="d-flex justify-content-between align-items-center mb-1">-->
+<!--                        <label for="rating" class="form-label text-danger mb-0 fw-medium">Rating:</label>-->
+<!--                        <small id="previousRatingLabel" class="text-info d-none">-->
+<!--                            <i class="fas fa-history"></i> Previous rating: <span id="previousRatingValue">4</span>-->
+<!--                        </small>-->
+<!--                    </div>-->
+<!--                    <div class="d-flex align-items-center">-->
+<!--                        <input type="number" class="form-control form-control-sm w-25" id="rating" min="1" max="5" placeholder="1-5">-->
+<!--                        <small class="ms-2 text-muted">(5 - excellent)</small>-->
+<!--                    </div>-->
+<!--                </div>-->
+
+<!--                <button id="edit-comment-btn" class="btn btn-sm btn-outline-secondary d-none mb-3">-->
+<!--                    <i class="fas fa-pen me-1"></i> Edit Rating & Comment-->
+<!--                </button>-->
+
+<!--                <div id="first_display">-->
+<!--                    <input type="hidden" id="loggedInUser" value="{{ faculty_name }}">-->
+
+<!--                    <div class="mb-3">-->
+<!--                        <div class="d-flex align-items-center">-->
+<!--                            <h6 class="text-danger fw-medium mb-0">Name:</h6>-->
+<!--                            <h5 id="modalCandidateName-1" class="candidate-name ms-2 mb-0 fw-semibold"></h5>-->
+<!--                        </div>-->
+<!--                    </div>-->
+
+<!--                    <h6 class="text-danger fw-medium candidate-interests-heading">Interested to be an FI for:</h6>-->
+<!--                    <ul id="modalCandidateInterests-1" class="list-unstyled ps-2"></ul>-->
+<!--                </div>-->
+
+<!--                <div class="interest-prompt mb-3">-->
+<!--                    <p class="text-danger mb-2 fw-medium">Despite the low rating, does the candidate have qualities that make them a desirable FI?</p>-->
+
+<!--                    <div class="d-flex gap-3">-->
+<!--                        <div class="form-check">-->
+<!--                            <input type="radio" id="yes" name="interest_prompt" value="yes" class="form-check-input">-->
+<!--                            <label for="yes" class="form-check-label">Yes</label>-->
+<!--                        </div>-->
+<!--                        <div class="form-check">-->
+<!--                            <input type="radio" id="no" name="interest_prompt" value="no" class="form-check-input">-->
+<!--                            <label for="no" class="form-check-label">No</label>-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                </div>-->
+
+<!--                <div id="comment">-->
+<!--                    &lt;!&ndash; Previous comments indicator &ndash;&gt;-->
+<!--                    <div id="commentsHeader" class="d-flex justify-content-between align-items-center mb-2">-->
+<!--                        <h6 class="text-danger fw-medium mb-0">Comments</h6>-->
+<!--                        <small id="previousCommentsLabel" class="text-info d-none">-->
+<!--                            <i class="fas fa-comment-dots me-1"></i> You've previously commented-->
+<!--                        </small>-->
+<!--                    </div>-->
+
+<!--                    <div id="comments-section" class="mb-3">-->
+<!--                        &lt;!&ndash; Existing comments will be appended here &ndash;&gt;-->
+<!--                    </div>-->
+<!--                    <textarea id="new-comment" class="form-control comment-text mb-2" placeholder="Write your comment here..."></textarea>-->
+<!--                    <button id="post-comment-btn" class="btn btn-sm px-3" style="background-color: #008080; color: white;">-->
+<!--                        <i class="fas fa-comment me-1"></i> Post Comment-->
+<!--                    </button>-->
+<!--                </div>-->
+
+<!--                <div class="text-end mt-3 border-top pt-3">-->
+<!--                    <button id="final-subButton" class="btn px-4" style="background-color: #236465; color: white;" onclick="submitRating()">Submit</button>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--        </div>-->
+<!--    </div>-->
+<!--</div>-->
+
+<!--&lt;!&ndash; JavaScript &ndash;&gt;-->
+<!--<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>-->
+<!--<script src="../static/scripts/main.js"></script>-->
+
+<!--</body>-->
+<!--</html>-->
+
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,11 +371,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Candidate Review</title>
 
-    <!-- Load Bootstrap CSS first to avoid overriding custom styles -->
+    <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css">
-
-    <!-- Load Custom CSS after Bootstrap -->
-<!--    <link rel="stylesheet" href="../static/css/styles.css">-->
 
     <!-- FontAwesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
@@ -18,447 +381,922 @@
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap" rel="stylesheet">
 
     <style>
+        :root {
+            --primary: #AD4245;
+            --secondary: #236465;
+            --light: #f8f9fa;
+            --dark: #343a40;
+        }
+
         body {
-            font-family: "DM Sans", serif;
-            background-color: #AD4245;
+            font-family: "DM Sans", sans-serif;
+            background-color: #f5f5f7;
             min-height: 100vh;
         }
 
-        .main-container {
+        .card-container {
+            perspective: 1000px;
+            height: 600px;
             position: relative;
-            min-height: 100vh;
+            max-width: 1000px;
+            margin: 0 auto;
         }
 
-        .card-nav-container {
+        .card-wrapper {
+            transition: transform 0.5s ease-in-out;
+            transform-style: preserve-3d;
+            position: relative;
+            height: 100%;
+        }
+
+        .candidate-card {
             position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
             width: 100%;
-            max-width: 800px;
-        }
-
-        .nav-btn {
-            font-size: 2rem;
-            background: transparent;
-            color: white;
-            border: none;
-        }
-
-        .custom-card {
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 1rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
             background: white;
-            border-radius: 2rem;
-            box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
-            height: 450px;
-            transition: transform 0.6s ease-in-out, opacity 0.6s ease-in-out;
-            overflow: auto;
-        }
-
-        .custom-card.hidden-left {
-            transform: translateX(-100%);
-            opacity: 0;
-        }
-
-        .custom-card.hidden-right {
-            transform: translateX(100%);
-            opacity: 0;
-        }
-
-        .custom-card.active {
-            transform: translateX(0);
-            opacity: 1;
+            overflow: hidden;
             transition: transform 0.4s ease-out, opacity 0.4s ease-out;
         }
 
-        #candidateCard h3 {
-            color: #AD4245;
-            font-size: 1.5rem;
+        .card-enter-active {
+            animation: slideIn 0.5s forwards;
         }
 
-        #candidateCard p {
-            line-height: 1.8;
+        .card-leave-active {
+            animation: slideOut 0.5s forwards;
         }
 
-        #candidateCard button {
-            color: #236465;
-            font-weight: bold;
-            background: transparent;
-            border: none;
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
         }
 
-        .modal-content-custom {
-            border-radius: 1rem;
+        @keyframes slideOut {
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(-100%); opacity: 0; }
         }
 
-        .modal-close {
+        .nav-indicator {
+            display: flex;
+            justify-content: center;
+            margin-top: -25px;
+            position: relative;
+            z-index: 10;
+        }
+
+        .nav-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: #d8d8d8;
+            margin: 0 5px;
             cursor: pointer;
-            background: #AD4245;
-            width: 34px;
-            height: 26px;
-            color: white;
-            text-align: center;
-            border: none;
-            font-size: 1.2rem;
+            transition: all 0.3s ease;
         }
 
-        .section-heading {
-            color: #AD4245;
-            font-size: 1.8rem;
-            font-weight: bold;
+        .nav-dot.active {
+            background-color: var(--primary);
+            transform: scale(1.3);
         }
 
-        .section-divider {
-            border-left: 3px solid #AD4245;
-        }
-
-        .rate-btn, .submit-btn {
-            background-color: #AD4245;
+        .card-header {
+            background: linear-gradient(to right, var(--primary), #c95659);
             color: white;
             border: none;
+            padding: 1.25rem;
         }
 
-        .edit-btn {
-            background-color: #236465;
+        .card-body {
+            padding: 1.5rem;
+            height: calc(100% - 70px);
+            overflow-y: auto;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            border-color: var(--primary);
+        }
+
+        .btn-primary:hover {
+            background-color: #973a3d;
+            border-color: #973a3d;
+        }
+
+        .btn-secondary {
+            background-color: var(--secondary);
+            border-color: var(--secondary);
+        }
+
+        .btn-secondary:hover {
+            background-color: #1a4a4b;
+            border-color: #1a4a4b;
+        }
+
+        .btn-outline-primary {
+            color: var(--primary);
+            border-color: var(--primary);
+        }
+
+        .btn-outline-primary:hover {
+            background-color: var(--primary);
             color: white;
         }
 
-        .candidate-name {
-            color: #AD4245;
+        .rating-card {
+            background-color: white;
+            border-radius: 1rem;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
         }
 
-        .candidate-interests-heading {
-            color: #236465 !important;
+        .rating-card:hover {
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
         }
 
-        .comment-text {
-            color: #236465 !important;
+        .nav-controls {
+            position: absolute;
+            top: 50%;
+            width: 100%;
+            transform: translateY(-50%);
+            z-index: 20;
+            pointer-events: none;
+        }
+
+        .nav-btn {
+            background-color: white;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            pointer-events: auto;
+        }
+
+        .nav-btn:hover {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .prev-btn {
+            left: -22px;
+            position: absolute;
+        }
+
+        .next-btn {
+            right: -22px;
+            position: absolute;
+        }
+
+        .candidate-info-box {
+            border-left: 4px solid var(--primary);
+            padding-left: 15px;
+            margin-bottom: 20px;
+        }
+
+        .comment-card {
+            border-left: 3px solid var(--secondary);
+            padding-left: 15px;
+            margin-bottom: 15px;
+        }
+
+        .comment-actions {
+            visibility: hidden;
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+
+        .comment-card:hover .comment-actions {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        /* Tabs styling */
+        .nav-tabs .nav-link {
+            color: #495057;
+            border: none;
+            padding: 0.75rem 1rem;
+            border-bottom: 3px solid transparent;
+            font-weight: 500;
+        }
+
+        .nav-tabs .nav-link.active {
+            color: var(--primary);
+            background-color: transparent;
+            border-bottom: 3px solid var(--primary);
+        }
+
+        .tag-pill {
+            background-color: #f8f2f2;
+            color: var(--primary);
+            border: 1px solid #e9d8d8;
+            font-size: 0.85rem;
+            padding: 0.25rem 0.75rem;
+            border-radius: 50px;
+            display: inline-block;
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #ccc;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #aaa;
         }
 
         @media (max-width: 992px) {
-            .section-divider {
-                border-left: none;
-                border-top: 3px solid #AD4245;
-                margin-top: 1rem;
-                padding-top: 1rem;
+            .card-container {
+                height: 650px;
             }
         }
 
         @media (max-width: 768px) {
-            .custom-card {
-                height: auto;
-                min-height: 350px;
-            }
-
-            .card-nav-container {
-                position: relative;
-                top: 0;
-                left: 0;
-                transform: none;
-                margin: 2rem auto;
+            .card-container {
+                height: 750px;
             }
 
             .nav-btn {
-                font-size: 1.5rem;
+                width: 35px;
+                height: 35px;
             }
         }
-        </style>
+    </style>
 </head>
 <body>
-<header>
-    <nav class="navbar navbar-expand-lg bg-white shadow-sm">
-        <div class="container">
-            <!-- Logo -->
-            <a class="navbar-brand logo" href="/">
-                <img src="../static/images/Group 13.png" alt="Logo" width="170px">
-            </a>
+    <header>
+        <nav class="navbar navbar-expand-lg bg-white shadow-sm">
+            <div class="container">
+                <!-- Logo -->
+                <a class="navbar-brand logo" href="/">
+                    <img src="../static/images/Group 13.png" alt="Logo" width="170px">
+                </a>
 
-            <!-- Mobile Toggle Button -->
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
+                <!-- Mobile Toggle Button -->
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
 
-            <!-- Navbar Links -->
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto gap-3">
-                    <li class="nav-item">
-                        <a class="nav-link fw-bold text-danger" href="{{ url_for('faculty_dashboard') }}">
-                            <i class="fa-solid fa-gauge-high"></i> Dashboard
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-danger" href="{{ url_for('faculty_scheduling') }}">
-                            <i class="fa-solid fa-calendar-days"></i> Interview Scheduling
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-danger" href="{{ url_for('logout') }}">
-                            <i class="fa-solid fa-right-from-bracket"></i> Logout
-                        </a>
-                    </li>
-                </ul>
+                <!-- Navbar Links -->
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav ms-auto gap-3">
+                        <li class="nav-item">
+                            <a class="nav-link fw-bold text-danger" href="{{ url_for('faculty_dashboard') }}">
+                                <i class="fa-solid fa-gauge-high"></i> Dashboard
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-danger" href="{{ url_for('faculty_scheduling') }}">
+                                <i class="fa-solid fa-calendar-days"></i> Interview Scheduling
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-danger" href="{{ url_for('logout') }}">
+                                <i class="fa-solid fa-right-from-bracket"></i> Logout
+                            </a>
+                        </li>
+                    </ul>
+                </div>
             </div>
-        </div>
-    </nav>
-</header>
+        </nav>
+    </header>
 
+    <div class="container py-4">
+        <h3 class="text-center mb-4 fw-bold text-secondary">Candidate Review</h3>
 
- <div class="main-container">
-        <div class="card-nav-container">
-            <div class="d-flex align-items-center justify-content-center">
-                <button id="prevBtn" class="nav-btn">
+        <div class="card-container mb-4">
+            <div class="nav-controls">
+                <div class="nav-btn prev-btn" id="prevBtn">
                     <i class="fa-solid fa-chevron-left"></i>
-                </button>
-
-                <div class="flex-grow-1 position-relative">
-                    <div class="custom-card p-4 p-md-5" id="candidateCard"></div>
                 </div>
-
-                <button id="nextBtn" class="nav-btn">
+                <div class="nav-btn next-btn" id="nextBtn">
                     <i class="fa-solid fa-chevron-right"></i>
-                </button>
-            </div>
-        </div>
-    </div>
-
-<!-- Details Modal -->
-<!-- Details Modal -->
-<div class="modal fade" id="detailsModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg">
-        <!-- Changed from modal-lg to default size -->
-        <div class="modal-content modal-content-custom shadow">
-            <div class="modal-header py-2 px-3 border-0">
-                <!-- Removed justify-content-end and adjusted padding -->
-                <button type="button" class="btn-close me-1" onclick="closeModal()" aria-label="Close"></button>
+                </div>
             </div>
 
-            <div class="modal-body py-3 px-4">
-                <div class="row g-4">
-                    <!-- Reduced gap from g-4 to g-3 -->
-                    <!-- Candidate Info Section -->
-                    <div class="col-lg-4">
-                        <!-- Changed from col-lg-4 to col-md-4 -->
-                        <h3 class="fw-bold fs-5 mb-3">Hiring Details</h3>
-
-                        <div class="mb-3">
-                            <h6 class="text-danger mb-1">Name:</h6>
-                            <h5 id="modalCandidateName" class="fw-semibold"></h5>
-                        </div>
-
-                        <div>
-                            <h6 class="text-danger mb-1">Interested to be an FI for:</h6>
-                            <ul id="modalCandidateInterests" class="list-unstyled ps-0"></ul>
-                        </div>
-                    </div>
-
-                    <!-- Summary Section -->
-                    <div class="col-lg-8 border-start ps-md-4">
-                        <!-- Changed from col-lg-8 to col-md-8 -->
-                        <h3 class="fw-bold fs-5 mb-3">Summary</h3>
-                        <p class="summary fw-medium mb-2" id="modalCandidateSummary"></p>
-                        <p id="modalCandidateDetails" class="mb-3"></p>
-                        <div id="button">
-                            <button class="btn btn-danger px-3 py-1 rate-btn">Rate Candidate</button>
-                            <!-- Reduced button padding -->
-                        </div>
-                    </div>
+            <div class="card-wrapper">
+                <div class="candidate-card" id="candidateCard">
+                    <!-- Card content will be inserted here via JavaScript -->
                 </div>
             </div>
         </div>
-    </div>
-</div>
 
+        <div class="nav-indicator" id="nav-dots">
+            <!-- Navigation dots will be added dynamically -->
+        </div>
+    </div>
 
     <!-- Rating Modal -->
-<div class="modal fade" id="rateModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content shadow-sm">
-            <div class="modal-header py-2 border-0 align-items-center">
-                <h5 class="modal-title text-danger fw-bold fs-5">Candidate Rating</h5>
-                <div class="ms-auto d-flex align-items-center">
-                    <!-- Previously rated indicator -->
-                    <div id="previousRatingBadge" class="badge bg-info text-white me-3 d-none">
-                        <i class="fas fa-check-circle me-1"></i> Previously Rated
-                    </div>
-                    <button type="button" class="btn-close" onclick="closeRateModal()"></button>
-                </div>
-            </div>
-
-            <div class="modal-body py-3 px-4">
-                <!-- Rating input with visual indicator -->
-                <div class="mb-3">
-                    <div class="d-flex justify-content-between align-items-center mb-1">
-                        <label for="rating" class="form-label text-danger mb-0 fw-medium">Rating:</label>
-                        <small id="previousRatingLabel" class="text-info d-none">
-                            <i class="fas fa-history"></i> Previous rating: <span id="previousRatingValue">4</span>
-                        </small>
-                    </div>
-                    <div class="d-flex align-items-center">
-                        <input type="number" class="form-control form-control-sm w-25" id="rating" min="1" max="5" placeholder="1-5">
-                        <small class="ms-2 text-muted">(5 - excellent)</small>
+    <div class="modal fade" id="rateModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content shadow-sm">
+                <div class="modal-header py-2 border-0 align-items-center">
+                    <h5 class="modal-title text-danger fw-bold fs-5">Candidate Rating</h5>
+                    <div class="ms-auto d-flex align-items-center">
+                        <!-- Previously rated indicator -->
+                        <div id="previousRatingBadge" class="badge bg-info text-white me-3 d-none">
+                            <i class="fas fa-check-circle me-1"></i> Previously Rated
+                        </div>
+                        <button type="button" class="btn-close" onclick="closeRateModal()"></button>
                     </div>
                 </div>
 
-                <button id="edit-comment-btn" class="btn btn-sm btn-outline-secondary d-none mb-3">
-                    <i class="fas fa-pen me-1"></i> Edit Rating & Comment
-                </button>
-
-                <div id="first_display">
-                    <input type="hidden" id="loggedInUser" value="{{ faculty_name }}">
-
+                <div class="modal-body py-3 px-4">
+                    <!-- Rating input with visual indicator -->
                     <div class="mb-3">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <label for="rating" class="form-label text-danger mb-0 fw-medium">Rating:</label>
+                            <small id="previousRatingLabel" class="text-info d-none">
+                                <i class="fas fa-history"></i> Previous rating: <span id="previousRatingValue">4</span>
+                            </small>
+                        </div>
                         <div class="d-flex align-items-center">
-                            <h6 class="text-danger fw-medium mb-0">Name:</h6>
-                            <h5 id="modalCandidateName-1" class="candidate-name ms-2 mb-0 fw-semibold"></h5>
+                            <input type="number" class="form-control form-control-sm w-25" id="rating" min="1" max="5" placeholder="1-5">
+                            <small class="ms-2 text-muted">(5 - excellent)</small>
                         </div>
                     </div>
 
-                    <h6 class="text-danger fw-medium candidate-interests-heading">Interested to be an FI for:</h6>
-                    <ul id="modalCandidateInterests-1" class="list-unstyled ps-2"></ul>
-                </div>
-
-                <div class="interest-prompt mb-3">
-                    <p class="text-danger mb-2 fw-medium">Despite the low rating, does the candidate have qualities that make them a desirable FI?</p>
-
-                    <div class="d-flex gap-3">
-                        <div class="form-check">
-                            <input type="radio" id="yes" name="interest_prompt" value="yes" class="form-check-input">
-                            <label for="yes" class="form-check-label">Yes</label>
-                        </div>
-                        <div class="form-check">
-                            <input type="radio" id="no" name="interest_prompt" value="no" class="form-check-input">
-                            <label for="no" class="form-check-label">No</label>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="comment">
-                    <!-- Previous comments indicator -->
-                    <div id="commentsHeader" class="d-flex justify-content-between align-items-center mb-2">
-                        <h6 class="text-danger fw-medium mb-0">Comments</h6>
-                        <small id="previousCommentsLabel" class="text-info d-none">
-                            <i class="fas fa-comment-dots me-1"></i> You've previously commented
-                        </small>
-                    </div>
-
-                    <div id="comments-section" class="mb-3">
-                        <!-- Existing comments will be appended here -->
-                    </div>
-                    <textarea id="new-comment" class="form-control comment-text mb-2" placeholder="Write your comment here..."></textarea>
-                    <button id="post-comment-btn" class="btn btn-sm px-3" style="background-color: #008080; color: white;">
-                        <i class="fas fa-comment me-1"></i> Post Comment
+                    <button id="edit-comment-btn" class="btn btn-sm btn-outline-secondary d-none mb-3">
+                        <i class="fas fa-pen me-1"></i> Edit Rating & Comment
                     </button>
-                </div>
 
-                <div class="text-end mt-3 border-top pt-3">
-                    <button id="final-subButton" class="btn px-4" style="background-color: #236465; color: white;" onclick="submitRating()">Submit</button>
+                    <div id="first_display">
+                        <input type="hidden" id="loggedInUser" value="{{ faculty_name }}">
+
+                        <div class="mb-3">
+                            <div class="d-flex align-items-center">
+                                <h6 class="text-danger fw-medium mb-0">Name:</h6>
+                                <h5 id="modalCandidateName-1" class="candidate-name ms-2 mb-0 fw-semibold"></h5>
+                            </div>
+                        </div>
+
+                        <h6 class="text-danger fw-medium candidate-interests-heading">Interested to be an FI for:</h6>
+                        <ul id="modalCandidateInterests-1" class="list-unstyled ps-2"></ul>
+                    </div>
+
+                    <div class="interest-prompt mb-3">
+                        <p class="text-danger mb-2 fw-medium">Despite the low rating, does the candidate have qualities that make them a desirable FI?</p>
+
+                        <div class="d-flex gap-3">
+                            <div class="form-check">
+                                <input type="radio" id="yes" name="interest_prompt" value="yes" class="form-check-input">
+                                <label for="yes" class="form-check-label">Yes</label>
+                            </div>
+                            <div class="form-check">
+                                <input type="radio" id="no" name="interest_prompt" value="no" class="form-check-input">
+                                <label for="no" class="form-check-label">No</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="comment">
+                        <!-- Previous comments indicator -->
+                        <div id="commentsHeader" class="d-flex justify-content-between align-items-center mb-2">
+                            <h6 class="text-danger fw-medium mb-0">Comments</h6>
+                            <small id="previousCommentsLabel" class="text-info d-none">
+                                <i class="fas fa-comment-dots me-1"></i> You've previously commented
+                            </small>
+                        </div>
+
+                        <div id="comments-section" class="mb-3">
+                            <!-- Existing comments will be appended here -->
+                        </div>
+                        <textarea id="new-comment" class="form-control comment-text mb-2" placeholder="Write your comment here..."></textarea>
+                        <button id="post-comment-btn" class="btn btn-sm px-3" style="background-color: #008080; color: white;">
+                            <i class="fas fa-comment me-1"></i> Post Comment
+                        </button>
+                    </div>
+
+                    <div class="text-end mt-3 border-top pt-3">
+                        <button id="final-subButton" class="btn px-4" style="background-color: #236465; color: white;">Submit</button>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 
-
-<!--    <section>-->
-<!--        <div class="container-1">-->
-<!--            <button id="prevBtn" class="btn-1">-->
-<!--                <i class="fa-solid fa-chevron-left"></i>-->
-<!--            </button>-->
-
-<!--            <div class="card-container">-->
-<!--                &lt;!&ndash; Candidate details will be dynamically inserted here &ndash;&gt;-->
-<!--                <div class="custom-card" id="candidateCard"></div>-->
-<!--            </div>-->
-
-<!--            <button id="nextBtn" class="btn-1">-->
-<!--                <i class="fa-solid fa-chevron-right"></i>-->
-<!--            </button>-->
-<!--        </div>-->
-<!--    </section>-->
-
-
-<!--    &lt;!&ndash; Modal &ndash;&gt;-->
-<!--        <div id="detailsModal" class="modal">-->
-<!--            <div class="modal-content-1">-->
-<!--                <div><span class="close" onclick="closeModal()">&times;</span></div>-->
-
-<!--                <div class="flex-div">-->
-<!--                    <div class="section-1">-->
-<!--                        <h1>Hiring Details:</h1>-->
-<!--                        <h5>Name: </h5><h2 id="modalCandidateName"></h2>-->
-
-<!--                        <h5>Interested to be an FI for:</h5>-->
-<!--                        <ul id="modalCandidateInterests"></ul>-->
-<!--                    </div>-->
-
-<!--                    <div class="section-2">-->
-<!--                        <h1>Summary</h1>-->
-<!--                        <p class="summary" id="modalCandidateSummary"></p>-->
-<!--                        <p id="modalCandidateDetails"></p>-->
-<!--                        <div id="button"></div>-->
-
-<!--                    </div>-->
-
-<!--                </div>-->
-
-
-<!--            </div>-->
-<!--        </div>-->
-
-<!--        &lt;!&ndash; Rating Modal &ndash;&gt;-->
-<!--        <div id="rateModal" class="modal">-->
-<!--            <div class="modal-content">-->
-<!--                <span class="close" onclick="closeRateModal()">&times;</span>-->
-<!--                <h2 style="color: #AD4245; font-size: 24px; text-align: left; margin-top: 12px;">Candidate Rating</h2>-->
-<!--                <div style="display: flex; color: #AD4245;"><label for="rating">Rating: </label>-->
-<!--                <input type="number" id="rating" min="1" max="5" style=" margin-left: 5px; width: 50px;" placeholder="5 - excellent"></div>-->
-<!--                <br>-->
-
-<!--                <button id="edit-comment-btn" style="display: none; background:#236465; color: white;" class="btn btn-sm">-->
-<!--                Edit Rating & Comment-->
-<!--                </button>-->
-
-
-<!--                &lt;!&ndash; This must be the first display we see &ndash;&gt;-->
-<!--                <div id="first_display">-->
-<!--                    &lt;!&ndash; holds the name of the faculty &ndash;&gt;-->
-<!--                    <input type="hidden" id="loggedInUser" value="{{ faculty_name }}">-->
-
-<!--                    <div class="name-area" style="display: flex;">-->
-<!--                        <h5 style="color: #AD4245; text-align: left; ">Name: </h5> <h2 id="modalCandidateName-1" style="color: #AD4245; text-align: left; font-size: 20px; margin-left: 5px;"></h2>-->
-<!--                    </div>-->
-
-<!--                    <h5 style="color:#236465 !important; text-align: left;">Interested to be an FI for:</h5>-->
-<!--                    <ul id="modalCandidateInterests-1" style="text-align: left;"></ul>-->
-<!--                </div>-->
-
-<!--                &lt;!&ndash; when rating is less than 4, then show this message&ndash;&gt;-->
-<!--                <div class="interest-prompt">-->
-<!--                    <p style="color: #AD4245; text-align: left;">Despite the low rating, does the candidate have qualities that make them a desirable FI?</p>-->
-<!--                    -->
-<!--                    <div class="prompt_display_flex" style="display: flex">-->
-<!--                        <div><input type="radio" name="interest_prompt" value="yes"> Yes</div>-->
-<!--                        <div><input type="radio" name="interest_prompt" value="no"> No</div>-->
-<!--                    </div>-->
-<!--                    <br>-->
-<!--                </div>-->
-
-
-<!--                <div class="modal-body" id="comment" style="align-items: left;">-->
-<!--                    <div id="comments-section">-->
-<!--                         &lt;!&ndash; Existing comments will be appended here &ndash;&gt;-->
-<!--                    </div>-->
-<!--                    <textarea style="color:#236465 !important; text-align: left;" id="new-comment" class="form-control my-3" placeholder="Write your comment here..."></textarea>-->
-<!--                    <button id="post-comment-btn" class="btn" style="background:#008080 !important; color: white; text-align: left;">Post Comment</button>-->
-<!--                </div>-->
-
-<!--                <button id="final-subButton" class="rating-subButton" onclick="submitRating()">Submit</button>-->
-<!--            </div>-->
-<!--        </div>-->
+    <!-- Toast container for notifications -->
+    <div id="toast-container" class="position-fixed bottom-0 end-0 p-3"></div>
 
     <!-- JavaScript -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-<!--    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>-->
-    <script src="../static/scripts/main.js"></script>
+    <script>
+        let candidates = [];
+        let currentIndex = 0;
+        let selectedIndex = null;
+        const candidateCard = document.getElementById("candidateCard");
+        const prevBtn = document.getElementById("prevBtn");
+        const nextBtn = document.getElementById("nextBtn");
+        const navDots = document.getElementById("nav-dots");
 
-</body>
-</html>
+        // Bootstrap modal objects
+        let rateModalObj;
+
+        // Rating modal elements
+        const rateModal = document.getElementById("rateModal");
+        const modalCandidateName_rating = document.getElementById("modalCandidateName-1");
+        const modalCandidateInterests_rating = document.getElementById("modalCandidateInterests-1");
+
+        // Initialize Bootstrap modals
+        document.addEventListener('DOMContentLoaded', function() {
+            rateModalObj = new bootstrap.Modal(rateModal);
+
+            // Load candidates on page load
+            fetchCandidates();
+        });
+
+        // Fetch candidates from backend API
+        async function fetchCandidates() {
+            try {
+                let response = await fetch("/api/candidates");
+                let data = await response.json();
+                candidates = data;
+
+                if (candidates.length > 0) {
+                    // Create navigation dots
+                    createNavDots(candidates.length);
+                    displayCandidate(currentIndex, "right"); // Initial display
+                    updateNavDots();
+                }
+            } catch (error) {
+                console.error("Error fetching candidates:", error);
+                candidateCard.innerHTML = "<div class='d-flex justify-content-center align-items-center h-100'><p class='text-danger'><i class='fas fa-exclamation-triangle me-2'></i>Error loading candidates. Please try again later.</p></div>";
+            }
+        }
+
+        // Create navigation dots based on candidate count
+        function createNavDots(count) {
+            navDots.innerHTML = '';
+            for (let i = 0; i < count; i++) {
+                const dot = document.createElement('div');
+                dot.className = 'nav-dot';
+                dot.setAttribute('data-index', i);
+                dot.addEventListener('click', (e) => {
+                    const index = parseInt(e.target.getAttribute('data-index'));
+                    const direction = index > currentIndex ? "right" : "left";
+                    currentIndex = index;
+                    displayCandidate(currentIndex, direction);
+                    updateNavDots();
+                });
+                navDots.appendChild(dot);
+            }
+        }
+
+        // Update active state of navigation dots
+        function updateNavDots() {
+            document.querySelectorAll('.nav-dot').forEach((dot, index) => {
+                if (index === currentIndex) {
+                    dot.classList.add('active');
+                } else {
+                    dot.classList.remove('active');
+                }
+            });
+        }
+
+        // Function to display a candidate with animation
+        function displayCandidate(index, direction) {
+            if (candidates.length === 0) return;
+
+            let candidate = candidates[index];
+
+            // Add appropriate animation class
+            candidateCard.className = 'candidate-card';
+            void candidateCard.offsetWidth; // Force reflow
+
+            candidateCard.classList.add(direction === "left" ? "card-enter-active" : "card-leave-active");
+
+            // Update the card content
+            candidateCard.innerHTML = `
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h4 class="mb-0 fw-bold">${candidate.name}</h4>
+                    <span class="badge bg-light text-dark rounded-pill">${index + 1}/${candidates.length}</span>
+                </div>
+                <div class="card-body">
+                    <ul class="nav nav-tabs mb-3" id="candidateTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="info-tab" data-bs-toggle="tab" data-bs-target="#info-pane" type="button" role="tab">
+                                <i class="fas fa-user-circle me-1"></i> Summary
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="details-tab" data-bs-toggle="tab" data-bs-target="#details-pane" type="button" role="tab">
+                                <i class="fas fa-clipboard-list me-1"></i> Details
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="rate-tab" data-bs-toggle="tab" data-bs-target="#rate-pane" type="button" role="tab">
+                                <i class="fas fa-star me-1"></i> Rate
+                            </button>
+                        </li>
+                    </ul>
+
+                    <div class="tab-content">
+                        <!-- Summary Tab -->
+                        <div class="tab-pane fade show active" id="info-pane" role="tabpanel" tabindex="0">
+                            <div class="candidate-info-box">
+                                <div class="mb-3">
+                                    <h6 class="text-danger mb-1">Interested to be an FI for:</h6>
+                                    <div class="interests-container">
+                                        ${candidate.interests && candidate.interests.length > 0 ?
+                                          candidate.interests.map(interest => `<span class="tag-pill">${interest}</span>`).join('') :
+                                          "<span class='text-muted fst-italic'>No interests specified</span>"}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <h6 class="fw-bold">Summary</h6>
+                            <p>${candidate.summary}</p>
+                        </div>
+
+                        <!-- Details Tab -->
+                        <div class="tab-pane fade" id="details-pane" role="tabpanel" tabindex="0">
+                            <h6 class="fw-bold mb-3">Detailed Information</h6>
+                            <div>${candidate.details}</div>
+                        </div>
+
+                        <!-- Rate Tab -->
+                        <div class="tab-pane fade" id="rate-pane" role="tabpanel" tabindex="0">
+                            <div class="rating-card p-3 mb-3" id="ratingStatusCard">
+                                <h6 class="fw-bold text-secondary mb-3">Candidate Rating</h6>
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <div id="ratingStatus">
+                                        <span class="text-muted">You haven't rated this candidate yet</span>
+                                    </div>
+                                    <button class="btn btn-primary" onclick="openRateModal(${index})">
+                                        <i class="fas fa-star me-1"></i> Rate Now
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="mt-4" id="candidateCommentsSection">
+                                <h6 class="fw-bold text-secondary mb-3">Faculty Comments</h6>
+                                <div id="commentsList" class="comment-list">
+                                    <!-- Will be populated via JavaScript -->
+                                    <p class="text-muted fst-italic">No comments yet</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // Load any existing ratings and comments for this candidate
+            loadExistingRatingAndComments(candidate.id);
+        }
+
+        // Load existing rating and comments for the current candidate
+        function loadExistingRatingAndComments(applicationId) {
+            fetch(`/get_comments?application_id=${applicationId}`)
+                .then(response => response.json())
+                .then(data => {
+                    const ratingStatus = document.getElementById('ratingStatus');
+                    const commentsList = document.getElementById('commentsList');
+
+                    // Update rating status
+                    if (data.rating) {
+                        ratingStatus.innerHTML = `
+                            <div>
+                                <span class="fw-medium">Your rating:</span>
+                                <span class="badge bg-warning text-dark fs-6">${data.rating}/5</span>
+                            </div>
+                            <small class="text-muted">Click "Rate Now" to update</small>
+                        `;
+                    }
+
+                    // Update comments list
+                    if (data.comments && data.comments.length > 0) {
+                        commentsList.innerHTML = '';
+                        data.comments.forEach(comment => {
+                            commentsList.innerHTML += `
+                                <div class="comment-card">
+                                    <div class="d-flex justify-content-between">
+                                        <p class="fw-medium mb-1">${comment.faculty_name || 'Faculty'}</p>
+                                        <small class="text-muted">${comment.timestamp || 'Recent'}</small>
+                                    </div>
+                                    <p class="mb-0">${comment.comment}</p>
+                                </div>
+                            `;
+                        });
+                    } else {
+                        commentsList.innerHTML = '<p class="text-muted fst-italic">No comments yet</p>';
+                    }
+                })
+                .catch(error => {
+                    console.error("Error loading ratings and comments:", error);
+                });
+        }
+
+        // Navigation buttons
+        prevBtn.addEventListener("click", () => {
+            if (currentIndex > 0) {
+                currentIndex--;
+                displayCandidate(currentIndex, "left");
+                updateNavDots();
+            }
+        });
+
+        nextBtn.addEventListener("click", () => {
+            if (currentIndex < candidates.length - 1) {
+                currentIndex++;
+                displayCandidate(currentIndex, "right");
+                updateNavDots();
+            }
+        });
+
+        // Open the rating modal
+        function openRateModal(index) {
+            selectedIndex = index;
+            let candidate = candidates[index];
+            modalCandidateName_rating.textContent = candidate.name;
+
+            if (candidate.interests && candidate.interests.length > 0) {
+                modalCandidateInterests_rating.innerHTML = candidate.interests
+                    .map(interest => `<li class="mb-1">${interest}</li>`)
+                    .join("");
+            } else {
+                modalCandidateInterests_rating.innerHTML = "<li>No interests specified.</li>";
+            }
+
+            // Reset modal elements
+            document.getElementById("rating").value = "";
+            document.getElementById("first_display").style.display = "block";
+            document.querySelector(".interest-prompt").style.display = "none";
+            document.getElementById("comment").style.display = "none";
+            document.getElementById("comments-section").innerHTML = ""; // Clear previous comments
+
+            // Reset previous rating indicators
+            document.getElementById("previousRatingBadge").classList.add("d-none");
+            document.getElementById("previousRatingLabel").classList.add("d-none");
+            document.getElementById("previousCommentsLabel").classList.add("d-none");
+
+            // Fetch previous ratings and comments
+            checkPreviousRating(candidate.id);
+
+            // Fetch and display existing comments
+            fetchComments(candidate.id);
+
+            rateModalObj.show();
+        }
+
+        // Close rating modal
+        function closeRateModal() {
+            rateModalObj.hide();
+
+            // Refresh the current candidate display to show updated ratings/comments
+            displayCandidate(currentIndex, "right");
+        }
+
+        // Check for previous ratings
+        function checkPreviousRating(applicationId) {
+            fetch(`/get_comments?application_id=${applicationId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.rating) {
+                        // Show the previous rating badge
+                        const ratingBadge = document.getElementById("previousRatingBadge");
+                        const ratingLabel = document.getElementById("previousRatingLabel");
+                        const ratingValue = document.getElementById("previousRatingValue");
+
+                        ratingBadge.classList.remove("d-none");
+                        ratingLabel.classList.remove("d-none");
+                        ratingValue.textContent = data.rating;
+
+                        // Pre-fill the rating input with previous value
+                        document.getElementById("rating").value = data.rating;
+
+                        // If they also had comments before
+                        if (data.has_comments) {
+                            document.getElementById("previousCommentsLabel").classList.remove("d-none");
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error("Error checking previous rating:", error);
+                });
+        }
+
+        // Handle rating input
+        document.getElementById("rating").addEventListener("input", function () {
+            let rating = parseInt(this.value, 10);
+
+            if (rating < 4) {
+                document.getElementById("first_display").style.display = "none";
+                document.querySelector(".interest-prompt").style.display = "block";
+                document.getElementById("comment").style.display = "none";
+            } else {
+                document.getElementById("first_display").style.display = "block";
+                document.querySelector(".interest-prompt").style.display = "none";
+                document.getElementById("comment").style.display = "block";
+            }
+        });
+
+        // Handle radio button selection
+        document.querySelectorAll("input[name='interest_prompt']").forEach((radio) => {
+            radio.addEventListener("change", function () {
+                if (this.value === "yes") {
+                    let applicantId = selectedIndex + 1;
+                    document.getElementById("comment").style.display = "block";
+                    fetchComments(applicantId);
+                } else {
+                    document.getElementById("comment").style.display = "none";
+                }
+            });
+        });
+
+        function fetchComments(applicationId) {
+    let facultyName = document.getElementById("loggedInUser").value;
+    let userHasCommented = false;
+
+    fetch(`/get_comments?application_id=${applicationId}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                let commentsSection = document.getElementById("comments-section");
+                if (!commentsSection) {
+                    console.error("Error: comments-section not found in DOM");
+                    return;
+                }
+
+                commentsSection.innerHTML = ""; // Clear previous comments
+
+                if (data.comments.length === 0) {
+                    commentsSection.innerHTML = "<p class='text-muted'>No comments yet.</p>";
+                    return;
+                }
+
+                data.comments.forEach(comment => {
+                    const commentDiv = document.createElement("div");
+                    commentDiv.setAttribute("id", `comment-${comment.id}`);
+
+                    // Check if this is the current user's comment
+                    if (comment.faculty_name === facultyName) {
+                        userHasCommented = true;
+                    }
+                    console.log("from db: ");
+                    console.log(comment.faculty_name);
+                    console.log("from session:");
+                    console.log(facultyName);
+
+                    commentDiv.innerHTML = `
+                        <div class="comment-card mb-3 border-start border-3 ps-3" style="border-color: #236465 !important;">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div class="comment-content">
+                                    <p class="mb-1" style="color:#236465 !important">
+                                        <strong class="fw-bold">${comment.faculty_name || facultyName}:</strong>
+                                        <span id="commentText-${comment.id}" style="color: inherit;">${comment.comment}</span>
+                                    </p>
+                                    <small class="text-muted comment-time">${comment.timestamp || 'Just now'}</small>
+                                </div>
+                                <div class="comment-actions">
+                                    ${comment.faculty_name === facultyName ? `
+                                    <button class="btn btn-sm rounded-pill me-1 shadow-sm" style="background:#008080 !important; color: white;"
+                                        onclick="editComment('${comment.id}')">
+                                        <i class="fas fa-edit me-1"></i> Edit
+                                    </button>
+                                    <button class="btn btn-sm rounded-pill shadow-sm" style="background:#AD4245 !important; color: white;"
+                                        onclick="deleteComment('${comment.id}')">
+                                        <i class="fas fa-trash-alt me-1"></i> Delete
+                                    </button>
+                                    ` : ''}
+                                </div>
+                            </div>
+                        </div>
+                    `;
+
+                    commentsSection.appendChild(commentDiv);
+                });
+
+                // Show the "you've previously commented" indicator if applicable
+                if (userHasCommented) {
+                    document.getElementById("previousCommentsLabel").classList.remove("d-none");
+                }
+            } else {
+                console.error("Failed to fetch comments:", data.message);
+                showToast("Failed to load comments", "error");
+            }
+        })
+        .catch(error => {
+            console.error("Error fetching comments:", error);
+            showToast("Error loading comments", "error");
+        });
+}
+// Function to edit a comment
+function editComment(commentId) {
+    const commentSpan = document.getElementById(`commentText-${commentId}`);
+    const newComment = prompt("Edit your comment:", commentSpan.textContent);
+
+    if (newComment !== null && newComment.trim() !== "") {
+        fetch("/comment", {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                comment_id: commentId,
+                rating: document.getElementById("rating").value, // Include updated rating
+                interest_prompt: document.querySelector("input[name='interest_prompt']:checked")?.value || "",
+                comment: newComment
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                commentSpan.textContent = newComment;
+                showToast("Comment updated successfully!");
+            } else {
+                showToast("Error: " + data.message, "error");
+            }
+        })
+        .catch(error => {
+            console.error("Error updating comment:", error);
+            showToast("Error updating comment", "error");
+        });
+    }
+}
+
+// Function to delete a comment
+function deleteComment(commentId) {
+    if (confirm("Are you sure you want to delete this comment?")) {
+        fetch("/delete_comment", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ comment_id: commentId })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                document.getElementById(`comment-${commentId}`).remove();
+                showToast("Comment deleted successfully!");
+            } else {
+                showToast("Error: " + data.message, "error");
+            }
+        })
+        .catch(error => {
+            console.error("Error deleting comment:", error);
+            showToast("Error deleting comment", "error");
+        });
+    }
+}
+
+function closeRateModal() {
+    rateModalObj.hide(); // Hide rating modal using Bootstrap method
+    setTimeout(() => {
+        detailsModalObj.show(); // Show details modal using Bootstrap method
+    }, 500); // Small delay to ensure smooth transition
+}
+
+// Toast notification helper
+function showToast(message, type = "success") {
+    // Create toast container if it doesn't exist
+    let toastContainer = document.getElementById("toast-container");
+    if (!toastContainer) {
+        toastContainer = document.createElement("div");
+        toastContainer.id = "toast-container";
+        toastContainer.className = "position-fixed bottom-0 end-0 p-3";
+        document.body.appendChild(toastContainer);
+    }
+
+    // Create toast element
+    const toastId = "toast-" + Date.now();
+    const toast = document.createElement("div");
+    toast.id = toastId;
+    toast.className = `toast align-items-center text-white bg-${type === "success" ? "success" : type === "error" ? "danger" : "warning"} border-0`;
+    toast.setAttribute("role", "alert");
+    toast.setAttribute("aria-live", "assertive");
+    toast.setAttribute("aria-atomic", "true");
+
+    toast.innerHTML = `
+        <div class="d-flex">
+            <div class="toast-body">
+                ${message}
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+    `;
+
+    toastContainer.appendChild(toast);
+
+    // Initialize and show toast
+    const bsToast = new bootstrap.Toast(toast, {
+        autohide: true,
+        delay: 3000
+    });
+    bsToast.show();
+}
+    </script>
