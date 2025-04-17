@@ -274,8 +274,18 @@ function displayCandidate(index, direction) {
 
 // Load existing rating and comments for the current candidate
 function loadExistingRatingAndComments(applicationId) {
+    if (!applicationId) {
+        console.error('Application ID is required');
+        return;
+    }
+    
     fetch(`/get_comments?application_id=${applicationId}`)
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
         .then(data => {
             const ratingStatus = document.getElementById('ratingStatus');
             const commentsList = document.getElementById('commentsList');
@@ -288,6 +298,10 @@ function loadExistingRatingAndComments(applicationId) {
                         <span class="badge bg-warning text-dark fs-6">${data.rating}/5</span>
                     </div>
                     <small class="text-muted">Click "Rate Now" to update</small>
+                `;
+            } else {
+                ratingStatus.innerHTML = `
+                    <span class="text-muted">You haven't rated this candidate yet</span>
                 `;
             }
 
@@ -311,6 +325,7 @@ function loadExistingRatingAndComments(applicationId) {
         })
         .catch(error => {
             console.error("Error loading ratings and comments:", error);
+            showToast("Error loading ratings and comments", "error");
         });
 }
 
@@ -567,8 +582,21 @@ function addSwipeStyles() {
 
 // Open the rating modal
 function openRateModal(index) {
+    // Validate index
+    if (index === null || index === undefined || index < 0 || index >= candidates.length) {
+        console.error('Invalid index for openRateModal:', index);
+        showToast("Error: Invalid candidate selection", "error");
+        return;
+    }
+    
     selectedIndex = index;
     let candidate = candidates[index];
+    
+    if (!candidate) {
+        console.error('No candidate found at index:', index);
+        showToast("Error: Candidate data not found", "error");
+        return;
+    }
     
     // Set candidate name and interests in the modal
     document.getElementById("modalCandidateName-1").textContent = candidate.name;
@@ -593,19 +621,10 @@ function openRateModal(index) {
     document.getElementById("previousRatingBadge").classList.add("d-none");
     document.getElementById("previousRatingLabel").classList.add("d-none");
     document.getElementById("previousCommentsLabel").classList.add("d-none");
-    document.getElementById("edit-rating-container").classList.add("d-none");
-
-    // Reset radio buttons
-    document.querySelectorAll("input[name='interest_prompt']").forEach(radio => {
-        radio.checked = false;
-    });
-
-    // Reset star rating
-    updateStarRating(0);
-
-    // Fetch previous ratings and comments
+    
+    // Check for previous rating
     checkPreviousRating(candidate.id);
-
+    
     // Show the modal
     rateModalObj.show();
 }
@@ -617,8 +636,18 @@ function closeRateModal() {
 
 // Check for previous ratings
 function checkPreviousRating(applicationId) {
+    if (!applicationId) {
+        console.error('Application ID is required');
+        return;
+    }
+    
     fetch(`/get_comments?application_id=${applicationId}`)
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
         .then(data => {
             if (data.rating) {
                 // Show the previous rating badge
@@ -630,13 +659,13 @@ function checkPreviousRating(applicationId) {
                 ratingBadge.classList.remove("d-none");
                 ratingLabel.classList.remove("d-none");
                 ratingValue.textContent = data.rating;
-
+                
                 // Pre-fill the rating input with previous value
                 document.getElementById("rating").value = data.rating;
                 
                 // Update star rating
                 updateStarRating(parseInt(data.rating));
-
+                
                 // If they also had comments before
                 if (data.has_comments) {
                     document.getElementById("previousCommentsLabel").classList.remove("d-none");
@@ -670,6 +699,7 @@ function checkPreviousRating(applicationId) {
         })
         .catch(error => {
             console.error("Error checking previous rating:", error);
+            showToast("Error checking previous rating", "error");
         });
 }
 
@@ -747,11 +777,21 @@ document.querySelectorAll("input[name='interest_prompt']").forEach((radio) => {
 
 // Fetch comments for a candidate
 function fetchComments(applicationId) {
+    if (!applicationId) {
+        console.error('Application ID is required');
+        return;
+    }
+    
     let facultyName = document.getElementById("loggedInUser").value;
     let userHasCommented = false;
 
     fetch(`/get_comments?application_id=${applicationId}`)
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
         .then(data => {
             if (data.success) {
                 let commentsSection = document.getElementById("comments-section");
@@ -899,6 +939,11 @@ function submitRating() {
     
     const candidate = candidates[selectedIndex];
     
+    if (!candidate || !candidate.id) {
+        showToast("Error: Invalid candidate data", "error");
+        return;
+    }
+    
     fetch("/rate_candidate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -909,7 +954,12 @@ function submitRating() {
             comment: comment
         })
     })
-    .then(response => response.json())
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
     .then(data => {
         if (data.success) {
             showToast("Rating submitted successfully!");
