@@ -28,7 +28,60 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize swipe functionality
     initSwipeListeners();
     addSwipeStyles();
+    
+    // Add responsive adjustments
+    adjustForMobile();
 });
+
+// Adjust layout for mobile devices
+function adjustForMobile() {
+    const cardContainer = document.querySelector('.card-container');
+    const cardBody = document.querySelector('.card-body');
+    
+    // Add event listener for window resize
+    window.addEventListener('resize', function() {
+        if (window.innerWidth <= 768) {
+            // Mobile adjustments
+            cardContainer.style.height = 'auto';
+            cardContainer.style.minHeight = '500px';
+            cardContainer.style.maxHeight = '600px';
+            
+            if (cardBody) {
+                cardBody.style.padding = '1rem';
+                cardBody.style.height = 'calc(100% - 60px)';
+            }
+            
+            // Make tabs more compact
+            const tabs = document.querySelectorAll('.nav-tabs .nav-link');
+            tabs.forEach(tab => {
+                tab.style.padding = '0.5rem 0.75rem';
+                tab.style.fontSize = '0.9rem';
+            });
+            
+            // Adjust spacing in card content
+            const cardContent = document.querySelectorAll('.card-body h6, .card-body p');
+            cardContent.forEach(element => {
+                if (element.classList.contains('mb-3')) {
+                    element.classList.remove('mb-3');
+                    element.classList.add('mb-2');
+                }
+            });
+        } else {
+            // Desktop adjustments
+            cardContainer.style.height = '600px';
+            cardContainer.style.minHeight = 'auto';
+            cardContainer.style.maxHeight = 'none';
+            
+            if (cardBody) {
+                cardBody.style.padding = '1.5rem';
+                cardBody.style.height = 'calc(100% - 70px)';
+            }
+        }
+    });
+    
+    // Trigger initial adjustment
+    window.dispatchEvent(new Event('resize'));
+}
 
 // Fetch candidates from backend API
 async function fetchCandidates() {
@@ -91,7 +144,9 @@ function displayCandidate(index, direction) {
     newCard.id = 'newCandidateCard';
 
     // Add appropriate animation class based on direction
-    newCard.classList.add(direction === "left" ? "card-enter-active" : "card-leave-active");
+    // For "right" direction (next), new card slides in from right, current slides out to left
+    // For "left" direction (previous), new card slides in from left, current slides out to right
+    newCard.classList.add(direction === "left" ? "card-enter-from-left" : "card-enter-from-right");
 
     // Prepare card content
     newCard.innerHTML = `
@@ -177,7 +232,7 @@ function displayCandidate(index, direction) {
     // Apply opposite animation to the current card
     currentCard.className = 'candidate-card';
     void currentCard.offsetWidth; // Force reflow
-    currentCard.classList.add(direction === "left" ? "card-leave-active" : "card-enter-active");
+    currentCard.classList.add(direction === "left" ? "card-leave-to-right" : "card-leave-to-left");
 
     // After animation completes
     setTimeout(() => {
@@ -186,7 +241,7 @@ function displayCandidate(index, direction) {
 
         // Make the new card the current card
         newCard.id = 'candidateCard';
-        newCard.classList.remove('card-enter-active', 'card-leave-active');
+        newCard.classList.remove('card-enter-from-left', 'card-enter-from-right');
 
         // Initialize Bootstrap tabs in the new card
         const tabs = newCard.querySelectorAll('[data-bs-toggle="tab"]');
@@ -388,22 +443,79 @@ function addSwipeStyles() {
         }
 
         /* Enhanced animations for card transitions */
-        @keyframes slideIn {
+        @keyframes slideInFromRight {
             from { transform: translateX(100%); opacity: 0; }
             to { transform: translateX(0); opacity: 1; }
         }
 
-        @keyframes slideOut {
+        @keyframes slideInFromLeft {
+            from { transform: translateX(-100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @keyframes slideOutToLeft {
             from { transform: translateX(0); opacity: 1; }
             to { transform: translateX(-100%); opacity: 0; }
         }
 
-        .card-enter-active {
-            animation: slideIn 0.5s forwards;
+        @keyframes slideOutToRight {
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(100%); opacity: 0; }
         }
 
-        .card-leave-active {
-            animation: slideOut 0.5s forwards;
+        .card-enter-from-right {
+            animation: slideInFromRight 0.5s forwards;
+        }
+
+        .card-enter-from-left {
+            animation: slideInFromLeft 0.5s forwards;
+        }
+
+        .card-leave-to-left {
+            animation: slideOutToLeft 0.5s forwards;
+        }
+
+        .card-leave-to-right {
+            animation: slideOutToRight 0.5s forwards;
+        }
+        
+        /* Mobile optimizations */
+        @media (max-width: 768px) {
+            .card-container {
+                height: auto;
+                min-height: 500px;
+                max-height: 600px;
+            }
+            
+            .card-body {
+                padding: 1rem;
+                height: calc(100% - 60px);
+            }
+            
+            .nav-tabs .nav-link {
+                padding: 0.5rem 0.75rem;
+                font-size: 0.9rem;
+            }
+            
+            .card-header {
+                padding: 1rem;
+            }
+            
+            .card-header h4 {
+                font-size: 1.2rem;
+            }
+            
+            .tag-pill {
+                font-size: 0.8rem;
+                padding: 0.2rem 0.5rem;
+                margin-right: 0.3rem;
+                margin-bottom: 0.3rem;
+            }
+            
+            .comment-card {
+                padding: 0.75rem;
+                margin-bottom: 0.75rem;
+            }
         }
     `;
     document.head.appendChild(styleElement);
