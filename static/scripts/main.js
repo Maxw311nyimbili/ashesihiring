@@ -1258,3 +1258,51 @@ function showToast(message, type = "success") {
     });
     bsToast.show();
 }
+
+function initStarRating() {
+    const stars = document.querySelectorAll('.star-rating .star');
+    const ratingInput = document.getElementById('rating');
+    const ratingFeedback = document.getElementById('ratingFeedback');
+    
+    const ratingLabels = {
+        1: 'Poor',
+        2: 'Fair',
+        3: 'Good',
+        4: 'Very Good',
+        5: 'Excellent'
+    };
+
+    stars.forEach(star => {
+        star.addEventListener('mouseover', function() {
+            const rating = this.dataset.rating;
+            updateStars(rating);
+        });
+
+        star.addEventListener('click', function() {
+            const rating = this.dataset.rating;
+            ratingInput.value = rating;
+            updateStars(rating);
+            ratingFeedback.textContent = ratingLabels[rating];
+        });
+    });
+
+    document.querySelector('.star-rating').addEventListener('mouseleave', function() {
+        const currentRating = ratingInput.value;
+        updateStars(currentRating);
+    });
+
+    function updateStars(rating) {
+        stars.forEach(star => {
+            const starRating = star.dataset.rating;
+            if (starRating <= rating) {
+                star.classList.remove('far');
+                star.classList.add('fas');
+                star.classList.add('text-warning');
+            } else {
+                star.classList.remove('fas');
+                star.classList.add('far');
+                star.classList.remove('text-warning');
+            }
+        });
+    }
+}
