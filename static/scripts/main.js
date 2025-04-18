@@ -25,12 +25,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize star rating functionality
     initStarRating();
     
-    // Ensure card wrapper and candidate card exist
-    if (!cardWrapper || !candidateCard) {
-        console.error("Required DOM elements not found");
-        return;
-    }
-    
     // Load candidates on page load
     fetchCandidates();
     
@@ -95,31 +89,15 @@ function adjustForMobile() {
 // Fetch candidates from backend API
 async function fetchCandidates() {
     try {
-        console.log("Fetching candidates...");
         let response = await fetch("/api/candidates");
         let data = await response.json();
-        console.log("Received data:", data);
-        
-        // Check if data is an array or has a candidates property
-        if (Array.isArray(data)) {
-            candidates = data;
-        } else if (data.candidates && Array.isArray(data.candidates)) {
-            candidates = data.candidates;
-        } else {
-            console.error("Unexpected data format:", data);
-            throw new Error("Invalid data format received from server");
-        }
-        
-        console.log("Processed candidates:", candidates);
+        candidates = data;
 
         if (candidates.length > 0) {
             // Create navigation dots
             createNavDots(candidates.length);
             displayCandidate(currentIndex, "right"); // Initial display
             updateNavDots();
-        } else {
-            console.warn("No candidates found in the response");
-            candidateCard.innerHTML = "<div class='d-flex justify-content-center align-items-center h-100'><p class='text-muted'><i class='fas fa-info-circle me-2'></i>No candidates available.</p></div>";
         }
     } catch (error) {
         console.error("Error fetching candidates:", error);
@@ -162,16 +140,9 @@ function displayCandidate(index, direction) {
 
     isAnimating = true;
     let candidate = candidates[index];
-    console.log("Displaying candidate:", candidate);
-    
-    if (!candidate) {
-        console.error("Invalid candidate data at index:", index);
-        candidateCard.innerHTML = "<div class='d-flex justify-content-center align-items-center h-100'><p class='text-danger'><i class='fas fa-exclamation-triangle me-2'></i>Error: Invalid candidate data.</p></div>";
-        isAnimating = false;
-        return;
-    }
-    
     selectedIndex = index;  // Set the selectedIndex to the current index
+
+    
 
     // Create a new card element that will slide in
     const newCard = document.createElement('div');
@@ -179,78 +150,84 @@ function displayCandidate(index, direction) {
     newCard.id = 'newCandidateCard';
 
     // Add appropriate animation class based on direction
+    // For "right" direction (next), new card slides in from right, current slides out to left
+    // For "left" direction (previous), new card slides in from left, current slides out to right
     newCard.classList.add(direction === "left" ? "card-enter-from-left" : "card-enter-from-right");
 
     // Prepare card content
-    try {
-        newCard.innerHTML = `
-            <div class="card-header">
-                <h3>${candidate.name || 'Unknown'}</h3>
-                <div class="candidate-status ${(candidate.status || 'Pending').toLowerCase()}">${candidate.status || 'Pending'}</div>
-            </div>
-            <div class="card-body">
-                <ul class="nav nav-tabs" role="tablist">
-                    <li class="nav-item">
-                        <a class="nav-link active" data-bs-toggle="tab" href="#summary-${index}">Summary</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" data-bs-toggle="tab" href="#details-${index}">Details</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" data-bs-toggle="tab" href="#rating-${index}">Rating</a>
-                    </li>
-                </ul>
-                <div class="tab-content">
-                    <div class="tab-pane fade show active" id="summary-${index}">
-                        <div class="ai-summary">
-                            <h4>AI-Generated Summary</h4>
-                            <p>${candidate.ai_summary || 'No summary available.'}</p>
-                        </div>
-                        <div class="candidate-details">
-                            <p><strong>Email:</strong> ${candidate.email || 'Not provided'}</p>
-                            <p><strong>Phone:</strong> ${candidate.phone || 'Not provided'}</p>
-                            <p><strong>Applied:</strong> ${candidate.created_at || 'Unknown'}</p>
-                        </div>
-                    </div>
-                    <div class="tab-pane fade" id="details-${index}">
-                        <div class="document-links">
-                            ${candidate.cv_link ? `<a href="${candidate.cv_link}" target="_blank" class="btn btn-outline-primary"><i class="fas fa-file-pdf"></i> Resume</a>` : ''}
-                            ${candidate.cover_letter_link ? `<a href="${candidate.cover_letter_link}" target="_blank" class="btn btn-outline-primary"><i class="fas fa-file-alt"></i> Cover Letter</a>` : ''}
-                            ${candidate.transcript_link ? `<a href="${candidate.transcript_link}" target="_blank" class="btn btn-outline-primary"><i class="fas fa-file-contract"></i> Transcript</a>` : ''}
-                        </div>
-                    </div>
-                    <div class="tab-pane fade" id="rating-${index}">
-                        <div class="rating-section">
-                            <div class="current-rating">
-                                <h4>Current Rating</h4>
-                                <div class="stars">
-                                    ${generateStars(candidate.rating || 0)}
-                                </div>
-                                ${candidate.comment ? `<p class="comment">${candidate.comment}</p>` : ''}
+    newCard.innerHTML = `
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h4 class="mb-0 fw-bold">${candidate.name}</h4>
+            <span class="badge bg-light text-dark rounded-pill">${index + 1}/${candidates.length}</span>
+        </div>
+        <div class="card-body">
+            <ul class="nav nav-tabs mb-3" id="candidateTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="info-tab" data-bs-toggle="tab" data-bs-target="#info-pane" type="button" role="tab">
+                        <i class="fas fa-user-circle me-1"></i> Summary
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="rate-tab" data-bs-toggle="tab" data-bs-target="#rate-pane" type="button" role="tab">
+                        <i class="fas fa-star me-1"></i> Rate
+                    </button>
+                </li>
+            </ul>
+
+            <div class="tab-content">
+                <!-- Summary Tab -->
+                <div class="tab-pane fade show active" id="info-pane" role="tabpanel" tabindex="0">
+                    <div class="candidate-info-box">
+                        <div class="mb-3">
+                            <h6 class="text-danger mb-1">Interested to be an FI for:</h6>
+                            <div class="interests-container">
+                                ${candidate.interests && candidate.interests.length > 0 ?
+                                  candidate.interests.map(interest => `<span class="tag-pill">${interest}</span>`).join('') :
+                                  "<span class='text-muted fst-italic'>No interests specified</span>"}
                             </div>
-                            <button class="btn btn-primary rate-btn" onclick="openRatingModal(${candidate.id})">
-                                Rate Candidate
+                        </div>
+                    </div>
+
+                    <h6 class="fw-bold">Summary</h6>
+                    <p>${candidate.summary}</p>
+                    
+                    <h6 class="fw-bold mt-4">Documents</h6>
+                    <div class="document-links">
+                        ${candidate.details}
+                    </div>
+                </div>
+
+                <!-- Rate Tab -->
+                <div class="tab-pane fade" id="rate-pane" role="tabpanel" tabindex="0">
+                    <div class="rating-card p-3 mb-3" id="ratingStatusCard">
+                        <h6 class="fw-bold text-secondary mb-3">Candidate Rating</h6>
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div id="ratingStatus">
+                                <span class="text-muted">You haven't rated this candidate yet</span>
+                            </div>
+                            <button class="btn btn-primary" onclick="openRateModal(${index})">
+                                <i class="fas fa-star me-1"></i> Rate Now
                             </button>
+                        </div>
+                    </div>
+
+                    <div class="mt-4" id="candidateCommentsSection">
+                        <h6 class="fw-bold text-secondary mb-3">Faculty Comments</h6>
+                        <div id="commentsList" class="comment-list">
+                            <!-- Will be populated via JavaScript -->
+                            <p class="text-muted fst-italic">No comments yet</p>
                         </div>
                     </div>
                 </div>
             </div>
-        `;
-    } catch (error) {
-        console.error("Error creating card HTML:", error);
-        newCard.innerHTML = "<div class='d-flex justify-content-center align-items-center h-100'><p class='text-danger'><i class='fas fa-exclamation-triangle me-2'></i>Error creating candidate card.</p></div>";
-    }
+        </div>
+    `;
 
     // Add the new card
     cardWrapper.appendChild(newCard);
 
     // Get the current card
     const currentCard = document.getElementById('candidateCard');
-    if (!currentCard) {
-        console.error("Current card element not found");
-        isAnimating = false;
-        return;
-    }
 
     // Apply opposite animation to the current card
     currentCard.className = 'candidate-card';
@@ -259,57 +236,37 @@ function displayCandidate(index, direction) {
 
     // After animation completes
     setTimeout(() => {
-        try {
-            // Remove the old card
-            cardWrapper.removeChild(currentCard);
+        // Remove the old card
+        cardWrapper.removeChild(currentCard);
 
-            // Make the new card the current card
-            newCard.id = 'candidateCard';
-            newCard.classList.remove('card-enter-from-left', 'card-enter-from-right');
+        // Make the new card the current card
+        newCard.id = 'candidateCard';
+        newCard.classList.remove('card-enter-from-left', 'card-enter-from-right');
 
-            // Initialize Bootstrap tabs in the new card
-            const tabs = newCard.querySelectorAll('[data-bs-toggle="tab"]');
-            tabs.forEach(tab => {
-                tab.addEventListener('click', function() {
-                    const target = newCard.querySelector(this.dataset.bsTarget);
-                    if (target) {
-                        newCard.querySelectorAll('.tab-pane').forEach(pane => {
-                            pane.classList.remove('show', 'active');
-                        });
-                        newCard.querySelectorAll('.nav-link').forEach(link => {
-                            link.classList.remove('active');
-                        });
-                        this.classList.add('active');
-                        target.classList.add('show', 'active');
-                    }
+        // Initialize Bootstrap tabs in the new card
+        const tabs = newCard.querySelectorAll('[data-bs-toggle="tab"]');
+        tabs.forEach(tab => {
+            tab.addEventListener('click', function() {
+                const target = newCard.querySelector(this.dataset.bsTarget);
+                newCard.querySelectorAll('.tab-pane').forEach(pane => {
+                    pane.classList.remove('show', 'active');
                 });
+                newCard.querySelectorAll('.nav-link').forEach(link => {
+                    link.classList.remove('active');
+                });
+                this.classList.add('active');
+                target.classList.add('show', 'active');
             });
+        });
 
-            // Load ratings and comments for this candidate
-            loadExistingRatingAndComments(candidate.id);
-        } catch (error) {
-            console.error("Error during card transition:", error);
-        }
+        // Load ratings and comments for this candidate
+        loadExistingRatingAndComments(candidate.id);
+
         isAnimating = false;
     }, 500); // Match this to your animation duration
 
     // Update navigation dots
     updateNavDots();
-}
-
-// Helper function to generate star rating HTML
-function generateStars(rating) {
-    let stars = '';
-    for (let i = 1; i <= 5; i++) {
-        if (i <= rating) {
-            stars += '<i class="fas fa-star"></i>';
-        } else if (i - 0.5 <= rating) {
-            stars += '<i class="fas fa-star-half-alt"></i>';
-        } else {
-            stars += '<i class="far fa-star"></i>';
-        }
-    }
-    return stars;
 }
 
 // Load existing rating and comments for the current candidate

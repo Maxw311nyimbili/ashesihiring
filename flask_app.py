@@ -9,10 +9,6 @@ import os
 import mysql.connector
 import logging
 import json
-import requests
-import PyPDF2
-import io
-import re
 
 # Configure logging
 logging.basicConfig(
@@ -30,106 +26,6 @@ app.secret_key = os.urandom(24)
 UPLOAD_FOLDER = 'static/uploads'
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-
-# Base URL for file links
-base_url = "https://ashesihiring.pythonanywhere.com/download_file/?file="
-
-# Wit.ai configuration
-WIT_AI_ACCESS_TOKEN = os.environ.get('WIT_AI_ACCESS_TOKEN', 'YOUR_WIT_AI_ACCESS_TOKEN')
-WIT_AI_API_URL = 'https://api.wit.ai/message'
-
-# =============================================================================
-# FILE PROCESSING AND AI FUNCTIONS
-# =============================================================================
-
-def extract_text_from_pdf(file_path):
-    """Extract text from a PDF file."""
-    try:
-        with open(file_path, 'rb') as file:
-            pdf_reader = PyPDF2.PdfReader(file)
-            text = ""
-            for page in pdf_reader.pages:
-                text += page.extract_text() + "\n"
-            return text
-    except Exception as e:
-        logging.error(f"Error extracting text from PDF: {str(e)}")
-        return ""
-
-def extract_text_from_file(file_path):
-    """Extract text from a file based on its extension."""
-    try:
-        if not file_path:
-            logging.warning("No file path provided to extract_text_from_file")
-            return ""
-            
-        if file_path.lower().endswith('.pdf'):
-            return extract_text_from_pdf(file_path)
-        else:
-            logging.warning(f"Unsupported file type: {file_path}")
-            return ""
-    except Exception as e:
-        logging.error(f"Error extracting text from file {file_path}: {str(e)}")
-        return ""
-
-def generate_summary_with_wit_ai(text):
-    """Generate a summary using Wit.ai API."""
-    try:
-        # Check if Wit.ai token is properly configured
-        if WIT_AI_ACCESS_TOKEN == 'YOUR_WIT_AI_ACCESS_TOKEN':
-            logging.warning("Wit.ai token not configured. Using fallback summary.")
-            return text[:200] + "..." if len(text) > 200 else text
-            
-        headers = {
-            'Authorization': f'Bearer {WIT_AI_ACCESS_TOKEN}',
-            'Content-Type': 'application/json'
-        }
-        
-        # Prepare the text for analysis
-        # Limit text length to avoid API limits
-        text = text[:5000]  # Adjust this limit based on Wit.ai's requirements
-        
-        # Make the API request
-        response = requests.post(
-            WIT_AI_API_URL,
-            headers=headers,
-            json={'text': text}
-        )
-        
-        if response.status_code == 200:
-            data = response.json()
-            
-            # Extract relevant information from Wit.ai response
-            # This will depend on how you've trained your Wit.ai model
-            entities = data.get('entities', {})
-            
-            # Example: Extract key skills, experience, education
-            skills = entities.get('skill', [])
-            experience = entities.get('experience', [])
-            education = entities.get('education', [])
-            
-            # Construct a summary
-            summary_parts = []
-            
-            if skills:
-                summary_parts.append(f"Skills: {', '.join([s['value'] for s in skills])}")
-            
-            if experience:
-                summary_parts.append(f"Experience: {', '.join([e['value'] for e in experience])}")
-            
-            if education:
-                summary_parts.append(f"Education: {', '.join([e['value'] for e in education])}")
-            
-            if summary_parts:
-                return " | ".join(summary_parts)
-            else:
-                # Fallback to a simple summary if no entities were found
-                return text[:200] + "..." if len(text) > 200 else text
-        else:
-            logging.error(f"Wit.ai API error: {response.status_code} - {response.text}")
-            return text[:200] + "..." if len(text) > 200 else text
-    except Exception as e:
-        logging.error(f"Error generating summary with Wit.ai: {str(e)}")
-        return text[:200] + "..." if len(text) > 200 else text
 
 # =============================================================================
 # DATABASE CONNECTION
@@ -337,99 +233,61 @@ def serve_candidates_json():
     except FileNotFoundError:
         return jsonify({"error": "JSON file not found"}), 404
 
-@app.route('/api/candidates', methods=['GET'])
+@app.route('/api/candidates')
 def get_candidates():
-    """Get all candidates with their details."""
     try:
-        # Get database connection
-        logging.info("Attempting to connect to database...")
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
-        logging.info("Database connection established successfully")
-        
-        # Query to get all applicants with their details
-        query = """
-            SELECT 
-                a.id,
-                a.first_name,
-                a.last_name,
-                a.telephone,
-                a.gender,
-                a.course_selection,
-                a.cv_path,
-                a.cover_letter_path,
-                a.transcript_path,
-                a.created_at
-            FROM 
-                applicants a
-            ORDER BY 
-                a.created_at DESC
-        """
-        
-        logging.info("Executing database query...")
-        cursor.execute(query)
+
+        cursor.execute("""
+            SELECT id, first_name, last_name, telephone, gender, course_selection, 
+                   cv_path, cover_letter_path, transcript_path 
+            FROM applicants
+        """)
         applicants = cursor.fetchall()
-        logging.info(f"Query returned {len(applicants)} applicants")
-        
-        # Process each applicant
+
         candidates = []
+        base_url = "/download_file/"
+
         for applicant in applicants:
-            try:
-                logging.info(f"Processing applicant ID: {applicant['id']}")
-                # Generate AI summary from CV
-                cv_text = ""
-                if applicant['cv_path']:
-                    logging.info(f"Extracting text from CV: {applicant['cv_path']}")
-                    cv_text = extract_text_from_file(applicant['cv_path'])
-                    logging.info(f"Extracted {len(cv_text)} characters from CV")
-                else:
-                    logging.warning(f"No CV path for applicant ID: {applicant['id']}")
-                
-                # Generate summary using Wit.ai
-                logging.info("Generating AI summary...")
-                ai_summary = generate_summary_with_wit_ai(cv_text) if cv_text else "No CV available for analysis."
-                logging.info(f"Generated summary: {ai_summary[:50]}...")
-                
-                # Create candidate details
-                candidate = {
-                    'id': applicant['id'],
-                    'name': f"{applicant['first_name']} {applicant['last_name']}",
-                    'email': None,  # Not in the applicants table
-                    'phone': applicant['telephone'],
-                    'cv_link': f"{base_url}{applicant['cv_path']}" if applicant['cv_path'] else None,
-                    'cover_letter_link': f"{base_url}{applicant['cover_letter_path']}" if applicant['cover_letter_path'] else None,
-                    'transcript_link': f"{base_url}{applicant['transcript_path']}" if applicant['transcript_path'] else None,
-                    'created_at': applicant['created_at'].strftime('%Y-%m-%d %H:%M:%S'),
-                    'status': applicant.get('status', 'Pending'),  # Default to 'Pending' if not in the table
-                    'rating': applicant.get('rating', None),  # Default to None if not in the table
-                    'comment': applicant.get('comment', None),  # Default to None if not in the table
-                    'interest_prompt': applicant.get('interest_prompt', None),  # Default to None if not in the table
-                    'interest_response': applicant.get('interest_response', None),  # Default to None if not in the table
-                    'ai_summary': ai_summary
-                }
-                
-                candidates.append(candidate)
-                logging.info(f"Successfully processed applicant ID: {applicant['id']}")
-            except Exception as e:
-                logging.error(f"Error processing applicant {applicant.get('id', 'unknown')}: {str(e)}")
-                # Continue with the next applicant instead of failing the entire request
-        
-        # Close database connection
+            cursor.execute("SELECT course_name FROM course_preferences WHERE applicant_id = %s", (applicant["id"],))
+            interests = [row["course_name"] for row in cursor.fetchall()]
+
+            # Extract just the filename from the paths
+            cv_filename = os.path.basename(applicant['cv_path']) if applicant['cv_path'] else None
+            cover_letter_filename = os.path.basename(applicant['cover_letter_path']) if applicant['cover_letter_path'] else None
+            transcript_filename = os.path.basename(applicant['transcript_path']) if applicant['transcript_path'] else None
+
+            # Log the filenames for debugging
+            app.logger.info(f"CV filename: {cv_filename}")
+            app.logger.info(f"Cover letter filename: {cover_letter_filename}")
+            app.logger.info(f"Transcript filename: {transcript_filename}")
+
+            candidates.append({
+                "name": f"{applicant['first_name']} {applicant['last_name']}",
+                "id": applicant['id'],
+                "summary": f"Interested in {applicant.get('course_selection', 'Unknown Course')}.",
+                "details": f"""
+                    <a href='{base_url}?file={cv_filename}' target='_blank'><i class="fas fa-file-pdf"></i> Resume</a> | 
+                    <a href='{base_url}?file={cover_letter_filename}' target='_blank'><i class="fas fa-file-alt"></i> Cover Letter</a> | 
+                    <a href='{base_url}?file={transcript_filename}' target='_blank'><i class="fas fa-file-contract"></i> Transcript</a>
+                """,
+                "interests": interests
+            })
+
         cursor.close()
         conn.close()
-        logging.info("Database connection closed")
-        
-        logging.info(f"Returning {len(candidates)} candidates")
-        return jsonify({
-            'status': 'success',
-            'candidates': candidates
-        })
-    except Exception as e:
-        logging.error(f"Error getting candidates: {str(e)}")
-        return jsonify({
-            'status': 'error',
-            'message': f'Failed to get candidates: {str(e)}'
-        }), 500
+
+        with open("candidates.json", "w") as json_file:
+            json.dump(candidates, json_file, indent=4)
+
+        return jsonify(candidates)
+
+    except mysql.connector.Error as err:
+        error_response = {"error": str(err)}
+        with open("error_log.json", "w") as json_file:
+            json.dump(error_response, json_file, indent=4)
+        return jsonify(error_response), 500
 
 # Add a new route to serve files publicly
 @app.route('/download_file/')
@@ -750,7 +608,7 @@ def rate_candidate():
         cursor = conn.cursor(dictionary=True)
 
         # First check if the application exists
-        cursor.execute("SELECT id FROM applicants WHERE id = %s", (application_id,))
+        cursor.execute("SELECT id FROM applications WHERE id = %s", (application_id,))
         application = cursor.fetchone()
         
         if not application:
