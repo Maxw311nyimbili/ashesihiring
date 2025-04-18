@@ -268,9 +268,9 @@ def get_candidates():
                 "id": applicant['id'],
                 "summary": f"Interested in {applicant.get('course_selection', 'Unknown Course')}.",
                 "details": f"""
-                    <a href='{base_url}?file={cv_filename}' target='_blank'>Resume</a> | 
-                    <a href='{base_url}?file={cover_letter_filename}' target='_blank'>Cover Letter</a> | 
-                    <a href='{base_url}?file={transcript_filename}' target='_blank'>Transcript</a>
+                    <a href='{base_url}?file={cv_filename}' target='_blank'><i class="fas fa-file-pdf"></i> Resume</a> | 
+                    <a href='{base_url}?file={cover_letter_filename}' target='_blank'><i class="fas fa-file-alt"></i> Cover Letter</a> | 
+                    <a href='{base_url}?file={transcript_filename}' target='_blank'><i class="fas fa-file-contract"></i> Transcript</a>
                 """,
                 "interests": interests
             })
@@ -303,7 +303,7 @@ def download_file():
         return "Invalid file path", 403
     
     # Log the file path for debugging
-    app.logger.info(f'Attempting to download file: {file_path}')
+    app.logger.info(f'Attempting to serve file: {file_path}')
     
     # Get the filename from the path
     filename = os.path.basename(file_path)
@@ -329,8 +329,13 @@ def download_file():
     
     app.logger.info(f'Serving file: {filename} with MIME type: {mime_type}')
     
-    # Return the file
-    return send_file(full_path, mimetype=mime_type, as_attachment=True, download_name=filename)
+    # Return the file for inline viewing instead of forcing download
+    return send_file(
+        full_path, 
+        mimetype=mime_type, 
+        as_attachment=False,  # Set to False to allow inline viewing
+        download_name=filename
+    )
 
 # =============================================================================
 # COMMENT AND RATING ROUTES

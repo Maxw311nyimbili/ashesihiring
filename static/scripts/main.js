@@ -168,11 +168,6 @@ function displayCandidate(index, direction) {
                     </button>
                 </li>
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="details-tab" data-bs-toggle="tab" data-bs-target="#details-pane" type="button" role="tab">
-                        <i class="fas fa-clipboard-list me-1"></i> Details
-                    </button>
-                </li>
-                <li class="nav-item" role="presentation">
                     <button class="nav-link" id="rate-tab" data-bs-toggle="tab" data-bs-target="#rate-pane" type="button" role="tab">
                         <i class="fas fa-star me-1"></i> Rate
                     </button>
@@ -195,12 +190,11 @@ function displayCandidate(index, direction) {
 
                     <h6 class="fw-bold">Summary</h6>
                     <p>${candidate.summary}</p>
-                </div>
-
-                <!-- Details Tab -->
-                <div class="tab-pane fade" id="details-pane" role="tabpanel" tabindex="0">
-                    <h6 class="fw-bold mb-3">Detailed Information</h6>
-                    <div>${candidate.details}</div>
+                    
+                    <h6 class="fw-bold mt-4">Documents</h6>
+                    <div class="document-links">
+                        ${candidate.details}
+                    </div>
                 </div>
 
                 <!-- Rate Tab -->
