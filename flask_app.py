@@ -327,6 +327,143 @@ def get_candidates():
         return jsonify({"error": "An unexpected error occurred"}), 500
 
 
+@app.route('/check_pdf_extraction')
+def check_pdf_extraction():
+    """Detailed PDF extraction check for a specific candidate"""
+    application_id = request.args.get('application_id')
+
+    if not application_id:
+        return jsonify({"error": "Application ID is required"}), 400
+
+    try:
+        # Get the candidate's information
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+
+        cursor.execute("""
+            SELECT id, first_name, last_name, cv_path, cover_letter_path
+            FROM applicants
+            WHERE id = %s
+        """, (application_id,))
+
+        applicant = cursor.fetchone()
+
+        if not applicant:
+            return jsonify({"error": "Applicant not found"}), 404
+
+        # Get the candidate's interests
+        cursor.execute("SELECT course_name FROM course_preferences WHERE applicant_id = %s", (application_id,))
+        interests = [row["course_name"] for row in cursor.fetchall()]
+
+        cursor.close()
+        conn.close()
+
+        # Extract just the filename from the paths
+        cv_filename = os.path.basename(applicant['cv_path']) if applicant['cv_path'] else None
+        cover_letter_filename = os.path.basename(applicant['cover_letter_path']) if applicant[
+            'cover_letter_path'] else None
+
+        # Get the PDF content extractor
+        extractor = get_pdf_extractor(app)
+
+        # Check if files exist
+        cv_exists = False
+        cover_letter_exists = False
+
+        if cv_filename:
+            cv_path = os.path.join(app.config['UPLOAD_FOLDER'], cv_filename)
+            cv_exists = os.path.exists(cv_path)
+
+        if cover_letter_filename:
+            cover_letter_path = os.path.join(app.config['UPLOAD_FOLDER'], cover_letter_filename)
+            cover_letter_exists = os.path.exists(cover_letter_path)
+
+        # Try to extract text from the files
+        cv_text = ""
+        cover_letter_text = ""
+        cv_error = None
+        cover_letter_error = None
+
+        if cv_exists:
+            try:
+                cv_text = extractor.extract_text_from_pdf(cv_filename)
+            except Exception as e:
+                cv_error = str(e)
+
+        if cover_letter_exists:
+            try:
+                cover_letter_text = extractor.extract_text_from_pdf(cover_letter_filename)
+            except Exception as e:
+                cover_letter_error = str(e)
+
+        # Check if we can extract key information
+        combined_text = f"{cover_letter_text}\n\n{cv_text}"
+
+        # Extract detailed information for the report
+        key_phrases = []
+        skills = []
+        education = []
+        experience_years = None
+
+        try:
+            key_phrases = extractor.extract_key_phrases(combined_text)
+            skills = extractor.extract_skills(combined_text)
+            education = extractor.extract_education(combined_text)
+            experience_years = extractor.extract_experience_years(combined_text)
+        except Exception as e:
+            app.logger.error(f"Error extracting details: {str(e)}")
+
+        # Determine if we would use a fallback summary
+        would_use_fallback = not (key_phrases or skills or education)
+
+        # Extract sample text for preview (up to 300 chars)
+        cv_preview = cv_text[:300] + "..." if len(cv_text) > 300 else cv_text
+        cover_letter_preview = cover_letter_text[:300] + "..." if len(cover_letter_text) > 300 else cover_letter_text
+
+        return jsonify({
+            "applicant": {
+                "id": applicant['id'],
+                "name": f"{applicant['first_name']} {applicant['last_name']}",
+                "interests": interests
+            },
+            "files": {
+                "cv": {
+                    "filename": cv_filename,
+                    "exists": cv_exists,
+                    "path": os.path.join(app.config['UPLOAD_FOLDER'], cv_filename) if cv_filename else None,
+                    "error": cv_error,
+                    "text_length": len(cv_text) if cv_text else 0,
+                    "preview": cv_preview if cv_text else ""
+                },
+                "cover_letter": {
+                    "filename": cover_letter_filename,
+                    "exists": cover_letter_exists,
+                    "path": os.path.join(app.config['UPLOAD_FOLDER'],
+                                         cover_letter_filename) if cover_letter_filename else None,
+                    "error": cover_letter_error,
+                    "text_length": len(cover_letter_text) if cover_letter_text else 0,
+                    "preview": cover_letter_preview if cover_letter_text else ""
+                }
+            },
+            "extraction": {
+                "key_phrases_count": len(key_phrases),
+                "sample_key_phrases": key_phrases[:3] if key_phrases else [],
+                "skills_count": len(skills),
+                "sample_skills": skills[:5] if skills else [],
+                "education_count": len(education),
+                "education_details": education if education else [],
+                "experience_years": experience_years,
+                "would_use_fallback": would_use_fallback,
+                "reason": "Insufficient content extracted from documents" if would_use_fallback else "Sufficient content available for summary generation"
+            }
+        })
+
+    except Exception as e:
+        app.logger.error(f"Error checking PDF extraction: {str(e)}")
+        return jsonify({"error": str(e)}), 500
+
+
+
 # Add a new route to serve files publicly
 @app.route('/download_file/')
 def download_file():

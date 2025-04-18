@@ -39,7 +39,7 @@ document.addEventListener('DOMContentLoaded', function() {
     adjustForMobile();
 });
 
-// Add these styles to make the AI summary section visually distinct
+// Add better styles for distinguishing fallback summaries
 function addAISummaryStyles() {
     const styleElement = document.createElement('style');
     styleElement.textContent = `
@@ -82,6 +82,74 @@ function addAISummaryStyles() {
             line-height: 1.5;
         }
         
+        .summary-source-indicator {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+        }
+        
+        .summary-source-badge {
+            padding: 0.25rem 0.6rem;
+            border-radius: 20px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+        }
+        
+        .summary-source-badge.content-based {
+            background-color: #e3f2fd;
+            color: #0d6efd;
+            border: 1px solid #b6d4fe;
+        }
+        
+        .summary-source-badge.fallback {
+            background-color: #fff3cd;
+            color: #664d03;
+            border: 1px solid #ffecb5;
+        }
+        
+        .summary-source-badge i {
+            margin-right: 5px;
+            font-size: 0.875rem;
+        }
+        
+        .source-info-tooltip {
+            display: inline-block;
+            margin-left: 5px;
+            cursor: help;
+            color: #6c757d;
+        }
+        
+        .pdf-check-btn {
+            margin-left: 5px;
+            padding: 0.125rem 0.5rem;
+            font-size: 0.75rem;
+            background-color: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 3px;
+            color: #6c757d;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .pdf-check-btn:hover {
+            background-color: #e9ecef;
+            color: #343a40;
+        }
+        
+        .fallback-notice {
+            margin-top: 10px;
+            padding: 8px 12px;
+            background-color: #fff3cd;
+            border-left: 3px solid #ffc107;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            color: #664d03;
+        }
+        
         @media (max-width: 768px) {
             .ai-summary-box {
                 padding: 1rem;
@@ -89,6 +157,12 @@ function addAISummaryStyles() {
             
             .ai-summary-content {
                 font-size: 0.9rem;
+            }
+            
+            .summary-source-indicator {
+                position: static;
+                margin-bottom: 10px;
+                justify-content: flex-end;
             }
         }
     `;
@@ -201,7 +275,7 @@ function updateNavDots() {
     });
 }
 
-// Update the displayCandidate function to show AI summary
+// Update the displayCandidate function to clearly show summary source
 function displayCandidate(index, direction) {
     if (candidates.length === 0 || isAnimating) return;
 
@@ -217,7 +291,26 @@ function displayCandidate(index, direction) {
     // Add appropriate animation class based on direction
     newCard.classList.add(direction === "left" ? "card-enter-from-left" : "card-enter-from-right");
 
-    // Prepare card content - now with the enhanced AI summary section
+    // Source indicator for the summary
+    const summarySourceBadge = candidate.is_fallback ? 
+        `<div class="summary-source-badge fallback">
+            <i class="fas fa-robot"></i> Template-based Summary
+         </div>` : 
+        `<div class="summary-source-badge content-based">
+            <i class="fas fa-file-alt"></i> Document-based Summary
+         </div>`;
+        
+    // Additional info button for summary source
+    const infoButton = `
+        <span class="source-info-tooltip" title="Check the source of this summary">
+            <i class="fas fa-info-circle"></i>
+        </span>
+        <button class="pdf-check-btn" onclick="checkPDFExtraction(${candidate.id})">
+            <i class="fas fa-search"></i> Check PDF
+        </button>
+    `;
+
+    // Prepare card content with enhanced AI summary section
     newCard.innerHTML = `
         <div class="card-header d-flex justify-content-between align-items-center">
             <h4 class="mb-0 fw-bold">${candidate.name}</h4>
@@ -240,17 +333,23 @@ function displayCandidate(index, direction) {
             <div class="tab-content">
                 <!-- Summary Tab -->
                 <div class="tab-pane fade show active" id="info-pane" role="tabpanel" tabindex="0">
-                    <!-- AI Summary Section -->
+                    <!-- AI Summary Section with Source Indicator -->
                     <div class="ai-summary-box">
+                        <div class="summary-source-indicator">
+                            ${summarySourceBadge}
+                            ${infoButton}
+                        </div>
                         <div class="ai-summary-header">
                             <i class="fas fa-robot"></i>
                             <h6>AI Profile Analysis</h6>
-                            ${candidate.is_fallback ? '<span class="badge bg-warning text-dark ms-2">Fallback Summary</span>' : ''}
                         </div>
                         <div class="ai-summary-content">
                             ${candidate.summary}
+                            ${candidate.is_fallback ? 
+                                `<div class="fallback-notice">
+                                    <i class="fas fa-exclamation-triangle me-1"></i> This summary was generated using a template because the system couldn't extract sufficient content from the PDF files. This could be due to document formatting, protection settings, or file issues.
+                                </div>` : ''}
                         </div>
-                        ${candidate.is_fallback ? '<div class="mt-2 small text-muted"><i class="fas fa-info-circle me-1"></i> This is a fallback summary because the system could not extract content from the PDF files. Please check if the PDF files are properly uploaded and accessible.</div>' : ''}
                     </div>
                     
                     <div class="candidate-info-box">
@@ -330,6 +429,12 @@ function displayCandidate(index, direction) {
                 this.classList.add('active');
                 target.classList.add('show', 'active');
             });
+        });
+
+        // Initialize tooltip
+        const tooltips = newCard.querySelectorAll('.source-info-tooltip');
+        tooltips.forEach(tooltip => {
+            new bootstrap.Tooltip(tooltip);
         });
 
         // Load ratings and comments for this candidate
@@ -1142,39 +1247,135 @@ delay: 3000
 bsToast.show();
 }
 
+// Add this function to check PDF extraction details
 async function checkPDFExtraction(applicationId) {
     try {
         const response = await fetch(`/check_pdf_extraction?application_id=${applicationId}`);
         const data = await response.json();
         
         if (response.ok) {
-            let message = `PDF Extraction Status for ${data.applicant.name}:\n\n`;
+            // Create a modal to display the PDF extraction details
+            const modal = document.createElement('div');
+            modal.className = 'modal fade';
+            modal.id = 'pdfExtractionModal';
+            modal.tabIndex = '-1';
+            modal.setAttribute('aria-hidden', 'true');
             
-            // File existence
-            message += `CV: ${data.files.cv.exists ? '✅ Exists' : '❌ Missing'}\n`;
-            message += `Cover Letter: ${data.files.cover_letter.exists ? '✅ Exists' : '❌ Missing'}\n\n`;
+            let statusColor = data.extraction.would_use_fallback ? 'danger' : 'success';
+            let statusIcon = data.extraction.would_use_fallback ? 'exclamation-triangle' : 'check-circle';
+            let statusText = data.extraction.would_use_fallback ? 'Using Fallback Summary' : 'Using Document-Based Summary';
             
-            // Extraction results
-            message += `CV Text Length: ${data.files.cv.text_length} characters\n`;
-            message += `Cover Letter Text Length: ${data.files.cover_letter.text_length} characters\n\n`;
+            modal.innerHTML = `
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header py-2">
+                            <h5 class="modal-title">PDF Extraction Status</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="mb-3 text-center">
+                                <div class="d-inline-block p-3 rounded-circle bg-${statusColor} bg-opacity-10 mb-2">
+                                    <i class="fas fa-${statusIcon} text-${statusColor} fs-4"></i>
+                                </div>
+                                <h5 class="text-${statusColor}">${statusText}</h5>
+                                <p class="text-muted mb-0">For candidate: ${data.applicant.name}</p>
+                            </div>
+                            
+                            <div class="row g-3 mb-3">
+                                <div class="col-md-6">
+                                    <div class="card h-100">
+                                        <div class="card-header py-2 px-3 bg-light">CV Status</div>
+                                        <div class="card-body p-3">
+                                            <p class="mb-1">
+                                                <i class="fas fa-${data.files.cv.exists ? 'check text-success' : 'times text-danger'}"></i>
+                                                File exists: ${data.files.cv.exists ? 'Yes' : 'No'}
+                                            </p>
+                                            <p class="mb-1">Text extracted: ${data.files.cv.text_length} characters</p>
+                                            ${data.files.cv.error ? `<p class="mb-0 text-danger"><i class="fas fa-exclamation-circle"></i> Error: ${data.files.cv.error}</p>` : ''}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="card h-100">
+                                        <div class="card-header py-2 px-3 bg-light">Cover Letter Status</div>
+                                        <div class="card-body p-3">
+                                            <p class="mb-1">
+                                                <i class="fas fa-${data.files.cover_letter.exists ? 'check text-success' : 'times text-danger'}"></i>
+                                                File exists: ${data.files.cover_letter.exists ? 'Yes' : 'No'}
+                                            </p>
+                                            <p class="mb-1">Text extracted: ${data.files.cover_letter.text_length} characters</p>
+                                            ${data.files.cover_letter.error ? `<p class="mb-0 text-danger"><i class="fas fa-exclamation-circle"></i> Error: ${data.files.cover_letter.error}</p>` : ''}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="card mb-3">
+                                <div class="card-header py-2 px-3 bg-light">Extraction Results</div>
+                                <div class="card-body p-3">
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <div class="d-flex align-items-center mb-2">
+                                                <div class="rounded-circle bg-primary bg-opacity-10 p-2 me-2">
+                                                    <i class="fas fa-key text-primary"></i>
+                                                </div>
+                                                <div>
+                                                    <h6 class="mb-0">Key Phrases</h6>
+                                                    <p class="mb-0">${data.extraction.key_phrases_count} found</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="d-flex align-items-center mb-2">
+                                                <div class="rounded-circle bg-success bg-opacity-10 p-2 me-2">
+                                                    <i class="fas fa-tools text-success"></i>
+                                                </div>
+                                                <div>
+                                                    <h6 class="mb-0">Skills</h6>
+                                                    <p class="mb-0">${data.extraction.skills_count} found</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="d-flex align-items-center mb-2">
+                                                <div class="rounded-circle bg-info bg-opacity-10 p-2 me-2">
+                                                    <i class="fas fa-graduation-cap text-info"></i>
+                                                </div>
+                                                <div>
+                                                    <h6 class="mb-0">Education</h6>
+                                                    <p class="mb-0">${data.extraction.education_count} entries</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="alert ${data.extraction.would_use_fallback ? 'alert-warning' : 'alert-info'} mb-0">
+                                <i class="fas fa-info-circle me-2"></i>
+                                ${data.extraction.would_use_fallback ? 
+                                    'The system is using a template-based fallback summary because it could not extract sufficient meaningful content from the documents. This may be due to PDF formatting, security settings, or scanned image-based PDFs.' : 
+                                    'The system was able to extract meaningful content from the documents and is using this to generate a personalized summary.'}
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            `;
             
-            // Key information
-            message += `Key Phrases Found: ${data.extraction.key_phrases_count}\n`;
-            message += `Skills Found: ${data.extraction.skills_count}\n`;
-            message += `Education Entries Found: ${data.extraction.education_count}\n\n`;
+            // Add the modal to the document body
+            document.body.appendChild(modal);
             
-            // Errors
-            if (data.files.cv.error) {
-                message += `CV Error: ${data.files.cv.error}\n`;
-            }
-            if (data.files.cover_letter.error) {
-                message += `Cover Letter Error: ${data.files.cover_letter.error}\n`;
-            }
+            // Initialize and show the modal
+            const bsModal = new bootstrap.Modal(modal);
+            bsModal.show();
             
-            // Summary
-            message += `\nWould Use Fallback: ${data.extraction.would_use_fallback ? 'Yes' : 'No'}`;
-            
-            alert(message);
+            // Remove the modal from the DOM when it's hidden
+            modal.addEventListener('hidden.bs.modal', function () {
+                document.body.removeChild(modal);
+            });
         } else {
             showToast(data.error || 'Failed to check PDF extraction', 'error');
         }
@@ -1182,27 +1383,4 @@ async function checkPDFExtraction(applicationId) {
         console.error('Error checking PDF extraction:', error);
         showToast('Failed to check PDF extraction', 'error');
     }
-}
-
-function displayCandidate(candidate) {
-    // ... existing code ...
-    
-    // Add the AI summary section
-    const aiSummarySection = document.createElement('div');
-    aiSummarySection.className = 'ai-summary-section';
-    aiSummarySection.innerHTML = `
-        <div class="ai-summary-header">
-            <h5>AI Summary</h5>
-            ${candidate.is_fallback ? '<span class="badge bg-warning text-dark ms-2">Fallback Summary</span>' : ''}
-            <button class="btn btn-sm btn-outline-secondary ms-2" onclick="checkPDFExtraction(${candidate.id})">
-                <i class="fas fa-search"></i> Check PDF Status
-            </button>
-        </div>
-        <div class="ai-summary-content">
-            ${candidate.summary || 'No summary available yet.'}
-            ${candidate.is_fallback ? '<div class="mt-2 small text-muted"><i class="fas fa-info-circle me-1"></i> This is a fallback summary because the system could not extract content from the PDF files. Please check if the PDF files are properly uploaded and accessible.</div>' : ''}
-        </div>
-    `;
-    
-    // ... existing code ...
 }
