@@ -11,7 +11,6 @@ import logging
 import json
 import requests
 import PyPDF2
-import docx
 import io
 import re
 
@@ -53,24 +52,10 @@ def extract_text_from_pdf(file_path):
         logging.error(f"Error extracting text from PDF: {str(e)}")
         return ""
 
-def extract_text_from_docx(file_path):
-    """Extract text from a DOCX file."""
-    try:
-        doc = docx.Document(file_path)
-        text = ""
-        for paragraph in doc.paragraphs:
-            text += paragraph.text + "\n"
-        return text
-    except Exception as e:
-        logging.error(f"Error extracting text from DOCX: {str(e)}")
-        return ""
-
 def extract_text_from_file(file_path):
     """Extract text from a file based on its extension."""
     if file_path.lower().endswith('.pdf'):
         return extract_text_from_pdf(file_path)
-    elif file_path.lower().endswith('.docx'):
-        return extract_text_from_docx(file_path)
     else:
         logging.warning(f"Unsupported file type: {file_path}")
         return ""
