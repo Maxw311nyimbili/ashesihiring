@@ -4,6 +4,7 @@ let scheduledCandidates = [];
 let facultySchedule = null;
 let selectedCandidate = null;
 let modalObjects = {};
+let datePicker = null;
 
 // Initialize when DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
@@ -12,61 +13,37 @@ document.addEventListener('DOMContentLoaded', function() {
     modalObjects.batchSchedule = new bootstrap.Modal(document.getElementById('batchScheduleModal'));
     modalObjects.deleteSchedule = new bootstrap.Modal(document.getElementById('deleteScheduleModal'));
     modalObjects.confirmDate = new bootstrap.Modal(document.getElementById('confirmDateModal'));
-    
-    // Initialize date picker
+
+    // Initialize date picker using Flatpickr instead of Tempus Dominus
     initializeDatePicker();
-    
+
     // Initialize event listeners
     initEventListeners();
-    
-    // Load data
-    loadRatedCandidates();
-    loadFacultySchedule();
+
+    // Load faculty schedule first, then rated candidates
+    // This ensures we know scheduled status before rendering the candidate list
+    loadFacultySchedule().then(() => {
+        loadRatedCandidates();
+    });
 });
 
-// Initialize the date picker
+// Initialize the date picker using Flatpickr
 function initializeDatePicker() {
     // Get tomorrow's date as the minimum selectable date
     const tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
-    
-    // Initialize Tempus Dominus date picker
-    const datePicker = new tempusDominus.TempusDominus(document.getElementById('interview-date-picker'), {
-        display: {
-            icons: {
-                time: 'fas fa-clock',
-                date: 'fas fa-calendar',
-                up: 'fas fa-arrow-up',
-                down: 'fas fa-arrow-down',
-                previous: 'fas fa-chevron-left',
-                next: 'fas fa-chevron-right',
-                today: 'fas fa-calendar-day',
-                clear: 'fas fa-trash',
-                close: 'fas fa-times'
-            },
-            components: {
-                clock: false,
-                hours: false,
-                minutes: false,
-                seconds: false
-            },
-            buttons: {
-                today: true,
-                clear: true,
-                close: true
-            }
-        },
-        restrictions: {
-            minDate: tomorrow
-        }
-    });
-    
-    // Listen for change events
-    datePicker.subscribe(tempusDominus.Namespace.events.change, (e) => {
-        const selectedDate = e.date;
-        if (selectedDate) {
-            const formattedDate = formatDateForDisplay(selectedDate);
-            document.getElementById('interview-date').value = formattedDate;
+
+    // Initialize Flatpickr date picker
+    datePicker = flatpickr("#interview-date", {
+        dateFormat: "F j, Y", // Format like "April 20, 2025"
+        minDate: tomorrow,
+        disableMobile: true,
+        altInput: true,
+        altFormat: "F j, Y",
+        appendTo: document.querySelector('.datepicker-container'),
+        onChange: function(selectedDates, dateStr) {
+            // This happens when the date is changed
+            console.log("Selected date:", dateStr);
         }
     });
 }
@@ -80,29 +57,31 @@ function initEventListeners() {
             showToast('Please select an interview date', 'error');
             return;
         }
-        
+
         // Show confirmation modal
         document.getElementById('confirm-date-display').textContent = interviewDate;
         modalObjects.confirmDate.show();
     });
-    
+
     // Confirm date button
     document.getElementById('confirm-date-btn').addEventListener('click', function() {
         saveSchedule();
         modalObjects.confirmDate.hide();
     });
-    
+
     // Edit schedule button
     document.getElementById('edit-schedule-btn').addEventListener('click', function() {
         document.getElementById('current-schedule-section').classList.add('d-none');
         document.getElementById('availability-section').classList.remove('d-none');
-        
+
         // Pre-fill the date input with current schedule date if available
         if (facultySchedule && facultySchedule.interview_date) {
-            document.getElementById('interview-date').value = formatDateForDisplay(facultySchedule.interview_date);
+            // Convert ISO date to Date object for the date picker
+            const scheduleDate = new Date(facultySchedule.interview_date);
+            datePicker.setDate(scheduleDate, true);
         }
     });
-    
+
     // Delete schedule button
     document.getElementById('delete-schedule-btn').addEventListener('click', function() {
         if (facultySchedule && facultySchedule.interview_date) {
@@ -110,13 +89,13 @@ function initEventListeners() {
             modalObjects.deleteSchedule.show();
         }
     });
-    
+
     // Confirm delete button
     document.getElementById('confirm-delete-btn').addEventListener('click', function() {
         deleteSchedule();
         modalObjects.deleteSchedule.hide();
     });
-    
+
     // Batch schedule button
     document.getElementById('batch-schedule-btn').addEventListener('click', function() {
         if (facultySchedule && facultySchedule.interview_date) {
@@ -124,13 +103,13 @@ function initEventListeners() {
             modalObjects.batchSchedule.show();
         }
     });
-    
+
     // Confirm batch schedule button
     document.getElementById('confirm-batch-schedule').addEventListener('click', function() {
         batchScheduleInterviews();
         modalObjects.batchSchedule.hide();
     });
-    
+
     // Modal schedule button
     document.getElementById('modal-schedule-btn').addEventListener('click', function() {
         if (selectedCandidate) {
@@ -138,7 +117,7 @@ function initEventListeners() {
             modalObjects.candidateDetails.hide();
         }
     });
-    
+
     // Modal remove button
     document.getElementById('modal-remove-btn').addEventListener('click', function() {
         if (selectedCandidate) {
@@ -146,15 +125,15 @@ function initEventListeners() {
             modalObjects.candidateDetails.hide();
         }
     });
-    
+
     // Select all checkbox
     document.getElementById('select-all-candidates').addEventListener('change', function() {
-        const checkboxes = document.querySelectorAll('.candidate-checkbox');
+        const checkboxes = document.querySelectorAll('.candidate-checkbox:not(:disabled)');
         checkboxes.forEach(checkbox => {
             checkbox.checked = this.checked;
         });
     });
-    
+
     // Search functionality
     document.getElementById('candidate-search').addEventListener('input', function() {
         const searchTerm = this.value.toLowerCase();
@@ -164,7 +143,7 @@ function initEventListeners() {
 
 // Load rated candidates from API
 function loadRatedCandidates() {
-    fetch('/api/faculty_rated_applicants')
+    return fetch('/api/faculty_rated_applicants')
         .then(response => {
             if (!response.ok) {
                 throw new Error('Network response was not ok');
@@ -174,6 +153,9 @@ function loadRatedCandidates() {
         .then(data => {
             ratedCandidates = data;
             displayCandidateList(ratedCandidates);
+            if (facultySchedule && facultySchedule.interview_date) {
+                updateCandidateTable();
+            }
             updateStatCounts();
         })
         .catch(error => {
@@ -188,7 +170,7 @@ function loadRatedCandidates() {
 
 // Load faculty schedule from API
 function loadFacultySchedule() {
-    fetch('/api/faculty_interviews')
+    return fetch('/api/faculty_interviews')
         .then(response => {
             if (!response.ok) {
                 throw new Error('Network response was not ok');
@@ -198,6 +180,7 @@ function loadFacultySchedule() {
         .then(data => {
             processScheduleData(data);
             updateStatCounts();
+            return data; // Return the data so we can use it in chained promises
         })
         .catch(error => {
             console.error('Error loading faculty schedule:', error);
@@ -212,55 +195,72 @@ function processScheduleData(scheduleData) {
         showEmptySchedule();
         return;
     }
-    
-    // Group by date to find current faculty schedule
-    const groupedByDate = {};
-    scheduleData.forEach(interview => {
-        if (!groupedByDate[interview.interview_date]) {
-            groupedByDate[interview.interview_date] = [];
-        }
-        groupedByDate[interview.interview_date].push(interview);
-    });
-    
-    // Get current faculty email and name
-    const currentFacultyEmail = document.getElementById('faculty-email')?.value || '';
+
+    // Get current faculty name
     const currentFacultyName = document.getElementById('faculty-name')?.value || '';
-    
+    console.log("Current faculty name:", currentFacultyName);
+
+    // Debug: Log all interviews
+    console.log("All interviews:", scheduleData);
+
     // Find interviews for the current faculty
-    let facultyInterviews = [];
-    for (const date in groupedByDate) {
-        const interviews = groupedByDate[date].filter(interview => 
-            interview.email === currentFacultyEmail || 
-            interview.faculty_name === currentFacultyName
-        );
-        
-        if (interviews.length > 0) {
-            facultySchedule = {
-                interview_date: date,
-                interviews: interviews
-            };
-            facultyInterviews = interviews;
-            break;
-        }
-    }
-    
+    const facultyInterviews = scheduleData.filter(interview =>
+        interview.faculty_name === currentFacultyName
+    );
+
+    console.log("Faculty interviews:", facultyInterviews);
+
     if (facultyInterviews.length > 0) {
-        // Faculty has a schedule
-        scheduledCandidates = facultyInterviews.map(interview => ({
-            id: interview.applicant_id,
-            name: interview.applicant_name,
-            course_name: interview.course_name,
-            preference: interview.preference
-        }));
-        
-        displaySchedule(facultySchedule);
-        updateCandidateTable();
-        
-        // Hide date selector, show schedule
-        document.getElementById('availability-section').classList.add('d-none');
-        document.getElementById('current-schedule-section').classList.remove('d-none');
+        // Group by date to find the most recent date
+        const groupedByDate = {};
+        facultyInterviews.forEach(interview => {
+            if (!groupedByDate[interview.interview_date]) {
+                groupedByDate[interview.interview_date] = [];
+            }
+            groupedByDate[interview.interview_date].push(interview);
+        });
+
+        console.log("Grouped by date:", groupedByDate);
+
+        // Find the date with the most interviews (probably the faculty's chosen date)
+        let mostInterviews = 0;
+        let chosenDate = null;
+
+        for (const date in groupedByDate) {
+            if (groupedByDate[date].length > mostInterviews) {
+                mostInterviews = groupedByDate[date].length;
+                chosenDate = date;
+            }
+        }
+
+        // If we found a date, use it
+        if (chosenDate) {
+            facultySchedule = {
+                interview_date: chosenDate,
+                interviews: groupedByDate[chosenDate]
+            };
+
+            // Build scheduled candidates list
+            scheduledCandidates = facultySchedule.interviews.map(interview => ({
+                id: interview.applicant_id,
+                name: interview.applicant_name,
+                course_name: interview.course_name,
+                preference: interview.preference
+            }));
+
+            // Remove duplicates (a candidate might be scheduled for multiple courses)
+            scheduledCandidates = Array.from(new Map(
+                scheduledCandidates.map(item => [item.id, item])
+            ).values());
+
+            console.log("Scheduled candidates:", scheduledCandidates);
+
+            // Display the schedule
+            displaySchedule(facultySchedule);
+        } else {
+            showEmptySchedule();
+        }
     } else {
-        // No schedule for current faculty
         showEmptySchedule();
     }
 }
@@ -268,7 +268,7 @@ function processScheduleData(scheduleData) {
 // Display the list of rated candidates
 function displayCandidateList(candidates) {
     const candidateList = document.getElementById('candidate-list');
-    
+
     if (candidates.length === 0) {
         candidateList.innerHTML = `
             <li class="list-group-item text-center py-4 text-muted">
@@ -278,26 +278,26 @@ function displayCandidateList(candidates) {
         document.getElementById('candidate-count').textContent = '0';
         return;
     }
-    
+
     // Update count badge
     document.getElementById('candidate-count').textContent = candidates.length;
-    
+
     // Clear and build the list
     candidateList.innerHTML = '';
     candidates.forEach(candidate => {
         // Create rating stars
         const ratingStars = generateRatingStars(candidate.rating);
-        
+
         // Determine if this candidate is already scheduled
-        const isScheduled = scheduledCandidates.some(c => c.id === candidate.id);
-        const candidateStatus = isScheduled ? 
-            `<span class="candidate-badge scheduled"><i class="fas fa-check-circle me-1"></i> Scheduled</span>` : 
+        const isScheduled = scheduledCandidates.some(c => c.id == candidate.id);
+        const candidateStatus = isScheduled ?
+            `<span class="candidate-badge scheduled"><i class="fas fa-check-circle me-1"></i> Scheduled</span>` :
             `<span class="candidate-badge not-scheduled"><i class="fas fa-clock me-1"></i> Not Scheduled</span>`;
-            
+
         const listItem = document.createElement('li');
         listItem.className = 'list-group-item candidate-item py-3 px-3';
         listItem.dataset.candidateId = candidate.id;
-        
+
         listItem.innerHTML = `
             <div class="d-flex justify-content-between align-items-start">
                 <div class="candidate-info">
@@ -314,9 +314,9 @@ function displayCandidateList(candidates) {
                 </button>
             </div>
         `;
-        
+
         candidateList.appendChild(listItem);
-        
+
         // Add click event for the view button
         listItem.querySelector('.view-btn').addEventListener('click', function() {
             const candidateId = this.dataset.id;
@@ -329,35 +329,35 @@ function displayCandidateList(candidates) {
 function updateCandidateTable() {
     const tableBody = document.getElementById('candidate-schedule-list');
     tableBody.innerHTML = '';
-    
+
     // Sort candidates: scheduled first, then by rating
     const sortedCandidates = [...ratedCandidates].sort((a, b) => {
-        const aScheduled = scheduledCandidates.some(c => c.id === a.id);
-        const bScheduled = scheduledCandidates.some(c => c.id === b.id);
-        
+        const aScheduled = scheduledCandidates.some(c => c.id == a.id);
+        const bScheduled = scheduledCandidates.some(c => c.id == b.id);
+
         if (aScheduled && !bScheduled) return -1;
         if (!aScheduled && bScheduled) return 1;
-        
+
         // If scheduling status is the same, sort by rating
         return b.rating - a.rating;
     });
-    
+
     sortedCandidates.forEach(candidate => {
         const ratingStars = generateRatingStars(candidate.rating);
-        const isScheduled = scheduledCandidates.some(c => c.id === candidate.id);
-        
-        const candidateStatus = isScheduled ? 
-            `<span class="candidate-badge scheduled"><i class="fas fa-check-circle me-1"></i> Scheduled</span>` : 
+        const isScheduled = scheduledCandidates.some(c => c.id == candidate.id);
+
+        const candidateStatus = isScheduled ?
+            `<span class="candidate-badge scheduled"><i class="fas fa-check-circle me-1"></i> Scheduled</span>` :
             `<span class="candidate-badge not-scheduled"><i class="fas fa-clock me-1"></i> Not Scheduled</span>`;
-            
+
         const row = document.createElement('tr');
         row.dataset.candidateId = candidate.id;
         row.className = isScheduled ? 'bg-light' : '';
-        
+
         row.innerHTML = `
             <td>
                 <div class="form-check">
-                    <input class="form-check-input candidate-checkbox" type="checkbox" value="${candidate.id}" 
+                    <input class="form-check-input candidate-checkbox" type="checkbox" value="${candidate.id}"
                            ${isScheduled ? 'checked disabled' : ''}>
                 </div>
             </td>
@@ -370,24 +370,24 @@ function updateCandidateTable() {
                 <button class="btn btn-sm btn-outline-secondary view-candidate-btn" data-id="${candidate.id}">
                     <i class="fas fa-eye me-1"></i> View
                 </button>
-                ${isScheduled ? 
+                ${isScheduled ?
                     `<button class="btn btn-sm btn-outline-danger ms-2 remove-candidate-btn" data-id="${candidate.id}">
                         <i class="fas fa-times me-1"></i> Remove
-                    </button>` : 
+                    </button>` :
                     `<button class="btn btn-sm btn-outline-success ms-2 schedule-candidate-btn" data-id="${candidate.id}">
                         <i class="fas fa-plus me-1"></i> Add
                     </button>`
                 }
             </td>
         `;
-        
+
         tableBody.appendChild(row);
-        
+
         // Add event listeners
         row.querySelector('.view-candidate-btn').addEventListener('click', function() {
             openCandidateModal(candidate.id);
         });
-        
+
         if (isScheduled) {
             row.querySelector('.remove-candidate-btn').addEventListener('click', function() {
                 removeFromSchedule(candidate);
@@ -404,7 +404,7 @@ function updateCandidateTable() {
 function filterCandidateList(searchTerm) {
     const candidateItems = document.querySelectorAll('.candidate-item');
     let visibleCount = 0;
-    
+
     candidateItems.forEach(item => {
         const candidateName = item.querySelector('h6').textContent.toLowerCase();
         if (candidateName.includes(searchTerm)) {
@@ -414,10 +414,10 @@ function filterCandidateList(searchTerm) {
             item.style.display = 'none';
         }
     });
-    
+
     // Update visible count
     document.getElementById('candidate-count').textContent = visibleCount;
-    
+
     // Show no results message if needed
     if (visibleCount === 0 && searchTerm) {
         const candidateList = document.getElementById('candidate-list');
@@ -446,16 +446,16 @@ function openCandidateModal(candidateId) {
         showToast('Candidate not found', 'error');
         return;
     }
-    
+
     selectedCandidate = candidate;
-    
+
     // Check if candidate is already scheduled
     const isScheduled = scheduledCandidates.some(c => c.id == candidateId);
-    
+
     // Update the modal content
     document.getElementById('candidate-modal-name').textContent = candidate.name;
     document.getElementById('modal-display-rating').innerHTML = generateRatingStars(candidate.rating);
-    
+
     // Interests display
     let interestsHtml = 'No interests specified';
     if (candidate.interests && candidate.interests.length > 0) {
@@ -464,31 +464,31 @@ function openCandidateModal(candidateId) {
             .join(' ');
     }
     document.getElementById('modal-display-interests').innerHTML = interestsHtml;
-    
+
     // Interest prompt display
     const interestPromptContainer = document.getElementById('modal-interest-prompt-container');
     const displayInterestPrompt = document.getElementById('modal-display-interest-prompt');
-    
+
     if (candidate.interest_prompt) {
         interestPromptContainer.classList.remove('d-none');
-        displayInterestPrompt.textContent = candidate.interest_prompt === 'Yes' ? 
+        displayInterestPrompt.textContent = candidate.interest_prompt === 'Yes' ?
             'Yes, this candidate has qualities that make them a desirable FI despite the low rating.' :
             'No, this candidate does not have qualities that make them a desirable FI.';
     } else {
         interestPromptContainer.classList.add('d-none');
     }
-    
+
     // Comment display
     const commentContainer = document.getElementById('modal-comment-container');
     const displayComment = document.getElementById('modal-display-comment');
-    
+
     if (candidate.comment) {
         commentContainer.classList.remove('d-none');
         displayComment.textContent = candidate.comment;
     } else {
         commentContainer.classList.add('d-none');
     }
-    
+
     // Document links (if available)
     const documentLinks = document.getElementById('modal-document-links');
     if (candidate.details) {
@@ -496,10 +496,10 @@ function openCandidateModal(candidateId) {
     } else {
         documentLinks.innerHTML = '<p class="text-muted mb-0">No documents available</p>';
     }
-    
+
     // Schedule status section
     const scheduleStatusSection = document.getElementById('modal-schedule-status');
-    
+
     if (isScheduled) {
         scheduleStatusSection.innerHTML = `
             <div class="d-flex align-items-center">
@@ -540,18 +540,18 @@ function openCandidateModal(candidateId) {
         `;
         scheduleStatusSection.className = "schedule-status p-3 rounded-3 mb-3 bg-secondary bg-opacity-10";
     }
-    
+
     // Update the action buttons
     const scheduleBtn = document.getElementById('modal-schedule-btn');
     const removeBtn = document.getElementById('modal-remove-btn');
-    
+
     if (isScheduled) {
         scheduleBtn.classList.add('d-none');
         removeBtn.classList.remove('d-none');
     } else {
         scheduleBtn.classList.remove('d-none');
         removeBtn.classList.add('d-none');
-        
+
         // Disable schedule button if no faculty schedule exists
         if (!facultySchedule || !facultySchedule.interview_date) {
             scheduleBtn.disabled = true;
@@ -561,7 +561,7 @@ function openCandidateModal(candidateId) {
             scheduleBtn.title = "";
         }
     }
-    
+
     // Show the modal
     modalObjects.candidateDetails.show();
 }
@@ -572,11 +572,11 @@ function displaySchedule(schedule) {
         showEmptySchedule();
         return;
     }
-    
+
     // Format and display the date
     const formattedDate = formatDateForDisplay(schedule.interview_date);
     document.getElementById('display-interview-date').textContent = formattedDate;
-    
+
     // Show the current schedule section
     document.getElementById('availability-section').classList.add('d-none');
     document.getElementById('current-schedule-section').classList.remove('d-none');
@@ -592,16 +592,23 @@ function showEmptySchedule() {
 function saveSchedule() {
     const interviewDateInput = document.getElementById('interview-date');
     const interviewDate = interviewDateInput.value;
-    
+
     if (!interviewDate) {
         showToast('Please select an interview date', 'error');
         return;
     }
-    
+
     // Parse the formatted date back to YYYY-MM-DD
-    const dateObj = new Date(interviewDate);
+    // Flatpickr lets us get the selected date as a Date object
+    const selectedDates = datePicker.selectedDates;
+    if (!selectedDates || selectedDates.length === 0) {
+        showToast('Please select a valid date', 'error');
+        return;
+    }
+
+    const dateObj = selectedDates[0];
     const isoDate = dateObj.toISOString().split('T')[0];
-    
+
     // If we already have a schedule, update it
     if (facultySchedule && facultySchedule.interview_date) {
         fetch('/api/update_faculty_schedule', {
@@ -624,11 +631,11 @@ function saveSchedule() {
             if (data.success) {
                 // Update the local schedule
                 facultySchedule.interview_date = isoDate;
-                
+
                 // Update the UI
                 displaySchedule(facultySchedule);
                 updateCandidateTable();
-                
+
                 showToast('Schedule updated successfully', 'success');
             } else {
                 showToast('Error: ' + data.message, 'error');
@@ -644,11 +651,11 @@ function saveSchedule() {
             interview_date: isoDate,
             interviews: []
         };
-        
+
         // Update the UI
         displaySchedule(facultySchedule);
         updateCandidateTable();
-        
+
         showToast('Interview date saved successfully', 'success');
     }
 }
@@ -659,7 +666,7 @@ function deleteSchedule() {
         showToast('No schedule to delete', 'error');
         return;
     }
-    
+
     fetch('/api/delete_faculty_schedule', {
         method: 'POST',
         headers: {
@@ -680,13 +687,16 @@ function deleteSchedule() {
             // Clear the local schedule
             facultySchedule = null;
             scheduledCandidates = [];
-            
+
             // Reset the UI to empty state
             showEmptySchedule();
-            
+
             // Clear the date input
-            document.getElementById('interview-date').value = '';
-            
+            datePicker.clear();
+
+            // Update the display
+            displayCandidateList(ratedCandidates);
+
             showToast('Schedule deleted successfully', 'success');
             updateStatCounts();
         } else {
@@ -705,12 +715,12 @@ function scheduleInterview(candidate) {
         showToast('Invalid candidate selection', 'error');
         return;
     }
-    
+
     if (!facultySchedule || !facultySchedule.interview_date) {
         showToast('Please set your available date first', 'error');
         return;
     }
-    
+
     fetch('/api/create_interview', {
         method: 'POST',
         headers: {
@@ -729,19 +739,19 @@ function scheduleInterview(candidate) {
     })
     .then(data => {
         if (data.message) {
-            // Add to local scheduled candidates
-            if (!scheduledCandidates.some(c => c.id === candidate.id)) {
+            // Add to local scheduled candidates if not already there
+            if (!scheduledCandidates.some(c => c.id == candidate.id)) {
                 scheduledCandidates.push({
                     id: candidate.id,
                     name: candidate.name
                 });
             }
-            
+
             // Update the UI
             displayCandidateList(ratedCandidates);
             updateCandidateTable();
             updateStatCounts();
-            
+
             showToast(`${candidate.name} scheduled successfully`, 'success');
         } else {
             showToast('Error: ' + (data.error || 'Unknown error'), 'error');
@@ -759,7 +769,7 @@ function removeFromSchedule(candidate) {
         showToast('Invalid candidate selection', 'error');
         return;
     }
-    
+
     fetch('/api/remove_from_schedule', {
         method: 'POST',
         headers: {
@@ -779,12 +789,12 @@ function removeFromSchedule(candidate) {
         if (data.success) {
             // Remove from local scheduled candidates
             scheduledCandidates = scheduledCandidates.filter(c => c.id != candidate.id);
-            
+
             // Update the UI
             displayCandidateList(ratedCandidates);
             updateCandidateTable();
             updateStatCounts();
-            
+
             showToast(`${candidate.name} removed from schedule`, 'success');
         } else {
             showToast('Error: ' + data.message, 'error');
@@ -804,19 +814,19 @@ function batchScheduleInterviews() {
         showToast('No candidates selected for scheduling', 'error');
         return;
     }
-    
+
     if (!facultySchedule || !facultySchedule.interview_date) {
         showToast('Please set your available date first', 'error');
         return;
     }
-    
+
     // Create array of candidate IDs to schedule
     const candidateIds = Array.from(checkboxes).map(checkbox => checkbox.value);
-    
+
     // Create a progress counter
     let processedCount = 0;
     let successCount = 0;
-    
+
     // Process each candidate in sequence
     candidateIds.forEach(id => {
         // Find the candidate
@@ -825,7 +835,7 @@ function batchScheduleInterviews() {
             processedCount++;
             return;
         }
-        
+
         // Schedule the interview
         fetch('/api/create_interview', {
             method: 'POST',
@@ -840,18 +850,18 @@ function batchScheduleInterviews() {
         .then(response => response.json())
         .then(data => {
             processedCount++;
-            
+
             if (data.message) {
                 successCount++;
-                
-                // Add to local scheduled candidates
-                if (!scheduledCandidates.some(c => c.id === candidate.id)) {
+
+                // Add to local scheduled candidates if not already there
+                if (!scheduledCandidates.some(c => c.id == candidate.id)) {
                     scheduledCandidates.push({
                         id: candidate.id,
                         name: candidate.name
                     });
                 }
-                
+
                 // When all are processed, update UI
                 if (processedCount === candidateIds.length) {
                     displayCandidateList(ratedCandidates);
@@ -864,7 +874,7 @@ function batchScheduleInterviews() {
         .catch(error => {
             processedCount++;
             console.error(`Error scheduling interview for candidate ${id}:`, error);
-            
+
             // When all are processed, update UI
             if (processedCount === candidateIds.length) {
                 displayCandidateList(ratedCandidates);
@@ -880,7 +890,7 @@ function batchScheduleInterviews() {
 function updateStatCounts() {
     // Update total rated count
     document.getElementById('total-rated-count').textContent = ratedCandidates.length;
-    
+
     // Update total scheduled count
     document.getElementById('total-scheduled-count').textContent = scheduledCandidates.length;
 }
@@ -889,7 +899,7 @@ function updateStatCounts() {
 function generateRatingStars(rating) {
     rating = parseInt(rating) || 0;
     let starsHtml = '';
-    
+
     for (let i = 1; i <= 5; i++) {
         if (i <= rating) {
             starsHtml += '<i class="fas fa-star text-warning"></i>';
@@ -897,14 +907,14 @@ function generateRatingStars(rating) {
             starsHtml += '<i class="far fa-star text-muted"></i>';
         }
     }
-    
+
     return starsHtml;
 }
 
 // Format date for display
 function formatDateForDisplay(dateString) {
     if (!dateString) return '';
-    
+
     const date = new Date(dateString);
     const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
     return date.toLocaleDateString('en-US', options);
@@ -920,7 +930,7 @@ function showToast(message, type = 'success') {
         toastContainer.className = 'position-fixed bottom-0 end-0 p-3';
         document.body.appendChild(toastContainer);
     }
-    
+
     // Create toast element
     const toastId = 'toast-' + Date.now();
     const toast = document.createElement('div');
@@ -929,7 +939,7 @@ function showToast(message, type = 'success') {
     toast.setAttribute('role', 'alert');
     toast.setAttribute('aria-live', 'assertive');
     toast.setAttribute('aria-atomic', 'true');
-    
+
     // Set appropriate background class
     switch(type) {
         case 'success':
@@ -947,7 +957,7 @@ function showToast(message, type = 'success') {
         default:
             toast.classList.add('bg-dark');
     }
-    
+
     // Icon based on type
     let icon;
     switch(type) {
@@ -966,7 +976,7 @@ function showToast(message, type = 'success') {
         default:
             icon = 'bell';
     }
-    
+
     toast.innerHTML = `
         <div class="d-flex">
             <div class="toast-body">
@@ -975,16 +985,16 @@ function showToast(message, type = 'success') {
             <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
         </div>
     `;
-    
+
     toastContainer.appendChild(toast);
-    
+
     // Initialize and show toast
     const bsToast = new bootstrap.Toast(toast, {
         autohide: true,
         delay: 3000
     });
     bsToast.show();
-    
+
     // Remove the toast after it's hidden
     toast.addEventListener('hidden.bs.toast', function() {
         if (toastContainer.contains(toast)) {

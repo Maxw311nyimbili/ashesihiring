@@ -3,8 +3,8 @@
 {% block title %}Faculty Interview Scheduling{% endblock %}
 
 {% block styles %}
-<!-- Tempus Dominus Date Picker CSS -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@eonasdan/tempus-dominus@6.7.7/dist/css/tempus-dominus.min.css">
+<!-- Flatpickr Date Picker CSS (simpler alternative to Tempus Dominus) -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 <style>
     /* Premium styling enhancements */
     .card {
@@ -281,10 +281,10 @@
                                     <span class="text-secondary me-3">
                                         <i class="fas fa-calendar-alt fs-4"></i>
                                     </span>
-                                    <div>
-                                        <label for="interview-date-picker" class="form-label mb-0 fw-medium text-secondary">Select Your Available Date</label>
-                                        <div class="input-group" id="interview-date-picker">
-                                            <input type="text" class="form-control" id="interview-date" readonly>
+                                    <div class="w-100">
+                                        <label for="interview-date" class="form-label mb-0 fw-medium text-secondary">Select Your Available Date</label>
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" id="interview-date" placeholder="Click to select a date" readonly>
                                             <span class="input-group-text">
                                                 <i class="fas fa-calendar-day"></i>
                                             </span>
@@ -500,11 +500,14 @@
 
 <!-- Toast container for notifications -->
 <div id="toast-container" class="position-fixed bottom-0 end-0 p-3"></div>
+
+<!-- Hidden field to pass faculty name/email to JS -->
+<input type="hidden" id="faculty-name" value="{{ faculty_name }}">
 {% endblock %}
 
 {% block scripts %}
-<!-- Tempus Dominus Date Picker JS -->
-<script src="https://cdn.jsdelivr.net/npm/@eonasdan/tempus-dominus@6.7.7/dist/js/tempus-dominus.min.js"></script>
+<!-- Flatpickr date picker (simpler than Tempus Dominus, no popper.js dependency) -->
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 
 <script src="../static/scripts/faculty_scheduling.js"></script>
 {% endblock %}
