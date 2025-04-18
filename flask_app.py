@@ -1,7 +1,7 @@
 # =============================================================================
 # IMPORTS AND CONFIGURATION
 # =============================================================================
-from pdf_summary_extractor import init_pdf_summary_generator, get_pdf_summary_generator
+from pdf_summary_extractor import init_pdf_extractor, get_pdf_extractor
 from flask import Flask, render_template, request, redirect, url_for, jsonify, session, send_file
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 from cryptography.hazmat.primitives import hashes
@@ -228,13 +228,13 @@ def submit_application():
 
 # Initialize the PDF summary generator when the app starts
 @app.before_first_request
-def setup_pdf_generator():
-    """Initialize the PDF summary generator before the first request"""
+def setup_pdf_extractor():
+    """Initialize the PDF content extractor before the first request"""
     try:
-        init_pdf_summary_generator(app)
-        app.logger.info("PDF summary generator initialized successfully")
+        init_pdf_extractor(app)
+        app.logger.info("PDF content extractor initialized successfully")
     except Exception as e:
-        app.logger.error(f"Error initializing PDF summary generator: {str(e)}")
+        app.logger.error(f"Error initializing PDF content extractor: {str(e)}")
 
 
 @app.route('/json/candidates')
@@ -264,8 +264,8 @@ def get_candidates():
         candidates = []
         base_url = "/download_file/"
 
-        # Get the PDF summary generator
-        generator = get_pdf_summary_generator(app)
+        # Get the PDF content extractor
+        extractor = get_pdf_extractor(app)
 
         for applicant in applicants:
             cursor.execute("SELECT course_name FROM course_preferences WHERE applicant_id = %s", (applicant["id"],))
@@ -283,13 +283,15 @@ def get_candidates():
             app.logger.info(f"Cover letter filename: {cover_letter_filename}")
             app.logger.info(f"Transcript filename: {transcript_filename}")
 
-            # Generate AI summary using the PDF summary generator
+            # Generate content-based AI summary using the PDF extractor
             try:
-                ai_summary = generator.generate_summary(cv_filename, interests)
-                app.logger.info(f"Generated AI summary for candidate {applicant['id']}")
+                # Create the summary based on the actual PDF content
+                ai_summary = extractor.generate_summary(cv_filename, cover_letter_filename, interests)
+                app.logger.info(f"Generated content-based summary for candidate {applicant['id']}")
             except Exception as e:
-                app.logger.error(f"Error generating AI summary: {str(e)}")
-                ai_summary = f"Experienced candidate interested in {applicant.get('course_selection', 'teaching')}."
+                app.logger.error(f"Error generating content-based summary: {str(e)}")
+                # Fallback to a template-based summary if content extraction fails
+                ai_summary = extractor.generate_fallback_summary(interests)
                 app.logger.info(f"Using fallback summary for candidate {applicant['id']}")
 
             candidates.append({
@@ -301,10 +303,7 @@ def get_candidates():
                     <a href='{base_url}?file={cover_letter_filename}' target='_blank'><i class="fas fa-file-alt"></i> Cover Letter</a> | 
                     <a href='{base_url}?file={transcript_filename}' target='_blank'><i class="fas fa-file-contract"></i> Transcript</a>
                 """,
-                "interests": interests,
-                "cv_path": cv_filename,
-                "cover_letter_path": cover_letter_filename,
-                "transcript_path": transcript_filename
+                "interests": interests
             })
 
         cursor.close()
