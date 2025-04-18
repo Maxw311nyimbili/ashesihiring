@@ -31,6 +31,9 @@ UPLOAD_FOLDER = 'static/uploads'
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
+# Base URL for file links
+base_url = "https://ashesihiring.pythonanywhere.com/download_file/?file="
+
 # Wit.ai configuration
 WIT_AI_ACCESS_TOKEN = os.environ.get('WIT_AI_ACCESS_TOKEN', 'YOUR_WIT_AI_ACCESS_TOKEN')
 WIT_AI_API_URL = 'https://api.wit.ai/message'
@@ -54,15 +57,28 @@ def extract_text_from_pdf(file_path):
 
 def extract_text_from_file(file_path):
     """Extract text from a file based on its extension."""
-    if file_path.lower().endswith('.pdf'):
-        return extract_text_from_pdf(file_path)
-    else:
-        logging.warning(f"Unsupported file type: {file_path}")
+    try:
+        if not file_path:
+            logging.warning("No file path provided to extract_text_from_file")
+            return ""
+            
+        if file_path.lower().endswith('.pdf'):
+            return extract_text_from_pdf(file_path)
+        else:
+            logging.warning(f"Unsupported file type: {file_path}")
+            return ""
+    except Exception as e:
+        logging.error(f"Error extracting text from file {file_path}: {str(e)}")
         return ""
 
 def generate_summary_with_wit_ai(text):
     """Generate a summary using Wit.ai API."""
     try:
+        # Check if Wit.ai token is properly configured
+        if WIT_AI_ACCESS_TOKEN == 'YOUR_WIT_AI_ACCESS_TOKEN':
+            logging.warning("Wit.ai token not configured. Using fallback summary.")
+            return text[:200] + "..." if len(text) > 200 else text
+            
         headers = {
             'Authorization': f'Bearer {WIT_AI_ACCESS_TOKEN}',
             'Content-Type': 'application/json'
@@ -354,33 +370,37 @@ def get_candidates():
         # Process each applicant
         candidates = []
         for applicant in applicants:
-            # Generate AI summary from CV
-            cv_text = ""
-            if applicant['cv_path']:
-                cv_text = extract_text_from_file(applicant['cv_path'])
-            
-            # Generate summary using Wit.ai
-            ai_summary = generate_summary_with_wit_ai(cv_text) if cv_text else "No CV available for analysis."
-            
-            # Create candidate details
-            candidate = {
-                'id': applicant['id'],
-                'name': f"{applicant['first_name']} {applicant['last_name']}",
-                'email': None,  # Not in the applicants table
-                'phone': applicant['telephone'],
-                'cv_link': f"{base_url}{applicant['cv_path']}" if applicant['cv_path'] else None,
-                'cover_letter_link': f"{base_url}{applicant['cover_letter_path']}" if applicant['cover_letter_path'] else None,
-                'transcript_link': f"{base_url}{applicant['transcript_path']}" if applicant['transcript_path'] else None,
-                'created_at': applicant['created_at'].strftime('%Y-%m-%d %H:%M:%S'),
-                'status': applicant.get('status', 'Pending'),  # Default to 'Pending' if not in the table
-                'rating': applicant.get('rating', None),  # Default to None if not in the table
-                'comment': applicant.get('comment', None),  # Default to None if not in the table
-                'interest_prompt': applicant.get('interest_prompt', None),  # Default to None if not in the table
-                'interest_response': applicant.get('interest_response', None),  # Default to None if not in the table
-                'ai_summary': ai_summary
-            }
-            
-            candidates.append(candidate)
+            try:
+                # Generate AI summary from CV
+                cv_text = ""
+                if applicant['cv_path']:
+                    cv_text = extract_text_from_file(applicant['cv_path'])
+                
+                # Generate summary using Wit.ai
+                ai_summary = generate_summary_with_wit_ai(cv_text) if cv_text else "No CV available for analysis."
+                
+                # Create candidate details
+                candidate = {
+                    'id': applicant['id'],
+                    'name': f"{applicant['first_name']} {applicant['last_name']}",
+                    'email': None,  # Not in the applicants table
+                    'phone': applicant['telephone'],
+                    'cv_link': f"{base_url}{applicant['cv_path']}" if applicant['cv_path'] else None,
+                    'cover_letter_link': f"{base_url}{applicant['cover_letter_path']}" if applicant['cover_letter_path'] else None,
+                    'transcript_link': f"{base_url}{applicant['transcript_path']}" if applicant['transcript_path'] else None,
+                    'created_at': applicant['created_at'].strftime('%Y-%m-%d %H:%M:%S'),
+                    'status': applicant.get('status', 'Pending'),  # Default to 'Pending' if not in the table
+                    'rating': applicant.get('rating', None),  # Default to None if not in the table
+                    'comment': applicant.get('comment', None),  # Default to None if not in the table
+                    'interest_prompt': applicant.get('interest_prompt', None),  # Default to None if not in the table
+                    'interest_response': applicant.get('interest_response', None),  # Default to None if not in the table
+                    'ai_summary': ai_summary
+                }
+                
+                candidates.append(candidate)
+            except Exception as e:
+                logging.error(f"Error processing applicant {applicant.get('id', 'unknown')}: {str(e)}")
+                # Continue with the next applicant instead of failing the entire request
         
         # Close database connection
         cursor.close()
@@ -394,7 +414,7 @@ def get_candidates():
         logging.error(f"Error getting candidates: {str(e)}")
         return jsonify({
             'status': 'error',
-            'message': 'Failed to get candidates'
+            'message': f'Failed to get candidates: {str(e)}'
         }), 500
 
 # Add a new route to serve files publicly
