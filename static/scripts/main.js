@@ -245,10 +245,12 @@ function displayCandidate(index, direction) {
                         <div class="ai-summary-header">
                             <i class="fas fa-robot"></i>
                             <h6>AI Profile Analysis</h6>
+                            ${candidate.is_fallback ? '<span class="badge bg-warning text-dark ms-2">Fallback Summary</span>' : ''}
                         </div>
                         <div class="ai-summary-content">
                             ${candidate.summary}
                         </div>
+                        ${candidate.is_fallback ? '<div class="mt-2 small text-muted"><i class="fas fa-info-circle me-1"></i> This is a fallback summary because the system could not extract content from the PDF files. Please check if the PDF files are properly uploaded and accessible.</div>' : ''}
                     </div>
                     
                     <div class="candidate-info-box">
@@ -1138,4 +1140,69 @@ autohide: true,
 delay: 3000
 });
 bsToast.show();
+}
+
+async function checkPDFExtraction(applicationId) {
+    try {
+        const response = await fetch(`/check_pdf_extraction?application_id=${applicationId}`);
+        const data = await response.json();
+        
+        if (response.ok) {
+            let message = `PDF Extraction Status for ${data.applicant.name}:\n\n`;
+            
+            // File existence
+            message += `CV: ${data.files.cv.exists ? '✅ Exists' : '❌ Missing'}\n`;
+            message += `Cover Letter: ${data.files.cover_letter.exists ? '✅ Exists' : '❌ Missing'}\n\n`;
+            
+            // Extraction results
+            message += `CV Text Length: ${data.files.cv.text_length} characters\n`;
+            message += `Cover Letter Text Length: ${data.files.cover_letter.text_length} characters\n\n`;
+            
+            // Key information
+            message += `Key Phrases Found: ${data.extraction.key_phrases_count}\n`;
+            message += `Skills Found: ${data.extraction.skills_count}\n`;
+            message += `Education Entries Found: ${data.extraction.education_count}\n\n`;
+            
+            // Errors
+            if (data.files.cv.error) {
+                message += `CV Error: ${data.files.cv.error}\n`;
+            }
+            if (data.files.cover_letter.error) {
+                message += `Cover Letter Error: ${data.files.cover_letter.error}\n`;
+            }
+            
+            // Summary
+            message += `\nWould Use Fallback: ${data.extraction.would_use_fallback ? 'Yes' : 'No'}`;
+            
+            alert(message);
+        } else {
+            showToast(data.error || 'Failed to check PDF extraction', 'error');
+        }
+    } catch (error) {
+        console.error('Error checking PDF extraction:', error);
+        showToast('Failed to check PDF extraction', 'error');
+    }
+}
+
+function displayCandidate(candidate) {
+    // ... existing code ...
+    
+    // Add the AI summary section
+    const aiSummarySection = document.createElement('div');
+    aiSummarySection.className = 'ai-summary-section';
+    aiSummarySection.innerHTML = `
+        <div class="ai-summary-header">
+            <h5>AI Summary</h5>
+            ${candidate.is_fallback ? '<span class="badge bg-warning text-dark ms-2">Fallback Summary</span>' : ''}
+            <button class="btn btn-sm btn-outline-secondary ms-2" onclick="checkPDFExtraction(${candidate.id})">
+                <i class="fas fa-search"></i> Check PDF Status
+            </button>
+        </div>
+        <div class="ai-summary-content">
+            ${candidate.summary || 'No summary available yet.'}
+            ${candidate.is_fallback ? '<div class="mt-2 small text-muted"><i class="fas fa-info-circle me-1"></i> This is a fallback summary because the system could not extract content from the PDF files. Please check if the PDF files are properly uploaded and accessible.</div>' : ''}
+        </div>
+    `;
+    
+    // ... existing code ...
 }
