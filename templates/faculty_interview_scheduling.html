@@ -1,0 +1,236 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-4">
+    <h3 class="text-center mb-4 fw-bold text-secondary">Interview Scheduling</h3>
+
+    <!-- Main content container -->
+    <div class="row">
+        <!-- Left panel: Candidate list -->
+        <div class="col-lg-5 mb-4">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-header bg-white border-bottom py-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0 fw-bold text-danger">My Rated Candidates</h5>
+                        <div>
+                            <span class="badge bg-info rounded-pill" id="candidate-count">0</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    <div class="p-3 bg-light border-bottom">
+                        <div class="input-group">
+                            <span class="input-group-text bg-white border-end-0">
+                                <i class="fas fa-search text-muted"></i>
+                            </span>
+                            <input type="text" class="form-control border-start-0" id="candidate-search" 
+                                placeholder="Search candidates..." aria-label="Search">
+                        </div>
+                    </div>
+                    <div class="candidate-list-container" style="max-height: 500px; overflow-y: auto;">
+                        <ul class="list-group list-group-flush" id="candidate-list">
+                            <!-- Candidates will be loaded here -->
+                            <li class="list-group-item text-center py-4 text-muted">
+                                <i class="fas fa-spinner fa-spin me-2"></i> Loading candidates...
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right panel: Scheduling -->
+        <div class="col-lg-7">
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-header bg-white border-bottom py-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0 fw-bold text-danger">Interview Scheduling</h5>
+                        <button class="btn btn-sm" style="background-color: #236465; color: white;" id="save-availability">
+                            <i class="fas fa-calendar-check me-1"></i> Save My Availability
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div id="empty-selection-message" class="text-center py-4">
+                        <img src="../static/images/calendar-illustration.svg" alt="Calendar" class="mb-3" style="max-width: 150px; opacity: 0.6;">
+                        <h6 class="text-muted">Select your available date for interviews</h6>
+                        <p class="text-muted small">You can only select one day for all your interviews</p>
+                    </div>
+
+                    <div id="availability-selector" class="mb-4">
+                        <div class="form-group mb-3">
+                            <label for="interview-date" class="form-label text-secondary fw-medium">
+                                <i class="fas fa-calendar-day me-1"></i> Select Your Available Date:
+                            </label>
+                            <input type="date" class="form-control" id="interview-date" min="{{ min_date }}">
+                            <div class="form-text small">
+                                <i class="fas fa-info-circle me-1"></i> This date will be used for all your scheduled interviews
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Current schedule section -->
+                    <div id="current-schedule" class="mt-4">
+                        <h6 class="fw-bold mb-3 text-secondary border-bottom pb-2">
+                            <i class="fas fa-calendar-check me-1"></i> My Current Interview Schedule
+                        </h6>
+
+                        <div id="no-schedule-message" class="alert alert-light text-center">
+                            <i class="fas fa-calendar-xmark text-muted fs-4 mb-2"></i>
+                            <p class="mb-0">You haven't set your interview date yet</p>
+                        </div>
+
+                        <div id="schedule-details" class="d-none">
+                            <div class="alert alert-success mb-3">
+                                <div class="d-flex align-items-center">
+                                    <div class="schedule-info flex-grow-1">
+                                        <h6 class="mb-1 fw-bold">
+                                            <i class="fas fa-calendar-day me-1"></i> <span id="display-interview-date"></span>
+                                        </h6>
+                                        <p class="mb-0">
+                                            <span id="display-candidate-count" class="fw-medium">0</span> candidates scheduled
+                                        </p>
+                                    </div>
+                                    <div class="action-buttons">
+                                        <button class="btn btn-sm btn-outline-success me-1" id="edit-schedule-btn">
+                                            <i class="fas fa-edit"></i> Edit
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-danger" id="delete-schedule-btn">
+                                            <i class="fas fa-trash-alt"></i> Delete
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="table-responsive">
+                                <table class="table table-hover" id="schedule-table">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th scope="col">Candidate</th>
+                                            <th scope="col">Rating</th>
+                                            <th scope="col">Course Interest</th>
+                                            <th scope="col" class="text-center">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="scheduled-candidates">
+                                        <!-- Scheduled candidates will appear here -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Candidate selection card - this appears when a candidate is selected -->
+            <div class="card shadow-sm border-0 d-none" id="candidate-details-card">
+                <div class="card-header bg-white border-bottom py-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0 fw-bold text-danger" id="selected-candidate-name">Candidate Details</h5>
+                        <button class="btn-close" id="close-candidate-details"></button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="candidate-info-box mb-4">
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <h6 class="text-secondary mb-1">Your Rating:</h6>
+                                <div class="rating-display" id="display-rating">
+                                    <!-- Rating will be displayed here -->
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <h6 class="text-secondary mb-1">Course Interests:</h6>
+                                <div id="display-interests" class="interests-container">
+                                    <!-- Interests will be displayed here -->
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-3" id="interest-prompt-container">
+                            <h6 class="text-secondary mb-1">Interest Prompt Response:</h6>
+                            <p class="mb-0" id="display-interest-prompt">
+                                <!-- Interest prompt will be displayed here -->
+                            </p>
+                        </div>
+                        <div class="mb-0" id="comment-container">
+                            <h6 class="text-secondary mb-1">Your Comment:</h6>
+                            <p class="mb-0 fst-italic" id="display-comment">
+                                <!-- Comment will be displayed here -->
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Add to schedule section -->
+                    <div class="schedule-action text-center">
+                        <button class="btn" id="schedule-interview-btn" style="background-color: #236465; color: white;">
+                            <i class="fas fa-calendar-plus me-1"></i> Schedule Interview
+                        </button>
+                        <button class="btn btn-outline-danger d-none" id="remove-interview-btn">
+                            <i class="fas fa-calendar-minus me-1"></i> Remove from Schedule
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Confirm Schedule Modal -->
+<div class="modal fade" id="confirmScheduleModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header py-3 border-0">
+                <h5 class="modal-title text-danger fw-bold">Confirm Schedule</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body py-4">
+                <div class="text-center mb-3">
+                    <i class="fas fa-calendar-check text-success fs-3 mb-3"></i>
+                    <h5 class="text-success mb-3">Save Your Interview Schedule</h5>
+                    <p>You are about to set <span class="fw-bold" id="modal-date"></span> as your interview date for all selected candidates.</p>
+                    <p class="mb-0">Are you sure you want to proceed?</p>
+                </div>
+            </div>
+            <div class="modal-footer justify-content-center border-0 pt-0">
+                <button type="button" class="btn btn-outline-secondary px-4" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn px-4" id="confirm-save-btn" style="background-color: #236465; color: white;">
+                    Confirm
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Schedule Modal -->
+<div class="modal fade" id="deleteScheduleModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header py-3 border-0">
+                <h5 class="modal-title text-danger fw-bold">Delete Schedule</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body py-4">
+                <div class="text-center mb-3">
+                    <i class="fas fa-exclamation-triangle text-danger fs-3 mb-3"></i>
+                    <h5 class="text-danger mb-3">Delete Interview Schedule</h5>
+                    <p>You are about to delete your entire interview schedule for <span class="fw-bold" id="delete-modal-date"></span>.</p>
+                    <p class="mb-0">This will remove all scheduled interviews. Are you sure?</p>
+                </div>
+            </div>
+            <div class="modal-footer justify-content-center border-0 pt-0">
+                <button type="button" class="btn btn-outline-secondary px-4" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger px-4" id="confirm-delete-btn">
+                    Delete Schedule
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Toast container for notifications -->
+<div id="toast-container" class="position-fixed bottom-0 end-0 p-3"></div>
+{% endblock %}
+
+{% block scripts %}
+<script src="../static/scripts/faculty_scheduling.js"></script>
+{% endblock %}

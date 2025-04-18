@@ -884,8 +884,8 @@ def get_scheduled_interviews():
 # INTERVIEW SCHEDULING ROUTES
 # =============================================================================
 
-@app.route('/faculty_scheduling')
-def faculty_scheduling():
+@app.route('/faculty_scheduling_interview')
+def faculty_scheduling_interview():
     """Render the faculty scheduling page."""
     if 'faculty_id' not in session:
         return redirect(url_for('faculty_login'))
