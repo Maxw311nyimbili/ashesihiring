@@ -896,7 +896,7 @@ def faculty_scheduling():
     from datetime import datetime, timedelta
     today = datetime.now().strftime('%Y-%m-%d')
 
-    return render_template('faculty_scheduling.html',
+    return render_template('faculty_interview_scheduling.html',
                            faculty_name=faculty_name,
                            min_date=today)
 
