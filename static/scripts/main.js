@@ -34,9 +34,6 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Add responsive adjustments
     adjustForMobile();
-
-    // Initialize all event listeners for the improved rating modal
-    initRatingModalEvents();
 });
 
 // Adjust layout for mobile devices
@@ -560,12 +557,12 @@ function addSwipeStyles() {
             }
             
             .nav-controls {
-                position: absolute;
-                top: 50%;
+            position: absolute;
+            top: 50%;
                 width: 100%;
-                transform: translateY(-50%);
+            transform: translateY(-50%);
                 z-index: 20;
-                pointer-events: none;
+            pointer-events: none;
             }
             
             .nav-btn {
@@ -586,243 +583,8 @@ function addSwipeStyles() {
     document.head.appendChild(styleElement);
 }
 
-// Enhanced Rating Modal Logic
-document.addEventListener('DOMContentLoaded', function() {
-    // Initialize all event listeners for the improved rating modal
-    initRatingModalEvents();
-});
-
-// Initialize all event listeners for the rating modal
-function initRatingModalEvents() {
-    // Step navigation buttons
-    document.getElementById('next-to-rating').addEventListener('click', () => {
-        showRatingStep(2);
-        updateProgressBar(66);
-    });
-    
-    document.getElementById('back-to-info').addEventListener('click', () => {
-        showRatingStep(1);
-        updateProgressBar(33);
-    });
-    
-    document.getElementById('next-to-comments').addEventListener('click', () => {
-        showRatingStep(3);
-        updateProgressBar(100);
-    });
-    
-    document.getElementById('back-to-rating').addEventListener('click', () => {
-        showRatingStep(2);
-        updateProgressBar(66);
-    });
-    
-    // Star rating with enhanced feedback
-    const stars = document.querySelectorAll('.star');
-    const ratingInput = document.getElementById('rating');
-    const nextToCommentsBtn = document.getElementById('next-to-comments');
-    const ratingFeedback = document.getElementById('ratingFeedback');
-    
-    stars.forEach(star => {
-        star.addEventListener('click', function() {
-            const rating = parseInt(this.getAttribute('data-rating'));
-            ratingInput.value = rating;
-            updateStarRating(rating);
-            
-            // Provide feedback based on rating
-            const feedbackMessages = [
-                "Poor fit for the position",
-                "Below average candidate",
-                "Acceptable candidate",
-                "Strong candidate",
-                "Exceptional candidate"
-            ];
-            
-            ratingFeedback.textContent = feedbackMessages[rating - 1];
-            ratingFeedback.className = 'mt-2 fw-medium';
-            
-            // Add appropriate color based on rating
-            if (rating <= 2) {
-                ratingFeedback.classList.add('text-danger');
-            } else if (rating == 3) {
-                ratingFeedback.classList.add('text-warning');
-            } else {
-                ratingFeedback.classList.add('text-success');
-            }
-            
-            // Show/hide interest prompt based on rating
-            handleRatingChange(rating);
-            
-            // Enable the next button when a rating is selected
-            nextToCommentsBtn.disabled = false;
-        });
-        
-        // Enhanced hover effects
-        star.addEventListener('mouseover', function() {
-            const hoverRating = parseInt(this.getAttribute('data-rating'));
-            highlightStars(hoverRating);
-        });
-        
-        star.addEventListener('mouseout', function() {
-            const currentRating = parseInt(ratingInput.value) || 0;
-            highlightStars(currentRating);
-        });
-    });
-    
-    // Interest prompt radio buttons
-    document.querySelectorAll("input[name='interest_prompt']").forEach((radio) => {
-        radio.addEventListener("change", function() {
-            // No need to conditionally enable the next button here as it's already enabled by rating selection
-        });
-    });
-    
-    // Character count for comment textarea
-    const commentTextarea = document.getElementById('new-comment');
-    const characterCount = document.getElementById('characterCount');
-    
-    commentTextarea.addEventListener('input', function() {
-        const currentLength = this.value.length;
-        characterCount.textContent = `${currentLength}/500`;
-        
-        // Visual feedback for character count
-        if (currentLength > 450) {
-            characterCount.className = 'text-danger';
-        } else if (currentLength > 350) {
-            characterCount.className = 'text-warning';
-        } else {
-            characterCount.className = 'text-muted';
-        }
-    });
-    
-    // Submit rating button
-    document.getElementById('submit-rating').addEventListener('click', submitRatingEnhanced);
-    
-    // Edit mode controls
-    document.getElementById('cancel-edit').addEventListener('click', () => {
-        // Revert to display mode and reset form
-        toggleEditMode(false);
-    });
-    
-    document.getElementById('update-rating').addEventListener('click', () => {
-        submitRatingEnhanced(true); // Pass true to indicate this is an update
-    });
-}
-
-// Show the specified step and hide others
-function showRatingStep(stepNumber) {
-    document.querySelectorAll('.rating-step').forEach((step, index) => {
-        if (index + 1 === stepNumber) {
-            step.classList.remove('d-none');
-            // Add a subtle animation
-            step.style.opacity = 0;
-            setTimeout(() => {
-                step.style.transition = 'opacity 0.3s ease';
-                step.style.opacity = 1;
-            }, 50);
-        } else {
-            step.classList.add('d-none');
-        }
-    });
-}
-
-// Update the progress bar
-function updateProgressBar(percentage) {
-    const progressBar = document.getElementById('ratingProgressBar');
-    progressBar.style.width = `${percentage}%`;
-    progressBar.setAttribute('aria-valuenow', percentage);
-    
-    // Animate the progress bar
-    progressBar.style.transition = 'width 0.4s ease-in-out';
-}
-
-// Handle showing/hiding sections based on rating
-function handleRatingChange(rating) {
-    const interestPromptSection = document.getElementById('interest-prompt-section');
-    
-    // For low ratings (1-3), show interest prompt
-    if (rating < 4) {
-        interestPromptSection.classList.remove('d-none');
-        // Apply fade-in effect
-        interestPromptSection.style.opacity = 0;
-        setTimeout(() => {
-            interestPromptSection.style.transition = 'opacity 0.3s ease';
-            interestPromptSection.style.opacity = 1;
-        }, 50);
-        
-        // Reset radio buttons
-        document.querySelectorAll("input[name='interest_prompt']").forEach(radio => {
-            radio.checked = false;
-        });
-    } else {
-        // For high ratings (4-5), hide interest prompt
-        interestPromptSection.classList.add('d-none');
-    }
-}
-
-// Enhanced star rating visualization
-function updateStarRating(rating) {
-    const stars = document.querySelectorAll('.star');
-    stars.forEach((star, index) => {
-        if (index < rating) {
-            star.classList.remove('far');
-            star.classList.add('fas');
-            // Color gradient based on rating
-            if (rating <= 2) {
-                star.style.color = '#AD4245'; // Red for low ratings
-            } else if (rating == 3) {
-                star.style.color = '#f0ad4e'; // Yellow/orange for medium
-            } else {
-                star.style.color = '#28a745'; // Green for high ratings
-            }
-        } else {
-            star.classList.remove('fas');
-            star.classList.add('far');
-            star.style.color = '#ccc';
-        }
-    });
-}
-
-// Helper function for star hover effects
-function highlightStars(count) {
-    const stars = document.querySelectorAll('.star');
-    stars.forEach((star, index) => {
-        if (index < count) {
-            star.classList.remove('far');
-            star.classList.add('fas');
-            // Color based on position
-            if (count <= 2) {
-                star.style.color = '#AD4245';
-            } else if (count == 3) {
-                star.style.color = '#f0ad4e';
-            } else {
-                star.style.color = '#28a745';
-            }
-        } else {
-            star.classList.remove('fas');
-            star.classList.add('far');
-            star.style.color = '#ccc';
-        }
-    });
-}
-
-// Toggle between edit mode and display mode
-function toggleEditMode(isEdit) {
-    const editControls = document.getElementById('edit-mode-controls');
-    const normalControls = document.querySelectorAll('.rating-step');
-    const submitBtn = document.getElementById('submit-rating');
-    
-    if (isEdit) {
-        editControls.classList.remove('d-none');
-        submitBtn.classList.add('d-none');
-    } else {
-        editControls.classList.add('d-none');
-        submitBtn.classList.remove('d-none');
-    }
-}
-
-// Open the enhanced rating modal
+// Open the rating modal
 function openRateModal(index) {
-    // Reset modal state
-    resetModalState();
-    
     // Validate index
     if (index === null || index === undefined || index < 0 || index >= candidates.length) {
         console.error('Invalid index for openRateModal:', index);
@@ -840,71 +602,46 @@ function openRateModal(index) {
     }
     
     // Set candidate name and interests in the modal
-    document.getElementById("modalCandidateName").textContent = candidate.name;
+    document.getElementById("modalCandidateName-1").textContent = candidate.name;
     
-    const interestsContainer = document.getElementById("modalCandidateInterests");
+    const interestsList = document.getElementById("modalCandidateInterests-1");
     if (candidate.interests && candidate.interests.length > 0) {
-        interestsContainer.innerHTML = candidate.interests
-            .map(interest => `<span class="tag-pill">${interest}</span>`)
+        interestsList.innerHTML = candidate.interests
+            .map(interest => `<li class="mb-1">${interest}</li>`)
             .join("");
     } else {
-        interestsContainer.innerHTML = "<span class='text-muted fst-italic'>No interests specified</span>";
+        interestsList.innerHTML = "<li>No interests specified.</li>";
     }
 
-    // Always start at step 1
-    showRatingStep(1);
-    updateProgressBar(33);
+    // Reset modal elements
+    document.getElementById("rating").value = "";
+    document.getElementById("interest-prompt-section").classList.add("d-none");
+    document.getElementById("new-comment-container").classList.add("d-none");
+    document.getElementById("comments-section").innerHTML = ""; // Clear previous comments
+    document.getElementById("new-comment").value = ""; // Clear new comment input
+
+    // Reset previous rating indicators
+    document.getElementById("previousRatingBadge").classList.add("d-none");
+    document.getElementById("previousRatingLabel").classList.add("d-none");
+    document.getElementById("previousCommentsLabel").classList.add("d-none");
+    document.getElementById("edit-rating-container").classList.add("d-none");
+    
+    // Make sure submit button is visible
+    document.getElementById("final-subButton").classList.remove("d-none");
     
     // Check for previous rating
     checkPreviousRating(candidate.id);
     
     // Show the modal
-    const rateModal = document.getElementById('rateModal');
-    const modalInstance = new bootstrap.Modal(rateModal);
-    modalInstance.show();
+    rateModalObj.show();
 }
 
-// Reset the modal state
-function resetModalState() {
-    // Reset all form fields
-    document.getElementById("rating").value = "";
-    document.getElementById("new-comment").value = "";
-    document.getElementById("characterCount").textContent = "0/500";
-    document.getElementById("characterCount").className = "text-muted";
-    
-    // Reset star rating
-    updateStarRating(0);
-    
-    // Hide all conditional sections
-    document.getElementById("interest-prompt-section").classList.add("d-none");
-    document.getElementById("previousRatingBadge").classList.add("d-none");
-    document.getElementById("previousCommentsLabel").classList.add("d-none");
-    
-    // Reset radio buttons
-    document.querySelectorAll("input[name='interest_prompt']").forEach(radio => {
-        radio.checked = false;
-    });
-    
-    // Reset rating feedback
-    document.getElementById("ratingFeedback").textContent = "";
-    document.getElementById("ratingFeedback").className = "mt-2 fw-medium";
-    
-    // Reset comments section
-    document.getElementById("comments-section").innerHTML = "";
-    document.getElementById("commentCount").textContent = "0";
-    
-    // Disable the continue button until rating is selected
-    document.getElementById("next-to-comments").disabled = true;
-    
-    // Hide edit mode controls
-    toggleEditMode(false);
-    
-    // Hide success state if visible
-    document.getElementById("rating-success").classList.add("d-none");
-    document.getElementById("ratingStepsContainer").classList.remove("d-none");
+// Close rating modal
+function closeRateModal() {
+    rateModalObj.hide();
 }
 
-// Check for previous ratings (enhanced)
+// Check for previous ratings
 function checkPreviousRating(applicationId) {
     if (!applicationId) {
         console.error('Application ID is required');
@@ -921,7 +658,15 @@ function checkPreviousRating(applicationId) {
         .then(data => {
             if (data.rating) {
                 // Show the previous rating badge
-                document.getElementById("previousRatingBadge").classList.remove("d-none");
+                const ratingBadge = document.getElementById("previousRatingBadge");
+                const ratingLabel = document.getElementById("previousRatingLabel");
+                const ratingValue = document.getElementById("previousRatingValue");
+                const editRatingContainer = document.getElementById("edit-rating-container");
+                const submitButton = document.getElementById("final-subButton");
+
+                ratingBadge.classList.remove("d-none");
+                ratingLabel.classList.remove("d-none");
+                ratingValue.textContent = data.rating;
                 
                 // Pre-fill the rating input with previous value
                 document.getElementById("rating").value = data.rating;
@@ -929,62 +674,42 @@ function checkPreviousRating(applicationId) {
                 // Update star rating
                 updateStarRating(parseInt(data.rating));
                 
-                // Update rating feedback
-                const feedbackMessages = [
-                    "Poor fit for the position",
-                    "Below average candidate", 
-                    "Acceptable candidate",
-                    "Strong candidate",
-                    "Exceptional candidate"
-                ];
-                
-                const ratingFeedback = document.getElementById('ratingFeedback');
-                const rating = parseInt(data.rating);
-                
-                ratingFeedback.textContent = feedbackMessages[rating - 1];
-                ratingFeedback.className = 'mt-2 fw-medium';
-                
-                if (rating <= 2) {
-                    ratingFeedback.classList.add('text-danger');
-                } else if (rating == 3) {
-                    ratingFeedback.classList.add('text-warning');
-                } else {
-                    ratingFeedback.classList.add('text-success');
-                }
-                
-                // Enable continue button
-                document.getElementById("next-to-comments").disabled = false;
-                
-                // Handle interest prompt visibility based on rating
-                handleRatingChange(rating);
-                
-                // If they had an interest prompt answer before, pre-select it
-                if (data.interest_prompt && rating < 4) {
-                    const radioButton = document.querySelector(`input[name='interest_prompt'][value='${data.interest_prompt}']`);
-                    if (radioButton) {
-                        radioButton.checked = true;
-                    }
-                }
-                
                 // If they also had comments before
                 if (data.has_comments) {
                     document.getElementById("previousCommentsLabel").classList.remove("d-none");
                     
-                    // Pre-fill comment field if editing
-                    if (data.user_comment) {
-                        document.getElementById("new-comment").value = data.user_comment;
-                        // Update character count
-                        const characterCount = document.getElementById('characterCount');
-                        characterCount.textContent = `${data.user_comment.length}/500`;
-                    }
+                    // Show edit button if they've already rated
+                    editRatingContainer.classList.remove("d-none");
+                    
+                    // Fetch and display existing comments
+                    fetchComments(applicationId);
                 }
                 
-                // Fetch all comments for this application
-                fetchEnhancedComments(applicationId);
-            } else {
-                // No previous rating
-                document.getElementById("comments-section").innerHTML = '<p class="text-muted fst-italic">No comments yet</p>';
-                document.getElementById("commentCount").textContent = "0";
+                // Check if rating is low to show interest prompt
+                if (parseInt(data.rating) < 4) {
+                    document.getElementById("interest-prompt-section").classList.remove("d-none");
+                    
+                    // If they had an interest prompt answer before, pre-select it
+                    if (data.interest_prompt) {
+                        const radioButton = document.querySelector(`input[name='interest_prompt'][value='${data.interest_prompt}']`);
+                        if (radioButton) {
+                            radioButton.checked = true;
+                            
+                            // If they answered "yes", show the comment section
+                            if (data.interest_prompt === "yes") {
+                                document.getElementById("new-comment-container").classList.remove("d-none");
+                            }
+                        }
+                    }
+                } else {
+                    // For high ratings, show comment section
+                    document.getElementById("new-comment-container").classList.remove("d-none");
+                }
+                
+                // If we're in edit mode, hide the submit button
+                if (editRatingContainer && !editRatingContainer.classList.contains("d-none")) {
+                    submitButton.classList.add("d-none");
+                }
             }
         })
         .catch(error => {
@@ -993,145 +718,281 @@ function checkPreviousRating(applicationId) {
         });
 }
 
-// Enhanced comment fetching and display
-function fetchEnhancedComments(applicationId) {
+// Update star rating display
+function updateStarRating(rating) {
+    const stars = document.querySelectorAll('.star');
+    stars.forEach((star, index) => {
+        if (index < rating) {
+            star.classList.remove('far');
+            star.classList.add('fas');
+            star.style.color = '#AD4245';
+            } else {
+            star.classList.remove('fas');
+            star.classList.add('far');
+            star.style.color = '#ccc';
+        }
+    });
+}
+
+// Initialize star rating functionality
+function initStarRating() {
+    const stars = document.querySelectorAll('.star');
+    const ratingInput = document.getElementById('rating');
+    
+    stars.forEach(star => {
+        star.addEventListener('click', function() {
+            const rating = parseInt(this.getAttribute('data-rating'));
+            ratingInput.value = rating;
+            updateStarRating(rating);
+            
+            // Trigger the input event to handle showing/hiding sections
+            ratingInput.dispatchEvent(new Event('input'));
+        });
+        
+        star.addEventListener('mouseover', function() {
+            const rating = parseInt(this.getAttribute('data-rating'));
+            updateStarRating(rating);
+        });
+        
+        star.addEventListener('mouseout', function() {
+            const currentRating = parseInt(ratingInput.value) || 0;
+            updateStarRating(currentRating);
+        });
+    });
+}
+
+// Handle rating input
+document.getElementById("rating").addEventListener("input", function () {
+    let rating = parseInt(this.value, 10);
+    
+    // Update star rating
+    updateStarRating(rating);
+
+    // Handle visibility of sections based on rating
+    if (rating < 4) {
+        // For low ratings (1-3), show interest prompt and hide comment section initially
+        document.getElementById("interest-prompt-section").classList.remove("d-none");
+        document.getElementById("new-comment-container").classList.add("d-none");
+        
+        // Reset radio buttons when rating changes
+        document.querySelectorAll("input[name='interest_prompt']").forEach(radio => {
+            radio.checked = false;
+        });
+    } else {
+        // For high ratings (4-5), hide interest prompt and show comment section
+        document.getElementById("interest-prompt-section").classList.add("d-none");
+        document.getElementById("new-comment-container").classList.remove("d-none");
+    }
+});
+
+// Handle radio button selection
+document.querySelectorAll("input[name='interest_prompt']").forEach((radio) => {
+    radio.addEventListener("change", function () {
+        if (this.value === "yes") {
+            // If "yes" is selected, show comment section
+            document.getElementById("new-comment-container").classList.remove("d-none");
+            
+            // Fetch comments if we have a valid candidate
+            if (selectedIndex !== null && candidates[selectedIndex]) {
+                fetchComments(candidates[selectedIndex].id);
+            }
+        } else {
+            // If "no" is selected, hide comment section
+            document.getElementById("new-comment-container").classList.add("d-none");
+        }
+    });
+});
+
+// Fetch comments for a candidate
+function fetchComments(applicationId) {
     if (!applicationId) {
         console.error('Application ID is required');
         return;
     }
     
-    let facultyName = document.getElementById("loggedInUser").value;
-    
-    fetch(`/get_comments?application_id=${applicationId}`)
+let facultyName = document.getElementById("loggedInUser").value;
+let userHasCommented = false;
+
+fetch(`/get_comments?application_id=${applicationId}`)
         .then(response => {
             if (!response.ok) {
                 throw new Error('Network response was not ok');
             }
             return response.json();
         })
-        .then(data => {
-            if (data.success) {
-                let commentsSection = document.getElementById("comments-section");
-                if (!commentsSection) {
-                    console.error("Error: comments-section not found in DOM");
-                    return;
-                }
+.then(data => {
+    if (data.success) {
+        let commentsSection = document.getElementById("comments-section");
+        if (!commentsSection) {
+            console.error("Error: comments-section not found in DOM");
+            return;
+        }
 
-                commentsSection.innerHTML = ""; // Clear previous comments
+        commentsSection.innerHTML = ""; // Clear previous comments
 
-                if (data.comments.length === 0) {
-                    commentsSection.innerHTML = "<p class='text-muted fst-italic'>No comments yet.</p>";
-                    document.getElementById("commentCount").textContent = "0";
-                    return;
-                }
+        if (data.comments.length === 0) {
+            commentsSection.innerHTML = "<p class='text-muted'>No comments yet.</p>";
+            return;
+        }
 
-                // Update comment count
-                document.getElementById("commentCount").textContent = data.comments.length;
-                
-                // Create a document fragment for better performance when adding multiple elements
-                const fragment = document.createDocumentFragment();
-                
-                data.comments.forEach(comment => {
-                    const commentDiv = document.createElement("div");
-                    
-                    const isCurrentUser = comment.faculty_name === facultyName;
-                    const borderColor = isCurrentUser ? "#AD4245" : "#236465";
-                    const badgeClass = isCurrentUser ? "bg-danger" : "bg-secondary";
-                    
-                    commentDiv.innerHTML = `
-                        <div class="comment-card mb-3 p-3 bg-light rounded-3 border-start border-3" style="border-color: ${borderColor} !important;">
-                            <div class="d-flex justify-content-between align-items-start">
-                                <div class="d-flex align-items-center">
-                                    <span class="badge ${badgeClass} me-2">${comment.faculty_name[0]}</span>
-                                    <strong class="fw-medium">${comment.faculty_name}</strong>
-                                    ${isCurrentUser ? '<span class="badge bg-light text-danger ms-2">You</span>' : ''}
-                                </div>
-                                <small class="text-muted">${comment.timestamp || 'Just now'}</small>
-                            </div>
-                            <p class="mt-2 mb-0">${comment.comment}</p>
-                            ${isCurrentUser ? `
-                            <div class="comment-actions mt-2 text-end">
-                                <button class="btn btn-sm btn-outline-secondary" onclick="editExistingComment('${comment.id}', '${comment.comment}')">
-                                    <i class="fas fa-edit me-1"></i> Edit
-                                </button>
-                            </div>
+        data.comments.forEach(comment => {
+            const commentDiv = document.createElement("div");
+            commentDiv.setAttribute("id", `comment-${comment.id}`);
+
+            // Check if this is the current user's comment
+            if (comment.faculty_name === facultyName) {
+                userHasCommented = true;
+            }
+
+            commentDiv.innerHTML = `
+                <div class="comment-card mb-3 border-start border-3 ps-3" style="border-color: #236465 !important;">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div class="comment-content">
+                            <p class="mb-1" style="color:#236465 !important">
+                                <strong class="fw-bold">${comment.faculty_name || facultyName}:</strong>
+                                <span id="commentText-${comment.id}" style="color: inherit;">${comment.comment}</span>
+                            </p>
+                            <small class="text-muted comment-time">${comment.timestamp || 'Just now'}</small>
+                        </div>
+                        <div class="comment-actions">
+                            ${comment.faculty_name === facultyName ? `
+                            <button class="btn btn-sm rounded-pill me-1 shadow-sm" style="background:#008080 !important; color: white;"
+                                onclick="editComment('${comment.id}')">
+                                <i class="fas fa-edit me-1"></i> Edit
+                            </button>
+                            <button class="btn btn-sm rounded-pill shadow-sm" style="background:#AD4245 !important; color: white;"
+                                onclick="deleteComment('${comment.id}')">
+                                <i class="fas fa-trash-alt me-1"></i> Delete
+                            </button>
                             ` : ''}
                         </div>
-                    `;
-                    
-                    fragment.appendChild(commentDiv);
-                });
-                
-                commentsSection.appendChild(fragment);
-            } else {
-                console.error("Failed to fetch comments:", data.message);
-                showToast("Failed to load comments", "error");
-            }
-        })
-        .catch(error => {
-            console.error("Error fetching comments:", error);
-            showToast("Error loading comments", "error");
+                    </div>
+                </div>
+            `;
+
+            commentsSection.appendChild(commentDiv);
         });
+
+        // Show the "you've previously commented" indicator if applicable
+        if (userHasCommented) {
+            document.getElementById("previousCommentsLabel").classList.remove("d-none");
+        }
+    } else {
+        console.error("Failed to fetch comments:", data.message);
+        showToast("Failed to load comments", "error");
+    }
+})
+.catch(error => {
+    console.error("Error fetching comments:", error);
+    showToast("Error loading comments", "error");
+});
 }
 
-// Edit an existing comment
-function editExistingComment(commentId, commentText) {
-    // Pre-fill the comment field
-    document.getElementById("new-comment").value = commentText;
-    
-    // Update character count
-    const characterCount = document.getElementById('characterCount');
-    characterCount.textContent = `${commentText.length}/500`;
-    
-    // Switch to edit mode
-    toggleEditMode(true);
-    
-    // Store the comment ID for the update operation
-    document.getElementById("new-comment").setAttribute('data-comment-id', commentId);
-    
-    // Make sure we're on the comments step
-    showRatingStep(3);
-    updateProgressBar(100);
+// Function to edit a comment
+function editComment(commentId) {
+const commentSpan = document.getElementById(`commentText-${commentId}`);
+const newComment = prompt("Edit your comment:", commentSpan.textContent);
+
+if (newComment !== null && newComment.trim() !== "") {
+        // Pre-select the "yes" radio button for interest_prompt
+        const yesRadioButton = document.querySelector("input[name='interest_prompt'][value='yes']");
+        if (yesRadioButton) {
+            yesRadioButton.checked = true;
+        }
+        
+        // Show the comment section when editing
+        document.getElementById("new-comment-container").classList.remove("d-none");
+        
+        // Set the new comment value in the textarea
+        document.getElementById("new-comment").value = newComment;
+        
+        // Hide the submit button when editing
+        document.getElementById("final-subButton").classList.add("d-none");
+        
+fetch("/comment", {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+        comment_id: commentId,
+        rating: document.getElementById("rating").value, // Include updated rating
+                interest_prompt: "yes", // Always set to "yes" when editing
+        comment: newComment
+    })
+})
+.then(response => response.json())
+.then(data => {
+    if (data.success) {
+        commentSpan.textContent = newComment;
+        showToast("Comment updated successfully!");
+                
+                // Show the submit button again after successful edit
+                document.getElementById("final-subButton").classList.remove("d-none");
+    } else {
+        showToast("Error: " + data.message, "error");
+    }
+})
+.catch(error => {
+    console.error("Error updating comment:", error);
+    showToast("Error updating comment", "error");
+});
+}
 }
 
-// Submit rating with enhanced UX
-function submitRatingEnhanced(isUpdate = false) {
+// Function to delete a comment
+function deleteComment(commentId) {
+if (confirm("Are you sure you want to delete this comment?")) {
+fetch("/delete_comment", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ comment_id: commentId })
+})
+.then(response => response.json())
+.then(data => {
+    if (data.success) {
+        document.getElementById(`comment-${commentId}`).remove();
+        showToast("Comment deleted successfully!");
+    } else {
+        showToast("Error: " + data.message, "error");
+    }
+})
+.catch(error => {
+    console.error("Error deleting comment:", error);
+    showToast("Error deleting comment", "error");
+});
+}
+}
+
+// Submit rating and comment
+function submitRating() {
     const rating = document.getElementById("rating").value;
     const comment = document.getElementById("new-comment").value;
     const interestPrompt = document.querySelector("input[name='interest_prompt']:checked")?.value || "";
-    const commentId = document.getElementById("new-comment").getAttribute('data-comment-id');
     
-    // Validation with enhanced UX
     if (!rating) {
         showToast("Please provide a rating", "error");
-        // Jump to the rating step
-        showRatingStep(2);
-        updateProgressBar(66);
         return;
     }
     
-    // Validation for low ratings
+    // Validate based on rating value
     if (parseInt(rating) < 4) {
         // For low ratings, require interest prompt
         if (!interestPrompt) {
-            showToast("Please indicate if the candidate has desirable qualities", "error");
-            // Highlight the interest prompt section
-            const promptSection = document.getElementById("interest-prompt-section");
-            promptSection.classList.add("border");
-            promptSection.classList.add("border-danger");
-            
-            // Remove the highlight after 2 seconds
-            setTimeout(() => {
-                promptSection.classList.remove("border");
-                promptSection.classList.remove("border-danger");
-            }, 2000);
+            showToast("Please answer the interest prompt", "error");
             return;
         }
         
-        // If interest prompt is "yes", encourage a comment
+        // If interest prompt is "yes", require a comment
         if (interestPrompt === "yes" && !comment) {
-            // We'll show a suggestion but not block submission
-            showToast("Consider adding a comment to explain your assessment", "warning");
+            showToast("Please provide a comment for low ratings with positive qualities", "error");
+            return;
+        }
+    } else {
+        // For high ratings (4-5), we don't require a comment
+        // But if the comment section is visible, we should allow an optional comment
+        const commentContainer = document.getElementById("new-comment-container");
+        if (!commentContainer.classList.contains("d-none") && !comment) {
+            // If the comment section is visible but no comment is provided, we'll just submit without a comment
+            console.log("Comment section visible but no comment provided, proceeding with submission");
         }
     }
     
@@ -1142,33 +1003,15 @@ function submitRatingEnhanced(isUpdate = false) {
         return;
     }
     
-    // Show loading state
-    const submitBtn = isUpdate ? document.getElementById('update-rating') : document.getElementById('submit-rating');
-    const originalText = submitBtn.innerHTML;
-    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Submitting...';
-    submitBtn.disabled = true;
-    
-    // Determine if this is an update to an existing comment
-    const endpoint = isUpdate && commentId ? "/comment" : "/rate_candidate";
-    const method = isUpdate && commentId ? "PUT" : "POST";
-    
-    // Prepare the request body
-    const requestBody = {
-        application_id: candidate.id,
-        rating: rating,
-        interest_prompt: interestPrompt,
-        comment: comment
-    };
-    
-    // Add comment_id for updates
-    if (isUpdate && commentId) {
-        requestBody.comment_id = commentId;
-    }
-    
-    fetch(endpoint, {
-        method: method,
+    fetch("/rate_candidate", {
+        method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(requestBody)
+        body: JSON.stringify({
+            application_id: candidate.id,
+            rating: rating,
+            interest_prompt: interestPrompt,
+            comment: comment
+        })
     })
     .then(response => {
         if (!response.ok) {
@@ -1178,131 +1021,56 @@ function submitRatingEnhanced(isUpdate = false) {
     })
     .then(data => {
         if (data.success) {
-            // Show success state
-            document.getElementById("ratingStepsContainer").classList.add("d-none");
-            document.getElementById("rating-success").classList.remove("d-none");
+            showToast("Rating submitted successfully!");
+            closeRateModal();
             
-            // Show success toast
-            showToast("Rating submitted successfully!", "success");
-            
-            // Close modal after a delay
-            setTimeout(() => {
-                closeRateModal();
-                
-                // Refresh the candidate display to show updated rating
-                displayCandidate(currentIndex, "right");
-            }, 2000);
+            // Refresh the candidate display to show updated rating
+            displayCandidate(currentIndex, "right");
         } else {
-            // Show error toast
             showToast("Error: " + data.message, "error");
-            
-            // Reset button state
-            submitBtn.innerHTML = originalText;
-            submitBtn.disabled = false;
         }
     })
     .catch(error => {
         console.error("Error submitting rating:", error);
         showToast("Error submitting rating", "error");
-        
-        // Reset button state
-        submitBtn.innerHTML = originalText;
-        submitBtn.disabled = false;
     });
-}
-
-// Close the rating modal
-function closeRateModal() {
-    const rateModal = document.getElementById('rateModal');
-    const modalInstance = bootstrap.Modal.getInstance(rateModal);
-    if (modalInstance) {
-        modalInstance.hide();
-    }
 }
 
 // Toast notification helper
 function showToast(message, type = "success") {
-    // Create toast container if it doesn't exist
-    let toastContainer = document.getElementById("toast-container");
-    if (!toastContainer) {
-        toastContainer = document.createElement("div");
-        toastContainer.id = "toast-container";
-        toastContainer.className = "position-fixed bottom-0 end-0 p-3";
-        document.body.appendChild(toastContainer);
-    }
-
-    // Create toast element
-    const toastId = "toast-" + Date.now();
-    const toast = document.createElement("div");
-    toast.id = toastId;
-    toast.className = `toast align-items-center text-white bg-${type === "success" ? "success" : type === "error" ? "danger" : "warning"} border-0`;
-    toast.setAttribute("role", "alert");
-    toast.setAttribute("aria-live", "assertive");
-    toast.setAttribute("aria-atomic", "true");
-
-    toast.innerHTML = `
-    <div class="d-flex">
-        <div class="toast-body">
-            ${message}
-        </div>
-        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
-    </div>
-    `;
-
-    toastContainer.appendChild(toast);
-
-    // Initialize and show toast
-    const bsToast = new bootstrap.Toast(toast, {
-        autohide: true,
-        delay: 3000
-    });
-    bsToast.show();
+// Create toast container if it doesn't exist
+let toastContainer = document.getElementById("toast-container");
+if (!toastContainer) {
+toastContainer = document.createElement("div");
+toastContainer.id = "toast-container";
+toastContainer.className = "position-fixed bottom-0 end-0 p-3";
+document.body.appendChild(toastContainer);
 }
 
-function initStarRating() {
-    const stars = document.querySelectorAll('.star-rating .star');
-    const ratingInput = document.getElementById('rating');
-    const ratingFeedback = document.getElementById('ratingFeedback');
-    
-    const ratingLabels = {
-        1: 'Poor',
-        2: 'Fair',
-        3: 'Good',
-        4: 'Very Good',
-        5: 'Excellent'
-    };
+// Create toast element
+const toastId = "toast-" + Date.now();
+const toast = document.createElement("div");
+toast.id = toastId;
+toast.className = `toast align-items-center text-white bg-${type === "success" ? "success" : type === "error" ? "danger" : "warning"} border-0`;
+toast.setAttribute("role", "alert");
+toast.setAttribute("aria-live", "assertive");
+toast.setAttribute("aria-atomic", "true");
 
-    stars.forEach(star => {
-        star.addEventListener('mouseover', function() {
-            const rating = this.dataset.rating;
-            updateStars(rating);
-        });
+toast.innerHTML = `
+<div class="d-flex">
+    <div class="toast-body">
+        ${message}
+    </div>
+    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+</div>
+`;
 
-        star.addEventListener('click', function() {
-            const rating = this.dataset.rating;
-            ratingInput.value = rating;
-            updateStars(rating);
-            ratingFeedback.textContent = ratingLabels[rating];
-        });
-    });
+toastContainer.appendChild(toast);
 
-    document.querySelector('.star-rating').addEventListener('mouseleave', function() {
-        const currentRating = ratingInput.value;
-        updateStars(currentRating);
-    });
-
-    function updateStars(rating) {
-        stars.forEach(star => {
-            const starRating = star.dataset.rating;
-            if (starRating <= rating) {
-                star.classList.remove('far');
-                star.classList.add('fas');
-                star.classList.add('text-warning');
-            } else {
-                star.classList.remove('fas');
-                star.classList.add('far');
-                star.classList.remove('text-warning');
-            }
-        });
-    }
+// Initialize and show toast
+const bsToast = new bootstrap.Toast(toast, {
+autohide: true,
+delay: 3000
+});
+bsToast.show();
 }

@@ -341,180 +341,111 @@
     <!-- Rating Modal -->
     <div class="modal fade" id="rateModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content shadow border-0">
-                <div class="modal-header py-3 border-0 bg-gradient" style="background: linear-gradient(135deg, #AD4245, #8a3538);">
-                    <h5 class="modal-title text-white fw-bold">Rate Candidate</h5>
+            <div class="modal-content shadow-sm">
+                <div class="modal-header py-3 border-0 align-items-center">
+                    <h5 class="modal-title text-danger fw-bold fs-5">Candidate Rating</h5>
                     <div class="ms-auto d-flex align-items-center">
-                        <!-- Previously rated indicator with improved design -->
-                        <div id="previousRatingBadge" class="badge bg-white text-dark me-3 d-none">
-                            <i class="fas fa-history me-1"></i> Previously Rated
+                        <!-- Previously rated indicator -->
+                        <div id="previousRatingBadge" class="badge bg-info text-white me-3 d-none">
+                            <i class="fas fa-check-circle me-1"></i> Previously Rated
                         </div>
-                        <button type="button" class="btn-close btn-close-white" onclick="closeRateModal()"></button>
+                        <button type="button" class="btn-close" onclick="closeRateModal()"></button>
                     </div>
                 </div>
 
-                <div class="modal-body py-4 px-4">
-                    <!-- Progress indicator -->
-                    <div class="rating-progress mb-4">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div class="progress w-100" style="height: 4px;">
-                                <div id="ratingProgressBar" class="progress-bar bg-danger" role="progressbar" style="width: 33%;" aria-valuenow="33" aria-valuemin="0" aria-valuemax="100"></div>
-                            </div>
+                <div class="modal-body py-3 px-4">
+                    <!-- Candidate Info Section -->
+                    <div class="candidate-info-section mb-4">
+                        <div class="d-flex align-items-center mb-2">
+                            <h6 class="text-danger fw-medium mb-0">Name:</h6>
+                            <h5 id="modalCandidateName-1" class="candidate-name ms-2 mb-0 fw-semibold"></h5>
                         </div>
-                        <div class="d-flex justify-content-between mt-2">
-                            <small class="text-muted">Candidate Info</small>
-                            <small class="text-muted">Rating</small>
-                            <small class="text-muted">Feedback</small>
+
+                        <div class="mb-2">
+                            <h6 class="text-danger fw-medium candidate-interests-heading">Interested to be an FI for:</h6>
+                            <ul id="modalCandidateInterests-1" class="list-unstyled ps-2 mb-0"></ul>
                         </div>
                     </div>
 
-                    <!-- Multi-step container -->
-                    <div id="ratingStepsContainer">
-                        <!-- Step 1: Candidate Info (always visible) -->
-                        <div id="rating-step-1" class="rating-step">
-                            <div class="candidate-info mb-4">
-                                <div class="candidate-card bg-light p-3 rounded-3 border-start border-4 border-danger">
-                                    <div class="d-flex align-items-center mb-3">
-                                        <div class="candidate-avatar bg-danger text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
-                                            <i class="fas fa-user"></i>
-                                        </div>
-                                        <h5 id="modalCandidateName" class="mb-0 fw-bold"></h5>
-                                    </div>
-                                    
-                                    <div>
-                                        <h6 class="text-danger fw-medium mb-2">Interested in Faculty Instructor positions for:</h6>
-                                        <div id="modalCandidateInterests" class="interests-container"></div>
-                                    </div>
-                                </div>
-                                
-                                <div class="d-flex justify-content-between mt-3">
-                                    <button type="button" class="btn btn-outline-secondary btn-sm px-3" disabled>
-                                        <i class="fas fa-arrow-left me-1"></i> Back
-                                    </button>
-                                    <button type="button" id="next-to-rating" class="btn btn-danger btn-sm px-4">
-                                        Continue <i class="fas fa-arrow-right ms-1"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Step 2: Rating Selection -->
-                        <div id="rating-step-2" class="rating-step d-none">
-                            <div class="rating-selection mb-4">
-                                <h6 class="text-danger fw-medium mb-3">How would you rate this candidate?</h6>
-                                
-                                <div class="rating-stars-container text-center mb-4">
-                                    <div class="star-rating fs-2">
-                                        <i class="far fa-star star" data-rating="1"></i>
-                                        <i class="far fa-star star" data-rating="2"></i>
-                                        <i class="far fa-star star" data-rating="3"></i>
-                                        <i class="far fa-star star" data-rating="4"></i>
-                                        <i class="far fa-star star" data-rating="5"></i>
-                                    </div>
-                                    <div class="rating-labels d-flex justify-content-between px-2 mt-1">
-                                        <small class="text-muted">Poor</small>
-                                        <small class="text-muted">Excellent</small>
-                                    </div>
-                                    <input type="hidden" id="rating" value="">
-                                    <div id="ratingFeedback" class="mt-2 fw-medium text-primary"></div>
-                                </div>
-                                
-                                <!-- Conditional Interest Prompt (for low ratings) -->
-                                <div id="interest-prompt-section" class="interest-prompt mb-4 d-none">
-                                    <div class="alert alert-warning py-3 px-3 border-start border-warning border-4">
-                                        <p class="text-dark mb-2 fw-medium">Despite the low rating, does the candidate have qualities that make them a desirable FI?</p>
-
-                                        <div class="d-flex gap-3">
-                                            <div class="form-check">
-                                                <input type="radio" id="yes" name="interest_prompt" value="yes" class="form-check-input">
-                                                <label for="yes" class="form-check-label">Yes</label>
-                                            </div>
-                                            <div class="form-check">
-                                                <input type="radio" id="no" name="interest_prompt" value="no" class="form-check-input">
-                                                <label for="no" class="form-check-label">No</label>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <div class="d-flex justify-content-between mt-3">
-                                    <button type="button" id="back-to-info" class="btn btn-outline-secondary btn-sm px-3">
-                                        <i class="fas fa-arrow-left me-1"></i> Back
-                                    </button>
-                                    <button type="button" id="next-to-comments" class="btn btn-danger btn-sm px-4" disabled>
-                                        Continue <i class="fas fa-arrow-right ms-1"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Step 3: Comments Section -->
-                        <div id="rating-step-3" class="rating-step d-none">
-                            <div class="comments-section">
-                                <div class="d-flex justify-content-between align-items-center mb-3">
-                                    <h6 class="text-danger fw-medium mb-0">Your Feedback</h6>
-                                    <!-- Previous comments indicator with improved design -->
-                                    <small id="previousCommentsLabel" class="badge bg-info text-white d-none">
-                                        <i class="fas fa-comment-dots me-1"></i> You've previously commented
-                                    </small>
-                                </div>
-
-                                <!-- New Comment Input -->
-                                <div id="new-comment-container" class="mb-4">
-                                    <textarea id="new-comment" class="form-control comment-text mb-2" rows="4" placeholder="Share your assessment of the candidate..."></textarea>
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <small id="commentHelp" class="text-muted">
-                                            <i class="fas fa-info-circle me-1"></i> Your feedback helps make better hiring decisions
-                                        </small>
-                                        <span id="characterCount" class="text-muted">0/500</span>
-                                    </div>
-                                </div>
-                                
-                                <!-- Existing Comments Section -->
-                                <div id="comments-header" class="d-flex justify-content-between mb-2 mt-4">
-                                    <h6 class="text-secondary fw-medium">Other Faculty Feedback</h6>
-                                    <span id="commentCount" class="badge bg-secondary rounded-pill">0</span>
-                                </div>
-                                
-                                <div id="comments-section" class="comments-container" style="max-height: 200px; overflow-y: auto;">
-                                    <!-- Existing comments will be displayed here -->
-                                    <p class="text-muted fst-italic">No comments yet</p>
-                                </div>
-                                
-                                <div class="d-flex justify-content-between mt-4">
-                                    <button type="button" id="back-to-rating" class="btn btn-outline-secondary btn-sm px-3">
-                                        <i class="fas fa-arrow-left me-1"></i> Back
-                                    </button>
-                                    <button type="button" id="submit-rating" class="btn btn-success btn-sm px-4">
-                                        <i class="fas fa-check me-1"></i> Submit Rating
-                                    </button>
-                                </div>
-                            </div>
+                    <!-- Rating Section -->
+                    <div class="rating-section mb-4">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <label for="rating" class="form-label text-danger mb-0 fw-medium">Rating:</label>
+                            <small id="previousRatingLabel" class="text-info d-none">
+                                <i class="fas fa-history"></i> Previous rating: <span id="previousRatingValue">4</span>
+                            </small>
                         </div>
                         
-                        <!-- Edit Mode Controls (when user has already rated) -->
-                        <div id="edit-mode-controls" class="d-none mt-4 pt-3 border-top">
-                            <div class="d-flex justify-content-between">
-                                <button type="button" id="cancel-edit" class="btn btn-outline-secondary">
-                                    <i class="fas fa-times me-1"></i> Cancel
-                                </button>
-                                <button type="button" id="update-rating" class="btn btn-primary">
-                                    <i class="fas fa-save me-1"></i> Update Rating
-                                </button>
+                        <div class="rating-input-container">
+                            <div class="d-flex align-items-center mb-2">
+                                <input type="number" class="form-control form-control-sm w-25" id="rating" min="1" max="5" placeholder="1-5">
+                                <small class="ms-2 text-muted">(5 - excellent)</small>
+                            </div>
+                            
+                            <div class="rating-stars d-flex justify-content-center mb-2">
+                                <div class="star-rating">
+                                    <i class="far fa-star star" data-rating="1"></i>
+                                    <i class="far fa-star star" data-rating="2"></i>
+                                    <i class="far fa-star star" data-rating="3"></i>
+                                    <i class="far fa-star star" data-rating="4"></i>
+                                    <i class="far fa-star star" data-rating="5"></i>
+                                </div>
                             </div>
                         </div>
                     </div>
-                    
-                    <!-- Success State (shown after submission) -->
-                    <div id="rating-success" class="text-center py-4 d-none">
-                        <div class="success-icon mb-3">
-                            <i class="fas fa-check-circle text-success" style="font-size: 3rem;"></i>
+
+                    <!-- Interest Prompt Section (shown for low ratings) -->
+                    <div id="interest-prompt-section" class="interest-prompt mb-4 d-none">
+                        <div class="alert alert-warning py-2 px-3">
+                            <p class="text-danger mb-2 fw-medium">Despite the low rating, does the candidate have qualities that make them a desirable FI?</p>
+
+                            <div class="d-flex gap-3">
+                                <div class="form-check">
+                                    <input type="radio" id="yes" name="interest_prompt" value="yes" class="form-check-input">
+                                    <label for="yes" class="form-check-label">Yes</label>
+                                </div>
+                                <div class="form-check">
+                                    <input type="radio" id="no" name="interest_prompt" value="no" class="form-check-input">
+                                    <label for="no" class="form-check-label">No</label>
+                                </div>
+                            </div>
                         </div>
-                        <h5 class="mb-3">Rating Submitted!</h5>
-                        <p class="text-muted mb-4">Thank you for your feedback on this candidate.</p>
-                        <button type="button" class="btn btn-outline-secondary" onclick="closeRateModal()">
-                            Close
+                    </div>
+
+                    <!-- Comments Section -->
+                    <div id="comment-section" class="comment-section">
+                        <!-- Previous comments indicator -->
+                        <div id="commentsHeader" class="d-flex justify-content-between align-items-center mb-2">
+                            <h6 class="text-danger fw-medium mb-0">Comments</h6>
+                            <small id="previousCommentsLabel" class="text-info d-none">
+                                <i class="fas fa-comment-dots me-1"></i> You've previously commented
+                            </small>
+                        </div>
+
+                        <!-- Existing Comments -->
+                        <div id="comments-section" class="mb-3">
+                            <!-- Existing comments will be appended here -->
+                        </div>
+                        
+                        <!-- New Comment Input -->
+                        <div id="new-comment-container" class="mb-3 d-none">
+                            <textarea id="new-comment" class="form-control comment-text mb-2" placeholder="Write your comment here..."></textarea>
+                            <button id="post-comment-btn" class="btn btn-sm px-3" style="background-color: #008080; color: white;">
+                                <i class="fas fa-comment me-1"></i> Post Comment
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Edit Button (shown when user has already rated) -->
+                    <div id="edit-rating-container" class="text-center mb-3 d-none">
+                        <button id="edit-comment-btn" class="btn btn-sm btn-outline-secondary">
+                            <i class="fas fa-pen me-1"></i> Edit Rating & Comment
                         </button>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div class="text-end mt-3 border-top pt-3">
+                        <button id="final-subButton" class="btn px-4" style="background-color: #236465; color: white;" onclick="submitRating()">Submit</button>
                     </div>
                 </div>
             </div>
