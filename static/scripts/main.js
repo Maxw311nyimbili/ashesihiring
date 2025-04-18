@@ -25,6 +25,9 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize star rating functionality
     initStarRating();
     
+    // Add AI summary styles
+    addAISummaryStyles();
+    
     // Load candidates on page load
     fetchCandidates();
     
@@ -35,6 +38,62 @@ document.addEventListener('DOMContentLoaded', function() {
     // Add responsive adjustments
     adjustForMobile();
 });
+
+// Add these styles to make the AI summary section visually distinct
+function addAISummaryStyles() {
+    const styleElement = document.createElement('style');
+    styleElement.textContent = `
+        .ai-summary-box {
+            background-color: #f8f9fa;
+            border-left: 4px solid #236465;
+            border-radius: 0.5rem;
+            padding: 1.25rem;
+            margin-bottom: 1.5rem;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        
+        .ai-summary-box:hover {
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+            transform: translateY(-2px);
+        }
+        
+        .ai-summary-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.75rem;
+        }
+        
+        .ai-summary-header i {
+            color: #236465;
+            margin-right: 0.5rem;
+            font-size: 1.1rem;
+        }
+        
+        .ai-summary-header h6 {
+            color: #236465;
+            margin-bottom: 0;
+            font-weight: 600;
+        }
+        
+        .ai-summary-content {
+            color: #343a40;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+        
+        @media (max-width: 768px) {
+            .ai-summary-box {
+                padding: 1rem;
+            }
+            
+            .ai-summary-content {
+                font-size: 0.9rem;
+            }
+        }
+    `;
+    document.head.appendChild(styleElement);
+}
 
 // Adjust layout for mobile devices
 function adjustForMobile() {
@@ -86,12 +145,20 @@ function adjustForMobile() {
     window.dispatchEvent(new Event('resize'));
 }
 
-// Fetch candidates from backend API
+// Modified fetchCandidates function to check for AI summaries
 async function fetchCandidates() {
     try {
         let response = await fetch("/api/candidates");
         let data = await response.json();
         candidates = data;
+
+        // Make sure every candidate has a valid summary
+        candidates.forEach(candidate => {
+            if (!candidate.summary || candidate.summary.trim() === "") {
+                // If no summary is provided, create a placeholder message
+                candidate.summary = "Processing candidate profile. Summary will be available soon.";
+            }
+        });
 
         if (candidates.length > 0) {
             // Create navigation dots
@@ -134,7 +201,7 @@ function updateNavDots() {
     });
 }
 
-// Function to display a candidate with animation
+// Update the displayCandidate function to show AI summary
 function displayCandidate(index, direction) {
     if (candidates.length === 0 || isAnimating) return;
 
@@ -142,19 +209,15 @@ function displayCandidate(index, direction) {
     let candidate = candidates[index];
     selectedIndex = index;  // Set the selectedIndex to the current index
 
-    
-
     // Create a new card element that will slide in
     const newCard = document.createElement('div');
     newCard.className = 'candidate-card';
     newCard.id = 'newCandidateCard';
 
     // Add appropriate animation class based on direction
-    // For "right" direction (next), new card slides in from right, current slides out to left
-    // For "left" direction (previous), new card slides in from left, current slides out to right
     newCard.classList.add(direction === "left" ? "card-enter-from-left" : "card-enter-from-right");
 
-    // Prepare card content
+    // Prepare card content - now with the enhanced AI summary section
     newCard.innerHTML = `
         <div class="card-header d-flex justify-content-between align-items-center">
             <h4 class="mb-0 fw-bold">${candidate.name}</h4>
@@ -177,6 +240,17 @@ function displayCandidate(index, direction) {
             <div class="tab-content">
                 <!-- Summary Tab -->
                 <div class="tab-pane fade show active" id="info-pane" role="tabpanel" tabindex="0">
+                    <!-- AI Summary Section -->
+                    <div class="ai-summary-box">
+                        <div class="ai-summary-header">
+                            <i class="fas fa-robot"></i>
+                            <h6>AI Profile Analysis</h6>
+                        </div>
+                        <div class="ai-summary-content">
+                            ${candidate.summary}
+                        </div>
+                    </div>
+                    
                     <div class="candidate-info-box">
                         <div class="mb-3">
                             <h6 class="text-danger mb-1">Interested to be an FI for:</h6>
@@ -187,9 +261,6 @@ function displayCandidate(index, direction) {
                             </div>
                         </div>
                     </div>
-
-                    <h6 class="fw-bold">Summary</h6>
-                    <p>${candidate.summary}</p>
                     
                     <h6 class="fw-bold mt-4">Documents</h6>
                     <div class="document-links">

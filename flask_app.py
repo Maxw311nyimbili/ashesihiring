@@ -1,6 +1,7 @@
 # =============================================================================
 # IMPORTS AND CONFIGURATION
 # =============================================================================
+from pdf_summary_extractor import init_pdf_summary_generator, get_pdf_summary_generator
 from flask import Flask, render_template, request, redirect, url_for, jsonify, session, send_file
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 from cryptography.hazmat.primitives import hashes
@@ -224,6 +225,18 @@ def submit_application():
 # =============================================================================
 # CANDIDATE API ROUTES
 # =============================================================================
+
+# Initialize the PDF summary generator when the app starts
+@app.before_first_request
+def setup_pdf_generator():
+    """Initialize the PDF summary generator before the first request"""
+    try:
+        init_pdf_summary_generator(app)
+        app.logger.info("PDF summary generator initialized successfully")
+    except Exception as e:
+        app.logger.error(f"Error initializing PDF summary generator: {str(e)}")
+
+
 @app.route('/json/candidates')
 def serve_candidates_json():
     try:
@@ -233,6 +246,8 @@ def serve_candidates_json():
     except FileNotFoundError:
         return jsonify({"error": "JSON file not found"}), 404
 
+
+# Updated get_candidates route to include AI summary generation
 @app.route('/api/candidates')
 def get_candidates():
     try:
@@ -249,30 +264,47 @@ def get_candidates():
         candidates = []
         base_url = "/download_file/"
 
+        # Get the PDF summary generator
+        generator = get_pdf_summary_generator(app)
+
         for applicant in applicants:
             cursor.execute("SELECT course_name FROM course_preferences WHERE applicant_id = %s", (applicant["id"],))
             interests = [row["course_name"] for row in cursor.fetchall()]
 
             # Extract just the filename from the paths
             cv_filename = os.path.basename(applicant['cv_path']) if applicant['cv_path'] else None
-            cover_letter_filename = os.path.basename(applicant['cover_letter_path']) if applicant['cover_letter_path'] else None
-            transcript_filename = os.path.basename(applicant['transcript_path']) if applicant['transcript_path'] else None
+            cover_letter_filename = os.path.basename(applicant['cover_letter_path']) if applicant[
+                'cover_letter_path'] else None
+            transcript_filename = os.path.basename(applicant['transcript_path']) if applicant[
+                'transcript_path'] else None
 
             # Log the filenames for debugging
             app.logger.info(f"CV filename: {cv_filename}")
             app.logger.info(f"Cover letter filename: {cover_letter_filename}")
             app.logger.info(f"Transcript filename: {transcript_filename}")
 
+            # Generate AI summary using the PDF summary generator
+            try:
+                ai_summary = generator.generate_summary(cv_filename, interests)
+                app.logger.info(f"Generated AI summary for candidate {applicant['id']}")
+            except Exception as e:
+                app.logger.error(f"Error generating AI summary: {str(e)}")
+                ai_summary = f"Experienced candidate interested in {applicant.get('course_selection', 'teaching')}."
+                app.logger.info(f"Using fallback summary for candidate {applicant['id']}")
+
             candidates.append({
                 "name": f"{applicant['first_name']} {applicant['last_name']}",
                 "id": applicant['id'],
-                "summary": f"Interested in {applicant.get('course_selection', 'Unknown Course')}.",
+                "summary": ai_summary,
                 "details": f"""
                     <a href='{base_url}?file={cv_filename}' target='_blank'><i class="fas fa-file-pdf"></i> Resume</a> | 
                     <a href='{base_url}?file={cover_letter_filename}' target='_blank'><i class="fas fa-file-alt"></i> Cover Letter</a> | 
                     <a href='{base_url}?file={transcript_filename}' target='_blank'><i class="fas fa-file-contract"></i> Transcript</a>
                 """,
-                "interests": interests
+                "interests": interests,
+                "cv_path": cv_filename,
+                "cover_letter_path": cover_letter_filename,
+                "transcript_path": transcript_filename
             })
 
         cursor.close()
@@ -288,6 +320,10 @@ def get_candidates():
         with open("error_log.json", "w") as json_file:
             json.dump(error_response, json_file, indent=4)
         return jsonify(error_response), 500
+    except Exception as e:
+        app.logger.error(f"Unexpected error in get_candidates: {str(e)}", exc_info=True)
+        return jsonify({"error": "An unexpected error occurred"}), 500
+
 
 # Add a new route to serve files publicly
 @app.route('/download_file/')
