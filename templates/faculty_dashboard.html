@@ -1,492 +1,166 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Candidate Review</title>
+{% extends "base.html" %}
 
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css">
+{% block title %}Faculty Dashboard{% endblock %}
 
-    <!-- FontAwesome for icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+{% block extra_css %}
+<style>
+    .candidate-card {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease;
+        margin-bottom: 1.5rem;
+    }
 
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap" rel="stylesheet">
+    .candidate-card:hover {
+        transform: translateY(-5px);
+    }
 
-    <style>
-        :root {
-            --primary: #AD4245;
-            --secondary: #236465;
-            --light: #f8f9fa;
-            --dark: #343a40;
-        }
+    .candidate-header {
+        background: var(--primary);
+        color: white;
+        padding: 1rem;
+        border-radius: 15px 15px 0 0;
+    }
 
-        body {
-            font-family: "DM Sans", sans-serif;
-            background-color: #f5f5f7;
-            min-height: 100vh;
-        }
+    .candidate-body {
+        padding: 1.5rem;
+    }
 
-        .card-container {
-            perspective: 1000px;
-            height: 600px;
-            position: relative;
-            max-width: 1000px;
-            margin: 0 auto;
-        }
+    .rating-stars {
+        color: #FFD700;
+        font-size: 1.5rem;
+    }
 
-        .card-wrapper {
-            transition: transform 0.5s ease-in-out;
-            transform-style: preserve-3d;
-            position: relative;
-            height: 100%;
-        }
+    .rating-stars i {
+        cursor: pointer;
+        transition: transform 0.2s ease;
+    }
 
-        .candidate-card {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            backface-visibility: hidden;
-            border-radius: 1rem;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
-            background: white;
-            overflow: hidden;
-            transition: transform 0.4s ease-out, opacity 0.4s ease-out;
-        }
+    .rating-stars i:hover {
+        transform: scale(1.2);
+    }
 
-        .card-enter-active {
-            animation: slideIn 0.5s forwards;
-        }
+    .comment-section {
+        margin-top: 1rem;
+        padding-top: 1rem;
+        border-top: 1px solid #dee2e6;
+    }
 
-        .card-leave-active {
-            animation: slideOut 0.5s forwards;
-        }
+    .ai-summary {
+        background: #f8f9fa;
+        border-left: 4px solid var(--primary);
+        padding: 1rem;
+        margin: 1rem 0;
+        border-radius: 0 5px 5px 0;
+    }
 
-        @keyframes slideIn {
-            from { transform: translateX(100%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
+    .ai-summary.fallback {
+        border-left-color: var(--accent);
+        background: #fff3f3;
+    }
 
-        @keyframes slideOut {
-            from { transform: translateX(0); opacity: 1; }
-            to { transform: translateX(-100%); opacity: 0; }
-        }
+    .summary-source {
+        font-size: 0.8rem;
+        color: #6c757d;
+        margin-top: 0.5rem;
+    }
+</style>
+{% endblock %}
 
-        .nav-indicator {
-            display: flex;
-            justify-content: center;
-            margin-top: -25px;
-            position: relative;
-            z-index: 10;
-        }
-
-        .nav-dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            background-color: #d8d8d8;
-            margin: 0 5px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .nav-dot.active {
-            background-color: var(--primary);
-            transform: scale(1.3);
-        }
-
-        .card-header {
-            background: linear-gradient(to right, var(--primary), #c95659);
-            color: white;
-            border: none;
-            padding: 1.25rem;
-        }
-
-        .card-body {
-            padding: 1.5rem;
-            height: calc(100% - 70px);
-            overflow-y: auto;
-        }
-
-        .btn-primary {
-            background-color: var(--primary);
-            border-color: var(--primary);
-        }
-
-        .btn-primary:hover {
-            background-color: #973a3d;
-            border-color: #973a3d;
-        }
-
-        .btn-secondary {
-            background-color: var(--secondary);
-            border-color: var(--secondary);
-        }
-
-        .btn-secondary:hover {
-            background-color: #1a4a4b;
-            border-color: #1a4a4b;
-        }
-
-        .btn-outline-primary {
-            color: var(--primary);
-            border-color: var(--primary);
-        }
-
-        .btn-outline-primary:hover {
-            background-color: var(--primary);
-            color: white;
-        }
-
-        .rating-card {
-            background-color: white;
-            border-radius: 1rem;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
-            transition: all 0.3s ease;
-        }
-
-        .rating-card:hover {
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-        }
-
-        .nav-controls {
-            position: absolute;
-            top: 50%;
-            width: 100%;
-            transform: translateY(-50%);
-            z-index: 20;
-            pointer-events: none;
-        }
-
-        .nav-btn {
-            background-color: white;
-            width: 45px;
-            height: 45px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
-            cursor: pointer;
-            transition: all 0.3s ease;
-            pointer-events: auto;
-        }
-
-        .nav-btn:hover {
-            background-color: var(--primary);
-            color: white;
-        }
-
-        .prev-btn {
-            left: -22px;
-            position: absolute;
-        }
-
-        .next-btn {
-            right: -22px;
-            position: absolute;
-        }
-
-        .candidate-info-box {
-            border-left: 4px solid var(--primary);
-            padding-left: 15px;
-            margin-bottom: 20px;
-        }
-
-        .comment-card {
-            border-left: 3px solid var(--secondary);
-            padding-left: 15px;
-            margin-bottom: 15px;
-        }
-
-        .comment-actions {
-            visibility: hidden;
-            opacity: 0;
-            transition: all 0.3s ease;
-        }
-
-        .comment-card:hover .comment-actions {
-            visibility: visible;
-            opacity: 1;
-        }
-
-        /* Tabs styling */
-        .nav-tabs .nav-link {
-            color: #495057;
-            border: none;
-            padding: 0.75rem 1rem;
-            border-bottom: 3px solid transparent;
-            font-weight: 500;
-        }
-
-        .nav-tabs .nav-link.active {
-            color: var(--primary);
-            background-color: transparent;
-            border-bottom: 3px solid var(--primary);
-        }
-
-        .tag-pill {
-            background-color: #f8f2f2;
-            color: var(--primary);
-            border: 1px solid #e9d8d8;
-            font-size: 0.85rem;
-            padding: 0.25rem 0.75rem;
-            border-radius: 50px;
-            display: inline-block;
-            margin-right: 0.5rem;
-            margin-bottom: 0.5rem;
-        }
-
-        /* Document links styling */
-        .document-links {
-            margin-top: 1rem;
-        }
-        
-        .document-links a {
-            display: inline-block;
-            margin-right: 1rem;
-            margin-bottom: 0.5rem;
-            padding: 0.5rem 1rem;
-            background-color: #f8f9fa;
-            border: 1px solid #e9ecef;
-            border-radius: 0.5rem;
-            color: var(--secondary);
-            text-decoration: none;
-            transition: all 0.3s ease;
-        }
-        
-        .document-links a:hover {
-            background-color: var(--secondary);
-            color: white;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-        
-        .document-links a i {
-            margin-right: 0.5rem;
-        }
-
-        /* Custom scrollbar */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: #f1f1f1;
-            border-radius: 10px;
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: #ccc;
-            border-radius: 10px;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: #aaa;
-        }
-
-        @media (max-width: 992px) {
-            .card-container {
-                height: 650px;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .card-container {
-                height: 750px;
-            }
-
-            .nav-btn {
-                width: 35px;
-                height: 35px;
-            }
-        }
-    </style>
-</head>
-<body>
-    <header>
-        <nav class="navbar navbar-expand-lg bg-white shadow-sm">
-            <div class="container">
-                <!-- Logo -->
-                <a class="navbar-brand logo" href="/">
-                    <img src="../static/images/Group 13.png" alt="Logo" width="170px">
-                </a>
-
-                <!-- Mobile Toggle Button -->
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-
-                <!-- Navbar Links -->
-                <div class="collapse navbar-collapse" id="navbarNav">
-                    <ul class="navbar-nav ms-auto gap-3">
-                        <li class="nav-item">
-                            <a class="nav-link fw-bold text-danger" href="{{ url_for('faculty_dashboard') }}">
-                                <i class="fa-solid fa-gauge-high"></i> Dashboard
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-danger" href="{{ url_for('faculty_scheduling') }}">
-                                <i class="fa-solid fa-calendar-days"></i> Interview Scheduling
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-danger" href="{{ url_for('logout') }}">
-                                <i class="fa-solid fa-right-from-bracket"></i> Logout
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </nav>
-    </header>
-
-    <div class="container py-4">
-        <h3 class="text-center mb-4 fw-bold text-secondary">Candidate Review</h3>
-
-        <div class="card-container mb-4">
-            <div class="nav-controls">
-                <div class="nav-btn prev-btn" id="prevBtn">
-                    <i class="fa-solid fa-chevron-left"></i>
-                </div>
-                <div class="nav-btn next-btn" id="nextBtn">
-                    <i class="fa-solid fa-chevron-right"></i>
-                </div>
-            </div>
-
-            <div class="card-wrapper">
-                <div class="candidate-card" id="candidateCard">
-                    <!-- Card content will be inserted here via JavaScript -->
-                </div>
-            </div>
-        </div>
-
-        <div class="nav-indicator" id="nav-dots">
-            <!-- Navigation dots will be added dynamically -->
-        </div>
-    </div>
-
-    <!-- Rating Modal -->
-    <div class="modal fade" id="rateModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content shadow-sm">
-                <div class="modal-header py-3 border-0 align-items-center">
-                    <h5 class="modal-title text-danger fw-bold fs-5">Candidate Rating</h5>
-                    <div class="ms-auto d-flex align-items-center">
-                        <!-- Previously rated indicator -->
-                        <div id="previousRatingBadge" class="badge bg-info text-white me-3 d-none">
-                            <i class="fas fa-check-circle me-1"></i> Previously Rated
-                        </div>
-                        <button type="button" class="btn-close" onclick="closeRateModal()"></button>
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="mb-4">Candidate Review</h1>
+            
+            <!-- Candidate List -->
+            <div class="candidate-list">
+                {% for candidate in candidates %}
+                <div class="candidate-card">
+                    <div class="candidate-header">
+                        <h3>{{ candidate.name }}</h3>
+                        <p class="mb-0">{{ candidate.position }}</p>
                     </div>
-                </div>
-
-                <div class="modal-body py-3 px-4">
-                    <!-- Candidate Info Section -->
-                    <div class="candidate-info-section mb-4">
-                        <div class="d-flex align-items-center mb-2">
-                            <h6 class="text-danger fw-medium mb-0">Name:</h6>
-                            <h5 id="modalCandidateName-1" class="candidate-name ms-2 mb-0 fw-semibold"></h5>
-                        </div>
-
-                        <div class="mb-2">
-                            <h6 class="text-danger fw-medium candidate-interests-heading">Interested to be an FI for:</h6>
-                            <ul id="modalCandidateInterests-1" class="list-unstyled ps-2 mb-0"></ul>
-                        </div>
-                    </div>
-
-                    <!-- Rating Section -->
-                    <div class="rating-section mb-4">
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                            <label for="rating" class="form-label text-danger mb-0 fw-medium">Rating:</label>
-                            <small id="previousRatingLabel" class="text-info d-none">
-                                <i class="fas fa-history"></i> Previous rating: <span id="previousRatingValue">4</span>
-                            </small>
-                        </div>
-                        
-                        <div class="rating-input-container">
-                            <div class="d-flex align-items-center mb-2">
-                                <input type="number" class="form-control form-control-sm w-25" id="rating" min="1" max="5" placeholder="1-5">
-                                <small class="ms-2 text-muted">(5 - excellent)</small>
-                            </div>
-                            
-                            <div class="rating-stars d-flex justify-content-center mb-2">
-                                <div class="star-rating">
-                                    <i class="far fa-star star" data-rating="1"></i>
-                                    <i class="far fa-star star" data-rating="2"></i>
-                                    <i class="far fa-star star" data-rating="3"></i>
-                                    <i class="far fa-star star" data-rating="4"></i>
-                                    <i class="far fa-star star" data-rating="5"></i>
+                    <div class="candidate-body">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <h4>AI Summary</h4>
+                                <div class="ai-summary {% if candidate.is_fallback %}fallback{% endif %}">
+                                    {{ candidate.summary }}
+                                    <div class="summary-source">
+                                        Source: {% if candidate.is_fallback %}Fallback Summary{% else %}AI Generated{% endif %}
+                                    </div>
                                 </div>
+                                
+                                <h4 class="mt-4">Rating</h4>
+                                <div class="rating-stars" data-candidate-id="{{ candidate.id }}">
+                                    {% for i in range(5) %}
+                                    <i class="fas fa-star" data-rating="{{ i + 1 }}"></i>
+                                    {% endfor %}
+                                </div>
+                                
+                                <div class="comment-section">
+                                    <h4>Comments</h4>
+                                    <textarea class="form-control" rows="3" placeholder="Add your comments here..."></textarea>
+                                </div>
+                                
+                                <button class="btn btn-primary mt-3 submit-rating">Submit Rating</button>
                             </div>
                         </div>
                     </div>
-
-                    <!-- Interest Prompt Section (shown for low ratings) -->
-                    <div id="interest-prompt-section" class="interest-prompt mb-4 d-none">
-                        <div class="alert alert-warning py-2 px-3">
-                            <p class="text-danger mb-2 fw-medium">Despite the low rating, does the candidate have qualities that make them a desirable FI?</p>
-
-                            <div class="d-flex gap-3">
-                                <div class="form-check">
-                                    <input type="radio" id="yes" name="interest_prompt" value="yes" class="form-check-input">
-                                    <label for="yes" class="form-check-label">Yes</label>
-                                </div>
-                                <div class="form-check">
-                                    <input type="radio" id="no" name="interest_prompt" value="no" class="form-check-input">
-                                    <label for="no" class="form-check-label">No</label>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Comments Section -->
-                    <div id="comment-section" class="comment-section">
-                        <!-- Previous comments indicator -->
-                        <div id="commentsHeader" class="d-flex justify-content-between align-items-center mb-2">
-                            <h6 class="text-danger fw-medium mb-0">Comments</h6>
-                            <small id="previousCommentsLabel" class="text-info d-none">
-                                <i class="fas fa-comment-dots me-1"></i> You've previously commented
-                            </small>
-                        </div>
-
-                        <!-- Existing Comments -->
-                        <div id="comments-section" class="mb-3">
-                            <!-- Existing comments will be appended here -->
-                        </div>
-                        
-                        <!-- New Comment Input -->
-                        <div id="new-comment-container" class="mb-3 d-none">
-                            <textarea id="new-comment" class="form-control comment-text mb-2" placeholder="Write your comment here..."></textarea>
-                            <button id="post-comment-btn" class="btn btn-sm px-3" style="background-color: #008080; color: white;">
-                                <i class="fas fa-comment me-1"></i> Post Comment
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Edit Button (shown when user has already rated) -->
-                    <div id="edit-rating-container" class="text-center mb-3 d-none">
-                        <button id="edit-comment-btn" class="btn btn-sm btn-outline-secondary">
-                            <i class="fas fa-pen me-1"></i> Edit Rating & Comment
-                        </button>
-                    </div>
-
-                    <!-- Submit Button -->
-                    <div class="text-end mt-3 border-top pt-3">
-                        <button id="final-subButton" class="btn px-4" style="background-color: #236465; color: white;" onclick="submitRating()">Submit</button>
-                    </div>
                 </div>
+                {% endfor %}
             </div>
         </div>
     </div>
+</div>
+{% endblock %}
 
-    <!-- Toast container for notifications -->
-    <div id="toast-container" class="position-fixed bottom-0 end-0 p-3"></div>
-
-    <!-- Hidden input for faculty name -->
-    <input type="hidden" id="loggedInUser" value="{{ faculty_name }}">
-
-    <!-- JavaScript -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="../static/scripts/main.js"></script>
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Rating functionality
+    const ratingStars = document.querySelectorAll('.rating-stars i');
+    ratingStars.forEach(star => {
+        star.addEventListener('click', function() {
+            const rating = this.dataset.rating;
+            const candidateId = this.parentElement.dataset.candidateId;
+            const stars = this.parentElement.querySelectorAll('i');
+            
+            stars.forEach(s => {
+                if (s.dataset.rating <= rating) {
+                    s.classList.add('fas');
+                    s.classList.remove('far');
+                } else {
+                    s.classList.add('far');
+                    s.classList.remove('fas');
+                }
+            });
+            
+            // Show/hide comment section based on rating
+            const commentSection = this.closest('.candidate-body').querySelector('.comment-section');
+            if (rating <= 3) {
+                commentSection.style.display = 'block';
+            } else {
+                commentSection.style.display = 'none';
+            }
+        });
+    });
+    
+    // Submit rating
+    const submitButtons = document.querySelectorAll('.submit-rating');
+    submitButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const candidateCard = this.closest('.candidate-card');
+            const candidateId = candidateCard.querySelector('.rating-stars').dataset.candidateId;
+            const rating = candidateCard.querySelectorAll('.rating-stars .fas').length;
+            const comments = candidateCard.querySelector('textarea').value;
+            
+            // Here you would typically send this data to your backend
+            console.log('Submitting rating:', { candidateId, rating, comments });
+        });
+    });
+});
+</script>
+{% endblock %}
