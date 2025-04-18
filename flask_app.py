@@ -1,7 +1,7 @@
 # =============================================================================
 # IMPORTS AND CONFIGURATION
 # =============================================================================
-from flask import Flask, render_template, request, redirect, url_for, jsonify, session
+from flask import Flask, render_template, request, redirect, url_for, jsonify, session, send_file
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 from cryptography.hazmat.primitives import hashes
 import base64
@@ -247,7 +247,7 @@ def get_candidates():
         applicants = cursor.fetchall()
 
         candidates = []
-        base_url = "https://www.pythonanywhere.com/user/ashesihiring/files/home/ashesihiring/"
+        base_url = "/download_file/"
 
         for applicant in applicants:
             cursor.execute("SELECT course_name FROM course_preferences WHERE applicant_id = %s", (applicant["id"],))
@@ -258,9 +258,9 @@ def get_candidates():
                 "id": applicant['id'],
                 "summary": f"Interested in {applicant.get('course_selection', 'Unknown Course')}.",
                 "details": f"""
-                    <a href='{base_url}{applicant['cv_path']}' target='_blank'>Resume</a> | 
-                    <a href='{base_url}{applicant['cover_letter_path']}' target='_blank'>Cover Letter</a> | 
-                    <a href='{base_url}{applicant['transcript_path']}' target='_blank'>Transcript</a>
+                    <a href='{base_url}?file={applicant['cv_path']}' target='_blank'>Resume</a> | 
+                    <a href='{base_url}?file={applicant['cover_letter_path']}' target='_blank'>Cover Letter</a> | 
+                    <a href='{base_url}?file={applicant['transcript_path']}' target='_blank'>Transcript</a>
                 """,
                 "interests": interests
             })
@@ -278,6 +278,39 @@ def get_candidates():
         with open("error_log.json", "w") as json_file:
             json.dump(error_response, json_file, indent=4)
         return jsonify(error_response), 500
+
+# Add a new route to serve files publicly
+@app.route('/download_file/')
+def download_file():
+    file_path = request.args.get('file')
+    if not file_path:
+        return "No file specified", 400
+    
+    # Security check to prevent directory traversal
+    if '..' in file_path or file_path.startswith('/'):
+        return "Invalid file path", 403
+    
+    # Construct the full path
+    full_path = os.path.join(app.config['UPLOAD_FOLDER'], file_path)
+    
+    # Check if file exists
+    if not os.path.exists(full_path):
+        return "File not found", 404
+    
+    # Get the filename from the path
+    filename = os.path.basename(file_path)
+    
+    # Determine the MIME type based on file extension
+    mime_type = 'application/octet-stream'  # Default
+    if filename.endswith('.pdf'):
+        mime_type = 'application/pdf'
+    elif filename.endswith('.doc') or filename.endswith('.docx'):
+        mime_type = 'application/msword'
+    elif filename.endswith('.txt'):
+        mime_type = 'text/plain'
+    
+    # Return the file
+    return send_file(full_path, mimetype=mime_type, as_attachment=True, download_name=filename)
 
 # =============================================================================
 # COMMENT AND RATING ROUTES
