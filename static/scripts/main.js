@@ -156,67 +156,53 @@ function displayCandidate(index, direction) {
 
     // Prepare card content
     newCard.innerHTML = `
-        <div class="card-header d-flex justify-content-between align-items-center">
-            <h4 class="mb-0 fw-bold">${candidate.name}</h4>
-            <span class="badge bg-light text-dark rounded-pill">${index + 1}/${candidates.length}</span>
+        <div class="card-header">
+            <h3>${candidate.name}</h3>
+            <div class="candidate-status ${candidate.status.toLowerCase()}">${candidate.status}</div>
         </div>
         <div class="card-body">
-            <ul class="nav nav-tabs mb-3" id="candidateTabs" role="tablist">
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link active" id="info-tab" data-bs-toggle="tab" data-bs-target="#info-pane" type="button" role="tab">
-                        <i class="fas fa-user-circle me-1"></i> Summary
-                    </button>
+            <ul class="nav nav-tabs" role="tablist">
+                <li class="nav-item">
+                    <a class="nav-link active" data-bs-toggle="tab" href="#summary-${index}">Summary</a>
                 </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="rate-tab" data-bs-toggle="tab" data-bs-target="#rate-pane" type="button" role="tab">
-                        <i class="fas fa-star me-1"></i> Rate
-                    </button>
+                <li class="nav-item">
+                    <a class="nav-link" data-bs-toggle="tab" href="#details-${index}">Details</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-bs-toggle="tab" href="#rating-${index}">Rating</a>
                 </li>
             </ul>
-
             <div class="tab-content">
-                <!-- Summary Tab -->
-                <div class="tab-pane fade show active" id="info-pane" role="tabpanel" tabindex="0">
-                    <div class="candidate-info-box">
-                        <div class="mb-3">
-                            <h6 class="text-danger mb-1">Interested to be an FI for:</h6>
-                            <div class="interests-container">
-                                ${candidate.interests && candidate.interests.length > 0 ?
-                                  candidate.interests.map(interest => `<span class="tag-pill">${interest}</span>`).join('') :
-                                  "<span class='text-muted fst-italic'>No interests specified</span>"}
-                            </div>
-                        </div>
+                <div class="tab-pane fade show active" id="summary-${index}">
+                    <div class="ai-summary">
+                        <h4>AI-Generated Summary</h4>
+                        <p>${candidate.ai_summary}</p>
                     </div>
-
-                    <h6 class="fw-bold">Summary</h6>
-                    <p>${candidate.summary}</p>
-                    
-                    <h6 class="fw-bold mt-4">Documents</h6>
-                    <div class="document-links">
-                        ${candidate.details}
+                    <div class="candidate-details">
+                        <p><strong>Email:</strong> ${candidate.email}</p>
+                        <p><strong>Phone:</strong> ${candidate.phone}</p>
+                        <p><strong>Applied:</strong> ${candidate.created_at}</p>
                     </div>
                 </div>
-
-                <!-- Rate Tab -->
-                <div class="tab-pane fade" id="rate-pane" role="tabpanel" tabindex="0">
-                    <div class="rating-card p-3 mb-3" id="ratingStatusCard">
-                        <h6 class="fw-bold text-secondary mb-3">Candidate Rating</h6>
-                        <div class="d-flex align-items-center justify-content-between">
-                            <div id="ratingStatus">
-                                <span class="text-muted">You haven't rated this candidate yet</span>
-                            </div>
-                            <button class="btn btn-primary" onclick="openRateModal(${index})">
-                                <i class="fas fa-star me-1"></i> Rate Now
-                            </button>
-                        </div>
+                <div class="tab-pane fade" id="details-${index}">
+                    <div class="document-links">
+                        ${candidate.cv_link ? `<a href="${candidate.cv_link}" target="_blank" class="btn btn-outline-primary"><i class="fas fa-file-pdf"></i> Resume</a>` : ''}
+                        ${candidate.cover_letter_link ? `<a href="${candidate.cover_letter_link}" target="_blank" class="btn btn-outline-primary"><i class="fas fa-file-alt"></i> Cover Letter</a>` : ''}
+                        ${candidate.transcript_link ? `<a href="${candidate.transcript_link}" target="_blank" class="btn btn-outline-primary"><i class="fas fa-file-contract"></i> Transcript</a>` : ''}
                     </div>
-
-                    <div class="mt-4" id="candidateCommentsSection">
-                        <h6 class="fw-bold text-secondary mb-3">Faculty Comments</h6>
-                        <div id="commentsList" class="comment-list">
-                            <!-- Will be populated via JavaScript -->
-                            <p class="text-muted fst-italic">No comments yet</p>
+                </div>
+                <div class="tab-pane fade" id="rating-${index}">
+                    <div class="rating-section">
+                        <div class="current-rating">
+                            <h4>Current Rating</h4>
+                            <div class="stars">
+                                ${generateStars(candidate.rating || 0)}
+                            </div>
+                            ${candidate.comment ? `<p class="comment">${candidate.comment}</p>` : ''}
                         </div>
+                        <button class="btn btn-primary rate-btn" onclick="openRatingModal(${candidate.id})">
+                            Rate Candidate
+                        </button>
                     </div>
                 </div>
             </div>
@@ -267,6 +253,21 @@ function displayCandidate(index, direction) {
 
     // Update navigation dots
     updateNavDots();
+}
+
+// Helper function to generate star rating HTML
+function generateStars(rating) {
+    let stars = '';
+    for (let i = 1; i <= 5; i++) {
+        if (i <= rating) {
+            stars += '<i class="fas fa-star"></i>';
+        } else if (i - 0.5 <= rating) {
+            stars += '<i class="fas fa-star-half-alt"></i>';
+        } else {
+            stars += '<i class="far fa-star"></i>';
+        }
+    }
+    return stars;
 }
 
 // Load existing rating and comments for the current candidate
