@@ -164,10 +164,6 @@ def faculty_dashboard():
 def candidate_page():
     return render_template('candidate.html')
 
-# @app.route('/faculty_scheduling')
-# def faculty_scheduling():
-#     return render_template('faculty_scheduling.html')
-
 @app.route('/admin_dashboard')
 def admin_dashboard():
     return render_template('admin_dashboard.html')
