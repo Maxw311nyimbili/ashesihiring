@@ -253,14 +253,24 @@ def get_candidates():
             cursor.execute("SELECT course_name FROM course_preferences WHERE applicant_id = %s", (applicant["id"],))
             interests = [row["course_name"] for row in cursor.fetchall()]
 
+            # Extract just the filename from the paths
+            cv_filename = os.path.basename(applicant['cv_path']) if applicant['cv_path'] else None
+            cover_letter_filename = os.path.basename(applicant['cover_letter_path']) if applicant['cover_letter_path'] else None
+            transcript_filename = os.path.basename(applicant['transcript_path']) if applicant['transcript_path'] else None
+
+            # Log the filenames for debugging
+            app.logger.info(f"CV filename: {cv_filename}")
+            app.logger.info(f"Cover letter filename: {cover_letter_filename}")
+            app.logger.info(f"Transcript filename: {transcript_filename}")
+
             candidates.append({
                 "name": f"{applicant['first_name']} {applicant['last_name']}",
                 "id": applicant['id'],
                 "summary": f"Interested in {applicant.get('course_selection', 'Unknown Course')}.",
                 "details": f"""
-                    <a href='{base_url}?file={applicant['cv_path']}' target='_blank'>Resume</a> | 
-                    <a href='{base_url}?file={applicant['cover_letter_path']}' target='_blank'>Cover Letter</a> | 
-                    <a href='{base_url}?file={applicant['transcript_path']}' target='_blank'>Transcript</a>
+                    <a href='{base_url}?file={cv_filename}' target='_blank'>Resume</a> | 
+                    <a href='{base_url}?file={cover_letter_filename}' target='_blank'>Cover Letter</a> | 
+                    <a href='{base_url}?file={transcript_filename}' target='_blank'>Transcript</a>
                 """,
                 "interests": interests
             })
@@ -284,21 +294,29 @@ def get_candidates():
 def download_file():
     file_path = request.args.get('file')
     if not file_path:
+        app.logger.error('No file specified in download_file request')
         return "No file specified", 400
     
     # Security check to prevent directory traversal
     if '..' in file_path or file_path.startswith('/'):
+        app.logger.error(f'Invalid file path in download_file request: {file_path}')
         return "Invalid file path", 403
     
-    # Construct the full path
-    full_path = os.path.join(app.config['UPLOAD_FOLDER'], file_path)
-    
-    # Check if file exists
-    if not os.path.exists(full_path):
-        return "File not found", 404
+    # Log the file path for debugging
+    app.logger.info(f'Attempting to download file: {file_path}')
     
     # Get the filename from the path
     filename = os.path.basename(file_path)
+    app.logger.info(f'Extracted filename: {filename}')
+    
+    # Construct the full path - try both the direct path and the uploads folder
+    full_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+    app.logger.info(f'Looking for file at: {full_path}')
+    
+    # Check if file exists
+    if not os.path.exists(full_path):
+        app.logger.error(f'File not found at: {full_path}')
+        return "File not found", 404
     
     # Determine the MIME type based on file extension
     mime_type = 'application/octet-stream'  # Default
@@ -308,6 +326,8 @@ def download_file():
         mime_type = 'application/msword'
     elif filename.endswith('.txt'):
         mime_type = 'text/plain'
+    
+    app.logger.info(f'Serving file: {filename} with MIME type: {mime_type}')
     
     # Return the file
     return send_file(full_path, mimetype=mime_type, as_attachment=True, download_name=filename)
