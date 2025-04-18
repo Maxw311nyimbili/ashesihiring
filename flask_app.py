@@ -164,9 +164,9 @@ def faculty_dashboard():
 def candidate_page():
     return render_template('candidate.html')
 
-@app.route('/faculty_scheduling')
-def faculty_scheduling():
-    return render_template('faculty_scheduling.html')
+# @app.route('/faculty_scheduling')
+# def faculty_scheduling():
+#     return render_template('faculty_scheduling.html')
 
 @app.route('/admin_dashboard')
 def admin_dashboard():
@@ -537,9 +537,9 @@ def add_comment():
 
         if rating >= 4:
             cursor.execute("""
-                            INSERT INTO comments (application_id, rating, faculty_id, interest_prompt, comment)
-                            VALUES (%s, %s, %s, NULL, NULL)
-                    """, (application_id, rating, user_id))
+                INSERT INTO comments (application_id, rating, faculty_id, interest_prompt, comment)
+                VALUES (%s, %s, %s, NULL, NULL)
+            """, (application_id, rating, user_id))
         else:
             if not interest_prompt or not comment_text:
                 return jsonify({'success': False, 'message': 'Interest Prompt and Comment are required for ratings below 4.'}), 400
@@ -882,8 +882,6 @@ def get_scheduled_interviews():
     return jsonify(interviews)
 
 
-
-
 # Add these routes to your existing flask_app.py
 
 # =============================================================================
@@ -1146,8 +1144,6 @@ def remove_from_schedule():
     except Exception as e:
         app.logger.error(f"Error removing candidate from schedule: {str(e)}")
         return jsonify({"success": False, "message": str(e)}), 500
-
-
 
 # =============================================================================
 # MAIN APPLICATION ENTRY POINT
