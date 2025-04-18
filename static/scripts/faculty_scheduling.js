@@ -115,7 +115,7 @@ function initEventListeners() {
 
 // Load rated candidates from API
 function loadRatedCandidates() {
-    // UPDATED URL - using the new endpoint
+    // Using the new endpoint
     fetch('/api/faculty_rated_applicants')
         .then(response => {
             if (!response.ok) {
@@ -139,7 +139,7 @@ function loadRatedCandidates() {
 
 // Load faculty schedule from API
 function loadFacultySchedule() {
-    // UPDATED URL - using the new endpoint
+    // Using the new endpoint
     fetch('/api/faculty_interviews')
         .then(response => {
             if (!response.ok) {
@@ -175,13 +175,14 @@ function processScheduleData(scheduleData) {
 
     // Get current faculty email from session
     const currentFacultyEmail = document.getElementById('faculty-email')?.value || '';
+    const currentFacultyName = document.getElementById('faculty-name')?.value || '';
 
     // Find interviews for the current faculty
     let facultyInterviews = [];
     for (const date in groupedByDate) {
         const interviews = groupedByDate[date].filter(interview =>
             interview.email === currentFacultyEmail ||
-            interview.faculty_name === document.getElementById('faculty-name')?.value
+            interview.faculty_name === currentFacultyName
         );
 
         if (interviews.length > 0) {
@@ -506,7 +507,6 @@ function saveSchedule() {
     }
 
     // We have an existing schedule with candidates, update the date
-    // UPDATED URL - using the new endpoint
     fetch('/api/update_faculty_schedule', {
         method: 'POST',
         headers: {
@@ -554,11 +554,259 @@ function deleteSchedule() {
         return;
     }
 
-    // UPDATED URL - using the new endpoint
     fetch('/api/delete_faculty_schedule', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-            date: facultySchedul
+            date: facultySchedule.interview_date
+        })
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.success) {
+            // Clear the local schedule
+            facultySchedule = null;
+            scheduledCandidates = [];
+
+            // Reset the UI to empty state
+            showEmptySchedule();
+
+            // Update the candidate list to reflect schedule status
+            updateCandidateListScheduleStatus();
+
+            showToast('Schedule deleted successfully', 'success');
+        } else {
+            showToast('Error: ' + data.message, 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error deleting schedule:', error);
+        showToast('Error deleting schedule', 'error');
+    });
+}
+
+// Schedule an interview with a candidate
+function scheduleInterview(candidate) {
+    if (!candidate || !candidate.id) {
+        showToast('Invalid candidate selection', 'error');
+        return;
+    }
+
+    if (!facultySchedule || !facultySchedule.interview_date) {
+        showToast('Please set your available date first', 'error');
+        return;
+    }
+
+    fetch('/api/create_interview', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            applicant_id: candidate.id,
+            date: facultySchedule.interview_date
+        })
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.message) {
+            // Add to local scheduled candidates
+            scheduledCandidates.push({
+                id: candidate.id,
+                name: candidate.name
+            });
+
+            // Update the UI
+            updateScheduleUI();
+
+            // Update button visibility
+            document.getElementById('schedule-interview-btn').classList.add('d-none');
+            document.getElementById('remove-interview-btn').classList.remove('d-none');
+
+            // Update candidate list to reflect scheduled status
+            updateCandidateListScheduleStatus();
+
+            showToast('Interview scheduled successfully', 'success');
+        } else {
+            showToast('Error: ' + (data.error || 'Unknown error'), 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error scheduling interview:', error);
+        showToast('Error scheduling interview', 'error');
+    });
+}
+
+// Remove a candidate from the schedule
+function removeFromSchedule(candidate) {
+    if (!candidate || !candidate.id) {
+        showToast('Invalid candidate selection', 'error');
+        return;
+    }
+
+    fetch('/api/remove_from_schedule', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            applicant_id: candidate.id
+        })
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.success) {
+            // Remove from local scheduled candidates
+            scheduledCandidates = scheduledCandidates.filter(c => c.id != candidate.id);
+
+            // Update the UI
+            updateScheduleUI();
+
+            // Update button visibility in candidate details
+            document.getElementById('schedule-interview-btn').classList.remove('d-none');
+            document.getElementById('remove-interview-btn').classList.add('d-none');
+
+            // Update candidate list to reflect scheduled status
+            updateCandidateListScheduleStatus();
+
+            showToast('Candidate removed from schedule', 'success');
+
+            // If this was the last scheduled candidate, update the count
+            document.getElementById('display-candidate-count').textContent = scheduledCandidates.length;
+
+            // If no candidates are left, show empty table row
+            if (scheduledCandidates.length === 0) {
+                document.getElementById('scheduled-candidates').innerHTML = `
+                    <tr>
+                        <td colspan="4" class="text-center text-muted py-4">
+                            <i class="fas fa-info-circle me-2"></i> No candidates scheduled yet
+                        </td>
+                    </tr>
+                `;
+            }
+        } else {
+            showToast('Error: ' + data.message, 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error removing from schedule:', error);
+        showToast('Error removing candidate from schedule', 'error');
+    });
+}
+
+// Update the schedule UI after changes
+function updateScheduleUI() {
+    // If we have a schedule with candidates
+    if (facultySchedule && scheduledCandidates.length > 0) {
+        // Update the count
+        document.getElementById('display-candidate-count').textContent = scheduledCandidates.length;
+
+        // Refresh the table
+        loadFacultySchedule(); // This will update the scheduled candidates table
+    }
+}
+
+// Update the candidate list to reflect scheduled status
+function updateCandidateListScheduleStatus() {
+    const candidateItems = document.querySelectorAll('.candidate-item');
+
+    candidateItems.forEach(item => {
+        const candidateId = item.dataset.candidateId;
+        const isScheduled = scheduledCandidates.some(c => c.id == candidateId);
+
+        const scheduleBadge = item.querySelector('.schedule-badge');
+        if (scheduleBadge) {
+            scheduleBadge.innerHTML = isScheduled ?
+                `<span class="badge bg-success">Scheduled</span>` :
+                `<span class="badge bg-light text-dark">Not Scheduled</span>`;
+        }
+    });
+}
+
+// Generate HTML for rating stars
+function generateRatingStars(rating) {
+    rating = parseInt(rating) || 0;
+    let starsHtml = '';
+
+    for (let i = 1; i <= 5; i++) {
+        if (i <= rating) {
+            starsHtml += '<i class="fas fa-star text-warning"></i>';
+        } else {
+            starsHtml += '<i class="far fa-star text-muted"></i>';
+        }
+    }
+
+    return starsHtml;
+}
+
+// Format date for display (YYYY-MM-DD to readable format)
+function formatDateForDisplay(dateString) {
+    if (!dateString) return '';
+
+    const date = new Date(dateString);
+    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+    return date.toLocaleDateString('en-US', options);
+}
+
+// Show toast notification
+function showToast(message, type = 'success') {
+    // Create toast container if it doesn't exist
+    let toastContainer = document.getElementById('toast-container');
+    if (!toastContainer) {
+        toastContainer = document.createElement('div');
+        toastContainer.id = 'toast-container';
+        toastContainer.className = 'position-fixed bottom-0 end-0 p-3';
+        document.body.appendChild(toastContainer);
+    }
+
+    // Create toast element
+    const toastId = 'toast-' + Date.now();
+    const toast = document.createElement('div');
+    toast.id = toastId;
+    toast.className = `toast align-items-center text-white bg-${type === 'success' ? 'success' : type === 'error' ? 'danger' : 'warning'} border-0`;
+    toast.setAttribute('role', 'alert');
+    toast.setAttribute('aria-live', 'assertive');
+    toast.setAttribute('aria-atomic', 'true');
+
+    toast.innerHTML = `
+        <div class="d-flex">
+            <div class="toast-body">
+                ${message}
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+    `;
+
+    toastContainer.appendChild(toast);
+
+    // Initialize and show toast
+    const bsToast = new bootstrap.Toast(toast, {
+        autohide: true,
+        delay: 3000
+    });
+    bsToast.show();
+
+    // Remove the toast after it's hidden
+    toast.addEventListener('hidden.bs.toast', function() {
+        if (toastContainer.contains(toast)) {
+            toastContainer.removeChild(toast);
+        }
+    });
+}
