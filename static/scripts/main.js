@@ -362,11 +362,11 @@ function displayCandidate(index, direction) {
                             </div>
                         </div>
                     </div>
-                    
+
                     <h6 class="fw-bold mt-4">Documents</h6>
                     <div class="document-links">
                         ${candidate.details}
-                    </div>
+                </div>
                 </div>
 
                 <!-- Rate Tab -->
