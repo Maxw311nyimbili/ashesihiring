@@ -3,7 +3,7 @@ import re
 import random
 import logging
 from flask import current_app
-import PyPDF2  # For PDF text extraction
+from PyPDF2 import PdfReader  # For PDF text extraction version 3.0.1
 
 # Set up logging
 logging.basicConfig(
@@ -38,9 +38,11 @@ class PDFContentExtractor:
             text = ""
             with open(full_path, 'rb') as file:
                 try:
-                    pdf_reader = PyPDF2.PdfReader(file)
-                    for page_num in range(len(pdf_reader.pages)):
-                        page = pdf_reader.pages[page_num]
+                    # For PyPDF2 version 3.0.1
+                    pdf_reader = PdfReader(file)
+
+                    # Extract text from each page
+                    for page in pdf_reader.pages:
                         text += page.extract_text() + "\n"
                 except Exception as e:
                     logger.error(f"Error extracting text from PDF page: {str(e)}")
@@ -243,6 +245,7 @@ class PDFContentExtractor:
 
         # If we couldn't extract much content, fall back to template-based generation
         if not key_phrases and not skills and not education:
+            logger.info(f"Generated fallback summary (content extraction failed)")
             return self.generate_fallback_summary(interests)
 
         # Build summary based on extracted content
