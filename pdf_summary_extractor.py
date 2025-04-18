@@ -3,7 +3,13 @@ import re
 import random
 import logging
 from flask import current_app
-from PyPDF2 import PdfReader  # For PDF text extraction version 3.0.1
+# Modify your import to handle different versions
+try:
+    # For PyPDF2 version 3.0.0 and newer
+    from PyPDF2 import PdfReader
+except ImportError:
+    # For older PyPDF2 versions
+    from PyPDF2 import PdfFileReader as PdfReader
 
 # Set up logging
 logging.basicConfig(
