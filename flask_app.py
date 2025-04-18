@@ -342,8 +342,10 @@ def get_candidates():
     """Get all candidates with their details."""
     try:
         # Get database connection
+        logging.info("Attempting to connect to database...")
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
+        logging.info("Database connection established successfully")
         
         # Query to get all applicants with their details
         query = """
@@ -364,20 +366,29 @@ def get_candidates():
                 a.created_at DESC
         """
         
+        logging.info("Executing database query...")
         cursor.execute(query)
         applicants = cursor.fetchall()
+        logging.info(f"Query returned {len(applicants)} applicants")
         
         # Process each applicant
         candidates = []
         for applicant in applicants:
             try:
+                logging.info(f"Processing applicant ID: {applicant['id']}")
                 # Generate AI summary from CV
                 cv_text = ""
                 if applicant['cv_path']:
+                    logging.info(f"Extracting text from CV: {applicant['cv_path']}")
                     cv_text = extract_text_from_file(applicant['cv_path'])
+                    logging.info(f"Extracted {len(cv_text)} characters from CV")
+                else:
+                    logging.warning(f"No CV path for applicant ID: {applicant['id']}")
                 
                 # Generate summary using Wit.ai
+                logging.info("Generating AI summary...")
                 ai_summary = generate_summary_with_wit_ai(cv_text) if cv_text else "No CV available for analysis."
+                logging.info(f"Generated summary: {ai_summary[:50]}...")
                 
                 # Create candidate details
                 candidate = {
@@ -398,6 +409,7 @@ def get_candidates():
                 }
                 
                 candidates.append(candidate)
+                logging.info(f"Successfully processed applicant ID: {applicant['id']}")
             except Exception as e:
                 logging.error(f"Error processing applicant {applicant.get('id', 'unknown')}: {str(e)}")
                 # Continue with the next applicant instead of failing the entire request
@@ -405,7 +417,9 @@ def get_candidates():
         # Close database connection
         cursor.close()
         conn.close()
+        logging.info("Database connection closed")
         
+        logging.info(f"Returning {len(candidates)} candidates")
         return jsonify({
             'status': 'success',
             'candidates': candidates
