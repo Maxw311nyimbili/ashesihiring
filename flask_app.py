@@ -889,29 +889,31 @@ def faculty_scheduling():
     """Render the faculty scheduling page."""
     if 'faculty_id' not in session:
         return redirect(url_for('faculty_login'))
-    
+
     faculty_name = session.get('faculty_name', 'Unknown')
-    
+
     # Get current date for min date attribute
     from datetime import datetime, timedelta
     today = datetime.now().strftime('%Y-%m-%d')
-    
-    return render_template('faculty_scheduling.html', 
-                          faculty_name=faculty_name,
-                          min_date=today)
 
-@app.route('/get_shortlisted_applicants')
-def get_shortlisted_applicants():
+    return render_template('faculty_scheduling.html',
+                           faculty_name=faculty_name,
+                           min_date=today)
+
+
+# New endpoint name to avoid conflict
+@app.route('/api/faculty_rated_applicants')
+def faculty_rated_applicants():
     """API to get applicants that the current faculty has rated."""
     if 'faculty_id' not in session:
         return jsonify({"error": "Unauthorized"}), 403
-    
+
     faculty_id = session.get('faculty_id')
-    
+
     try:
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
-        
+
         # Get applicants that this faculty has rated
         cursor.execute("""
             SELECT 
@@ -925,9 +927,9 @@ def get_shortlisted_applicants():
             WHERE c.faculty_id = %s
             ORDER BY c.rating DESC, a.first_name
         """, (faculty_id,))
-        
+
         applicants = cursor.fetchall()
-        
+
         # For each applicant, get their course interests
         for applicant in applicants:
             cursor.execute("""
@@ -935,44 +937,46 @@ def get_shortlisted_applicants():
                 FROM course_preferences
                 WHERE applicant_id = %s
             """, (applicant['id'],))
-            
+
             interests = [row['course_name'] for row in cursor.fetchall()]
             applicant['interests'] = interests
-        
+
         conn.close()
         return jsonify(applicants)
-    
+
     except Exception as e:
         app.logger.error(f"Error getting shortlisted applicants: {str(e)}")
         return jsonify({"error": str(e)}), 500
 
-@app.route('/schedule_interview', methods=['POST'])
-def schedule_interview():
+
+# New endpoint name to avoid conflict
+@app.route('/api/create_interview', methods=['POST'])
+def create_interview():
     """API to schedule an interview with an applicant."""
     if 'faculty_id' not in session:
         return jsonify({"error": "Unauthorized"}), 403
-    
+
     data = request.json
     applicant_id = data.get("applicant_id")
     interview_date = data.get("date")
     faculty_id = session.get("faculty_id")
-    
+
     if not applicant_id or not interview_date:
         return jsonify({"error": "Missing required fields"}), 400
-    
+
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
-        
+
         # Check if this applicant is already scheduled with this faculty
         cursor.execute("""
             SELECT id
             FROM interviews
             WHERE applicant_id = %s AND faculty_id = %s
         """, (applicant_id, faculty_id))
-        
+
         existing = cursor.fetchone()
-        
+
         if existing:
             # Update existing interview
             cursor.execute("""
@@ -988,23 +992,25 @@ def schedule_interview():
                 VALUES (%s, %s, %s)
             """, (applicant_id, faculty_id, interview_date))
             message = "Interview scheduled successfully"
-        
+
         conn.commit()
         conn.close()
-        
+
         return jsonify({"message": message})
-    
+
     except Exception as e:
         app.logger.error(f"Error scheduling interview: {str(e)}")
         return jsonify({"error": str(e)}), 500
 
-@app.route('/get_scheduled_interviews')
-def get_scheduled_interviews():
+
+# New endpoint name to avoid conflict
+@app.route('/api/faculty_interviews')
+def faculty_interviews():
     """API to get all scheduled interviews."""
     try:
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
-        
+
         # Get all scheduled interviews with details
         cursor.execute("""
             SELECT 
@@ -1023,34 +1029,35 @@ def get_scheduled_interviews():
             LEFT JOIN course_preferences cp ON a.id = cp.applicant_id
             ORDER BY i.interview_date, f.username
         """)
-        
+
         interviews = cursor.fetchall()
         conn.close()
-        
+
         return jsonify(interviews)
-    
+
     except Exception as e:
         app.logger.error(f"Error getting scheduled interviews: {str(e)}")
         return jsonify({"error": str(e)}), 500
 
-@app.route('/update_faculty_schedule', methods=['POST'])
+
+@app.route('/api/update_faculty_schedule', methods=['POST'])
 def update_faculty_schedule():
     """API to update a faculty's interview schedule date."""
     if 'faculty_id' not in session:
         return jsonify({"error": "Unauthorized"}), 403
-    
+
     data = request.json
     new_date = data.get("new_date")
     old_date = data.get("old_date")
     faculty_id = session.get("faculty_id")
-    
+
     if not new_date:
         return jsonify({"error": "Missing new date"}), 400
-    
+
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
-        
+
         # Update all interviews for this faculty to the new date
         if old_date:
             cursor.execute("""
@@ -1064,30 +1071,31 @@ def update_faculty_schedule():
                 SET interview_date = %s
                 WHERE faculty_id = %s
             """, (new_date, faculty_id))
-        
+
         conn.commit()
         conn.close()
-        
+
         return jsonify({"success": True, "message": "Schedule updated successfully"})
-    
+
     except Exception as e:
         app.logger.error(f"Error updating faculty schedule: {str(e)}")
         return jsonify({"success": False, "message": str(e)}), 500
 
-@app.route('/delete_faculty_schedule', methods=['POST'])
+
+@app.route('/api/delete_faculty_schedule', methods=['POST'])
 def delete_faculty_schedule():
     """API to delete all interviews for a faculty."""
     if 'faculty_id' not in session:
         return jsonify({"error": "Unauthorized"}), 403
-    
+
     data = request.json
     date = data.get("date")
     faculty_id = session.get("faculty_id")
-    
+
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
-        
+
         # Delete all interviews for this faculty
         if date:
             cursor.execute("""
@@ -1099,47 +1107,49 @@ def delete_faculty_schedule():
                 DELETE FROM interviews
                 WHERE faculty_id = %s
             """, (faculty_id,))
-        
+
         conn.commit()
         conn.close()
-        
+
         return jsonify({"success": True, "message": "Schedule deleted successfully"})
-    
+
     except Exception as e:
         app.logger.error(f"Error deleting faculty schedule: {str(e)}")
         return jsonify({"success": False, "message": str(e)}), 500
 
-@app.route('/remove_from_schedule', methods=['POST'])
+
+@app.route('/api/remove_from_schedule', methods=['POST'])
 def remove_from_schedule():
     """API to remove a specific candidate from the schedule."""
     if 'faculty_id' not in session:
         return jsonify({"error": "Unauthorized"}), 403
-    
+
     data = request.json
     applicant_id = data.get("applicant_id")
     faculty_id = session.get("faculty_id")
-    
+
     if not applicant_id:
         return jsonify({"error": "Missing applicant ID"}), 400
-    
+
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
-        
+
         # Delete the specific interview
         cursor.execute("""
             DELETE FROM interviews
             WHERE applicant_id = %s AND faculty_id = %s
         """, (applicant_id, faculty_id))
-        
+
         conn.commit()
         conn.close()
-        
+
         return jsonify({"success": True, "message": "Candidate removed from schedule"})
-    
+
     except Exception as e:
         app.logger.error(f"Error removing candidate from schedule: {str(e)}")
         return jsonify({"success": False, "message": str(e)}), 500
+
 
 # =============================================================================
 # MAIN APPLICATION ENTRY POINT
