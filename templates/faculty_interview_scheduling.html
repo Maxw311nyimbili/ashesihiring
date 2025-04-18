@@ -2,20 +2,237 @@
 
 {% block title %}Faculty Interview Scheduling{% endblock %}
 
+{% block styles %}
+<!-- Tempus Dominus Date Picker CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@eonasdan/tempus-dominus@6.7.7/dist/css/tempus-dominus.min.css">
+<style>
+    /* Premium styling enhancements */
+    .card {
+        border-radius: 0.75rem;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+        transition: all 0.3s ease;
+        border: none;
+    }
+
+    .card:hover {
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+    }
+
+    .card-header {
+        border-top-left-radius: 0.75rem !important;
+        border-top-right-radius: 0.75rem !important;
+        background: linear-gradient(to right, var(--primary), #c95659);
+        color: white;
+        border: none;
+    }
+
+    .schedule-card {
+        border-left: 4px solid var(--secondary);
+        background-color: rgba(35, 100, 101, 0.05);
+    }
+
+    .date-selector-wrapper {
+        position: relative;
+        z-index: 1;
+    }
+
+    .date-selector-wrapper::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(255, 255, 255, 0.7);
+        backdrop-filter: blur(5px);
+        border-radius: 1rem;
+        z-index: -1;
+    }
+
+    .table thead th {
+        background-color: rgba(35, 100, 101, 0.1);
+        color: var(--secondary);
+        font-weight: 600;
+        border: none;
+    }
+
+    .table-hover tbody tr:hover {
+        background-color: rgba(173, 66, 69, 0.05);
+    }
+
+    .btn-premium {
+        background: linear-gradient(to right, var(--secondary), #307f80);
+        color: white;
+        border: none;
+        box-shadow: 0 4px 10px rgba(35, 100, 101, 0.2);
+        transition: all 0.3s ease;
+    }
+
+    .btn-premium:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 15px rgba(35, 100, 101, 0.3);
+        color: white;
+    }
+
+    .btn-premium-outline {
+        color: var(--secondary);
+        background: transparent;
+        border: 2px solid var(--secondary);
+    }
+
+    .btn-premium-outline:hover {
+        background-color: var(--secondary);
+        color: white;
+    }
+
+    .btn-danger-soft {
+        background-color: rgba(173, 66, 69, 0.1);
+        color: var(--primary);
+        border: none;
+    }
+
+    .btn-danger-soft:hover {
+        background-color: var(--primary);
+        color: white;
+    }
+
+    .candidate-badge {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        border-radius: 50px;
+        font-size: 0.85rem;
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+        transition: all 0.3s ease;
+    }
+
+    .candidate-badge.scheduled {
+        background-color: rgba(25, 135, 84, 0.1);
+        color: #198754;
+        border: 1px solid rgba(25, 135, 84, 0.2);
+    }
+
+    .candidate-badge.not-scheduled {
+        background-color: rgba(173, 66, 69, 0.1);
+        color: var(--primary);
+        border: 1px solid rgba(173, 66, 69, 0.2);
+    }
+
+    .datepicker-container {
+        max-width: 400px;
+        margin: 0 auto;
+        background-color: white;
+        padding: 1.5rem;
+        border-radius: 1rem;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Animation classes */
+    .fade-in {
+        animation: fadeIn 0.5s ease-in-out forwards;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Shimmer loading effect for candidates */
+    .shimmer {
+        background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+        background-size: 200% 100%;
+        animation: shimmer 1.5s infinite;
+    }
+
+    @keyframes shimmer {
+        0% {
+            background-position: -200% 0;
+        }
+        100% {
+            background-position: 200% 0;
+        }
+    }
+
+    .shimmer-item {
+        height: 60px;
+        margin-bottom: 10px;
+        border-radius: 8px;
+    }
+
+    /* Custom scrollbar for candidate list */
+    .candidate-list-container {
+        scrollbar-width: thin;
+        scrollbar-color: rgba(173, 66, 69, 0.3) #f1f1f1;
+    }
+
+    .candidate-list-container::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .candidate-list-container::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 10px;
+    }
+
+    .candidate-list-container::-webkit-scrollbar-thumb {
+        background-color: rgba(173, 66, 69, 0.3);
+        border-radius: 10px;
+    }
+
+    .candidate-list-container::-webkit-scrollbar-thumb:hover {
+        background-color: rgba(173, 66, 69, 0.5);
+    }
+
+    /* Stats counter animation */
+    .stat-count {
+        animation: countUp 2s ease-out forwards;
+    }
+
+    @keyframes countUp {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="container py-4">
-    <h3 class="text-center mb-4 fw-bold text-secondary">Interview Scheduling</h3>
+    <!-- Header section with stats -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-0 bg-white shadow-sm">
+                <div class="card-body p-4">
+                    <div class="row align-items-center">
+                        <div class="col-md-8">
+                            <h3 class="fw-bold text-secondary mb-3">Faculty Interview Scheduling</h3>
+                            <p class="text-muted mb-0">Schedule your availability and manage candidate interviews in one place</p>
+                        </div>
+                        <div class="col-md-4 text-end">
+                            <div class="stat-count d-inline-block text-center me-3">
+                                <h4 class="mb-0 fw-bold text-danger" id="total-rated-count">0</h4>
+                                <span class="text-muted small">Rated</span>
+                            </div>
+                            <div class="stat-count d-inline-block text-center">
+                                <h4 class="mb-0 fw-bold text-success" id="total-scheduled-count">0</h4>
+                                <span class="text-muted small">Scheduled</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Main content container -->
     <div class="row">
         <!-- Left panel: Candidate list -->
         <div class="col-lg-5 mb-4">
-            <div class="card shadow-sm border-0 h-100">
-                <div class="card-header bg-white border-bottom py-3">
+            <div class="card h-100">
+                <div class="card-header py-3">
                     <div class="d-flex justify-content-between align-items-center">
-                        <h5 class="mb-0 fw-bold text-danger">My Rated Candidates</h5>
+                        <h5 class="mb-0 fw-bold text-white">My Rated Candidates</h5>
                         <div>
-                            <span class="badge bg-info rounded-pill" id="candidate-count">0</span>
+                            <span class="badge bg-white text-primary rounded-pill" id="candidate-count">0</span>
                         </div>
                     </div>
                 </div>
@@ -31,9 +248,15 @@
                     </div>
                     <div class="candidate-list-container" style="max-height: 500px; overflow-y: auto;">
                         <ul class="list-group list-group-flush" id="candidate-list">
-                            <!-- Candidates will be loaded here -->
-                            <li class="list-group-item text-center py-4 text-muted">
-                                <i class="fas fa-spinner fa-spin me-2"></i> Loading candidates...
+                            <!-- Loading placeholders -->
+                            <li class="list-group-item px-3 py-3">
+                                <div class="shimmer shimmer-item"></div>
+                            </li>
+                            <li class="list-group-item px-3 py-3">
+                                <div class="shimmer shimmer-item"></div>
+                            </li>
+                            <li class="list-group-item px-3 py-3">
+                                <div class="shimmer shimmer-item"></div>
                             </li>
                         </ul>
                     </div>
@@ -43,133 +266,100 @@
 
         <!-- Right panel: Scheduling -->
         <div class="col-lg-7">
-            <div class="card shadow-sm border-0 mb-4">
-                <div class="card-header bg-white border-bottom py-3">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <h5 class="mb-0 fw-bold text-danger">Interview Scheduling</h5>
-                        <button class="btn btn-sm" style="background-color: #236465; color: white;" id="save-availability">
-                            <i class="fas fa-calendar-check me-1"></i> Save My Availability
-                        </button>
-                    </div>
+            <!-- Date selection card -->
+            <div class="card mb-4">
+                <div class="card-header py-3">
+                    <h5 class="mb-0 fw-bold text-white">Interview Date Selection</h5>
                 </div>
-                <div class="card-body">
-                    <div id="empty-selection-message" class="text-center py-4">
-                        <img src="../static/images/calendar-illustration.svg" alt="Calendar" class="mb-3" style="max-width: 150px; opacity: 0.6;" onerror="this.style.display='none'">
-                        <h6 class="text-muted">Select your available date for interviews</h6>
-                        <p class="text-muted small">You can only select one day for all your interviews</p>
-                    </div>
+                <div class="card-body p-4">
+                    <div id="availability-section">
+                        <p class="text-muted mb-4">Select a single date when you'll be available to conduct all interviews. This date will be applied to all candidates you schedule.</p>
 
-                    <div id="availability-selector" class="mb-4">
-                        <div class="form-group mb-3">
-                            <label for="interview-date" class="form-label text-secondary fw-medium">
-                                <i class="fas fa-calendar-day me-1"></i> Select Your Available Date:
-                            </label>
-                            <input type="date" class="form-control" id="interview-date" min="{{ min_date }}">
-                            <div class="form-text small">
-                                <i class="fas fa-info-circle me-1"></i> This date will be used for all your scheduled interviews
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Current schedule section -->
-                    <div id="current-schedule" class="mt-4">
-                        <h6 class="fw-bold mb-3 text-secondary border-bottom pb-2">
-                            <i class="fas fa-calendar-check me-1"></i> My Current Interview Schedule
-                        </h6>
-
-                        <div id="no-schedule-message" class="alert alert-light text-center">
-                            <i class="fas fa-calendar-xmark text-muted fs-4 mb-2"></i>
-                            <p class="mb-0">You haven't set your interview date yet</p>
-                        </div>
-
-                        <div id="schedule-details" class="d-none">
-                            <div class="alert alert-success mb-3">
-                                <div class="d-flex align-items-center">
-                                    <div class="schedule-info flex-grow-1">
-                                        <h6 class="mb-1 fw-bold">
-                                            <i class="fas fa-calendar-day me-1"></i> <span id="display-interview-date"></span>
-                                        </h6>
-                                        <p class="mb-0">
-                                            <span id="display-candidate-count" class="fw-medium">0</span> candidates scheduled
-                                        </p>
-                                    </div>
-                                    <div class="action-buttons">
-                                        <button class="btn btn-sm btn-outline-success me-1" id="edit-schedule-btn">
-                                            <i class="fas fa-edit"></i> Edit
-                                        </button>
-                                        <button class="btn btn-sm btn-outline-danger" id="delete-schedule-btn">
-                                            <i class="fas fa-trash-alt"></i> Delete
-                                        </button>
+                        <div class="date-selector-wrapper mb-4">
+                            <div class="datepicker-container">
+                                <div class="d-flex align-items-center mb-3">
+                                    <span class="text-secondary me-3">
+                                        <i class="fas fa-calendar-alt fs-4"></i>
+                                    </span>
+                                    <div>
+                                        <label for="interview-date-picker" class="form-label mb-0 fw-medium text-secondary">Select Your Available Date</label>
+                                        <div class="input-group" id="interview-date-picker">
+                                            <input type="text" class="form-control" id="interview-date" readonly>
+                                            <span class="input-group-text">
+                                                <i class="fas fa-calendar-day"></i>
+                                            </span>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
 
-                            <div class="table-responsive">
-                                <table class="table table-hover" id="schedule-table">
-                                    <thead class="table-light">
-                                        <tr>
-                                            <th scope="col">Candidate</th>
-                                            <th scope="col">Rating</th>
-                                            <th scope="col">Course Interest</th>
-                                            <th scope="col" class="text-center">Actions</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="scheduled-candidates">
-                                        <!-- Scheduled candidates will appear here -->
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Candidate selection card - this appears when a candidate is selected -->
-            <div class="card shadow-sm border-0 d-none" id="candidate-details-card">
-                <div class="card-header bg-white border-bottom py-3">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <h5 class="mb-0 fw-bold text-danger" id="selected-candidate-name">Candidate Details</h5>
-                        <button class="btn-close" id="close-candidate-details"></button>
-                    </div>
-                </div>
-                <div class="card-body">
-                    <div class="candidate-info-box mb-4">
-                        <div class="row mb-3">
-                            <div class="col-md-6">
-                                <h6 class="text-secondary mb-1">Your Rating:</h6>
-                                <div class="rating-display" id="display-rating">
-                                    <!-- Rating will be displayed here -->
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <h6 class="text-secondary mb-1">Course Interests:</h6>
-                                <div id="display-interests" class="interests-container">
-                                    <!-- Interests will be displayed here -->
+                                <div class="d-flex justify-content-end mt-3">
+                                    <button class="btn btn-premium" id="save-availability">
+                                        <i class="fas fa-calendar-check me-1"></i> Set My Availability
+                                    </button>
                                 </div>
                             </div>
                         </div>
-                        <div class="mb-3" id="interest-prompt-container">
-                            <h6 class="text-secondary mb-1">Interest Prompt Response:</h6>
-                            <p class="mb-0" id="display-interest-prompt">
-                                <!-- Interest prompt will be displayed here -->
-                            </p>
-                        </div>
-                        <div class="mb-0" id="comment-container">
-                            <h6 class="text-secondary mb-1">Your Comment:</h6>
-                            <p class="mb-0 fst-italic" id="display-comment">
-                                <!-- Comment will be displayed here -->
-                            </p>
-                        </div>
                     </div>
 
-                    <!-- Add to schedule section -->
-                    <div class="schedule-action text-center">
-                        <button class="btn" id="schedule-interview-btn" style="background-color: #236465; color: white;">
-                            <i class="fas fa-calendar-plus me-1"></i> Schedule Interview
-                        </button>
-                        <button class="btn btn-outline-danger d-none" id="remove-interview-btn">
-                            <i class="fas fa-calendar-minus me-1"></i> Remove from Schedule
-                        </button>
+                    <!-- Current schedule display -->
+                    <div id="current-schedule-section" class="d-none">
+                        <div class="schedule-card p-3 rounded-3 mb-4">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="fw-bold text-secondary mb-1">
+                                        <i class="fas fa-calendar-day me-1"></i> Your Interview Date
+                                    </h6>
+                                    <p class="mb-0 fw-medium" id="display-interview-date"></p>
+                                </div>
+                                <div>
+                                    <button class="btn btn-sm btn-premium-outline me-2" id="edit-schedule-btn">
+                                        <i class="fas fa-edit me-1"></i> Change Date
+                                    </button>
+                                    <button class="btn btn-sm btn-danger-soft" id="delete-schedule-btn">
+                                        <i class="fas fa-trash-alt me-1"></i> Delete
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row align-items-center mb-4">
+                            <div class="col">
+                                <h6 class="fw-bold text-secondary mb-0">
+                                    <i class="fas fa-user-check me-1"></i> Candidates to Interview
+                                </h6>
+                            </div>
+                            <div class="col-auto">
+                                <button class="btn btn-sm btn-premium" id="batch-schedule-btn">
+                                    <i class="fas fa-users me-1"></i> Batch Schedule
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="table-responsive">
+                            <table class="table table-hover" id="schedule-table">
+                                <thead>
+                                    <tr>
+                                        <th scope="col" width="40px">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" id="select-all-candidates">
+                                            </div>
+                                        </th>
+                                        <th scope="col">Candidate</th>
+                                        <th scope="col">Rating</th>
+                                        <th scope="col">Status</th>
+                                        <th scope="col" class="text-center">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="candidate-schedule-list">
+                                    <!-- Will be populated via JavaScript -->
+                                    <tr>
+                                        <td colspan="5" class="text-center text-muted py-4">
+                                            <i class="fas fa-info-circle me-2"></i> Set your interview date above to start scheduling
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -177,53 +367,132 @@
     </div>
 </div>
 
-<!-- Confirm Schedule Modal -->
-<div class="modal fade" id="confirmScheduleModal" tabindex="-1" aria-hidden="true">
+<!-- Candidate Details Modal -->
+<div class="modal fade" id="candidateDetailsModal" tabindex="-1" aria-labelledby="candidateDetailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header py-3" style="background: linear-gradient(to right, var(--primary), #c95659); color: white;">
+                <h5 class="modal-title fw-bold" id="candidate-modal-name">Candidate Details</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <h6 class="text-secondary mb-2">Your Rating</h6>
+                            <div class="rating-display" id="modal-display-rating"></div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <h6 class="text-secondary mb-2">Course Interests</h6>
+                            <div id="modal-display-interests" class="interests-container"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-3" id="modal-interest-prompt-container">
+                    <h6 class="text-secondary mb-2">Interest Prompt Response</h6>
+                    <p class="mb-0 p-3 bg-light rounded-3" id="modal-display-interest-prompt"></p>
+                </div>
+
+                <div class="mb-4" id="modal-comment-container">
+                    <h6 class="text-secondary mb-2">Your Comment</h6>
+                    <p class="mb-0 p-3 bg-light rounded-3 fst-italic" id="modal-display-comment"></p>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <h6 class="text-secondary mb-2">Documents</h6>
+                            <div id="modal-document-links" class="document-links"></div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 text-end">
+                        <div class="schedule-status p-3 rounded-3 mb-3" id="modal-schedule-status">
+                            <!-- Will be populated via JavaScript -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer border-0">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-premium" id="modal-schedule-btn">Schedule Interview</button>
+                <button type="button" class="btn btn-danger d-none" id="modal-remove-btn">Remove from Schedule</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Batch Schedule Modal -->
+<div class="modal fade" id="batchScheduleModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header py-3 border-0">
-                <h5 class="modal-title text-danger fw-bold">Confirm Schedule</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header py-3" style="background: linear-gradient(to right, var(--secondary), #307f80); color: white;">
+                <h5 class="modal-title fw-bold">Batch Schedule Interviews</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body py-4">
+            <div class="modal-body p-4">
                 <div class="text-center mb-3">
-                    <i class="fas fa-calendar-check text-success fs-3 mb-3"></i>
-                    <h5 class="text-success mb-3">Save Your Interview Schedule</h5>
-                    <p>You are about to set <span class="fw-bold" id="modal-date"></span> as your interview date for all selected candidates.</p>
-                    <p class="mb-0">Are you sure you want to proceed?</p>
+                    <i class="fas fa-users-cog text-secondary fs-2 mb-3"></i>
+                    <h5 class="mb-3 text-secondary">Schedule Multiple Interviews</h5>
+                    <p class="mb-0">This will schedule all unscheduled candidates for <span class="fw-bold" id="batch-modal-date"></span></p>
+                </div>
+                <div class="alert alert-info" role="alert">
+                    <i class="fas fa-info-circle me-2"></i> Only candidates with a rating of 4 or higher, or with a "Yes" interest prompt response will be scheduled.
                 </div>
             </div>
-            <div class="modal-footer justify-content-center border-0 pt-0">
-                <button type="button" class="btn btn-outline-secondary px-4" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn px-4" id="confirm-save-btn" style="background-color: #236465; color: white;">
-                    Confirm
-                </button>
+            <div class="modal-footer border-0">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-premium" id="confirm-batch-schedule">Confirm Schedule</button>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Delete Schedule Modal -->
+<!-- Confirm Delete Schedule Modal -->
 <div class="modal fade" id="deleteScheduleModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header py-3 border-0">
-                <h5 class="modal-title text-danger fw-bold">Delete Schedule</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header py-3" style="background-color: var(--primary); color: white;">
+                <h5 class="modal-title fw-bold">Delete Schedule</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body py-4">
+            <div class="modal-body p-4">
                 <div class="text-center mb-3">
-                    <i class="fas fa-exclamation-triangle text-danger fs-3 mb-3"></i>
-                    <h5 class="text-danger mb-3">Delete Interview Schedule</h5>
+                    <i class="fas fa-exclamation-triangle text-danger fs-2 mb-3"></i>
+                    <h5 class="mb-3 text-danger">Delete Interview Schedule</h5>
                     <p>You are about to delete your entire interview schedule for <span class="fw-bold" id="delete-modal-date"></span>.</p>
                     <p class="mb-0">This will remove all scheduled interviews. Are you sure?</p>
                 </div>
             </div>
-            <div class="modal-footer justify-content-center border-0 pt-0">
-                <button type="button" class="btn btn-outline-secondary px-4" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-danger px-4" id="confirm-delete-btn">
-                    Delete Schedule
-                </button>
+            <div class="modal-footer border-0">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger" id="confirm-delete-btn">Delete Schedule</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Confirm Set Date Modal -->
+<div class="modal fade" id="confirmDateModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header py-3" style="background: linear-gradient(to right, var(--secondary), #307f80); color: white;">
+                <h5 class="modal-title fw-bold">Confirm Interview Date</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <div class="text-center mb-3">
+                    <i class="fas fa-calendar-check text-secondary fs-2 mb-3"></i>
+                    <h5 class="mb-3 text-secondary">Save Your Interview Date</h5>
+                    <p>You are about to set <span class="fw-bold" id="confirm-date-display"></span> as your interview date.</p>
+                    <p class="mb-0">This date will be used for all your scheduled interviews.</p>
+                </div>
+            </div>
+            <div class="modal-footer border-0">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-premium" id="confirm-date-btn">Confirm Date</button>
             </div>
         </div>
     </div>
@@ -234,5 +503,8 @@
 {% endblock %}
 
 {% block scripts %}
+<!-- Tempus Dominus Date Picker JS -->
+<script src="https://cdn.jsdelivr.net/npm/@eonasdan/tempus-dominus@6.7.7/dist/js/tempus-dominus.min.js"></script>
+
 <script src="../static/scripts/faculty_scheduling.js"></script>
 {% endblock %}
