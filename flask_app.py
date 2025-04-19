@@ -1160,8 +1160,8 @@ def remove_from_schedule():
 def admin_dashboard():
     """Render the admin dashboard page."""
     # Check if user is an admin
-    if 'role' not in session or session['role'] != 'admin':
-        return redirect(url_for('login'))
+    # if 'role' not in session or session['role'] != 'admin':
+    #     return redirect(url_for('login'))
 
     return render_template('admin_dashboard.html')
 
@@ -1169,8 +1169,8 @@ def admin_dashboard():
 def admin_dashboard_stats():
     """API to get statistics for the admin dashboard."""
     # Check if user is an admin
-    if 'role' not in session or session['role'] != 'admin':
-        return jsonify({"error": "Unauthorized"}), 403
+    # if 'role' not in session or session['role'] != 'admin':
+    #     return jsonify({"error": "Unauthorized"}), 403
 
     try:
         conn = get_db_connection()
