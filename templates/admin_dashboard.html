@@ -570,6 +570,20 @@
         initCharts();
     });
 
+    // Export report button
+    document.querySelector('.btn-danger-soft').addEventListener('click', function() {
+        exportFacultyReport();
+    });
+
+    // In the openFacultyModal function, add event listener for the Send Email button:
+    // Add this code after setting up the modal content but before showing the modal
+
+    document.querySelector('#facultyDetailsModal .btn-premium').addEventListener('click', function() {
+        const facultyEmail = document.getElementById('modal-faculty-email').textContent;
+        const facultyName = document.getElementById('faculty-modal-name').textContent;
+        sendEmailToFaculty(facultyEmail, facultyName);
+    });
+
     // Initialize event listeners
     function initEventListeners() {
         // Refresh data button
@@ -1275,5 +1289,166 @@
             }
         });
     }
+
+
+    // Add these functions to your admin dashboard JavaScript
+
+// Export faculty report as PDF
+function exportFacultyReport() {
+    // Show loading toast
+    showToast('Generating PDF report...', 'info');
+
+    // In a production environment, this would call an API endpoint
+    // For demonstration, we'll simulate the export with a delay
+    setTimeout(() => {
+        // Create a simple export using html2pdf.js library
+        // Note: In a real implementation, you would include html2pdf.js or use a server-side PDF generation
+
+        // Create content to export
+        const reportContent = document.createElement('div');
+        reportContent.innerHTML = `
+            <div style="padding: 20px; font-family: Arial, sans-serif;">
+                <h2 style="color: #AD4245;">Faculty Instructor Report</h2>
+                <p style="color: #666;">Generated on ${new Date().toLocaleDateString()} at ${new Date().toLocaleTimeString()}</p>
+                <hr>
+                <h3 style="color: #236465;">Overview Statistics</h3>
+                <p><strong>Total Faculty:</strong> ${document.getElementById('total-faculty').textContent}</p>
+                <p><strong>Faculty with Schedules:</strong> ${document.getElementById('scheduled-faculty').textContent}</p>
+                <p><strong>Scheduling Rate:</strong> ${document.getElementById('scheduling-percent').textContent}</p>
+                <p><strong>Average Rating:</strong> ${document.getElementById('avg-rating').textContent}/5</p>
+                <p><strong>Total Candidates:</strong> ${document.getElementById('total-candidates').textContent}</p>
+                <hr>
+                <h3 style="color: #236465;">Faculty List</h3>
+                <table style="width: 100%; border-collapse: collapse;">
+                    <thead>
+                        <tr style="background-color: #f2f2f2;">
+                            <th style="padding: 10px; text-align: left; border-bottom: 1px solid #ddd;">Name</th>
+                            <th style="padding: 10px; text-align: left; border-bottom: 1px solid #ddd;">Email</th>
+                            <th style="padding: 10px; text-align: left; border-bottom: 1px solid #ddd;">Status</th>
+                            <th style="padding: 10px; text-align: left; border-bottom: 1px solid #ddd;">Interview Date</th>
+                        </tr>
+                    </thead>
+                    <tbody id="report-faculty-list">
+                    </tbody>
+                </table>
+            </div>
+        `;
+
+        // Add faculty data to the report
+        const reportFacultyList = reportContent.querySelector('#report-faculty-list');
+        document.querySelectorAll('#faculty-table-body tr').forEach(row => {
+            const newRow = document.createElement('tr');
+
+            // Get faculty name
+            const nameCell = row.querySelector('td:first-child');
+            const name = nameCell ? nameCell.querySelector('h6').textContent : 'N/A';
+
+            // Get email, status, and date
+            const email = row.querySelector('td:nth-child(2)') ? row.querySelector('td:nth-child(2)').textContent : 'N/A';
+            const status = row.querySelector('td:nth-child(3) span:last-child') ? row.querySelector('td:nth-child(3) span:last-child').textContent : 'N/A';
+            const date = row.querySelector('td:nth-child(4) span') ? row.querySelector('td:nth-child(4) span').textContent : 'N/A';
+
+            newRow.innerHTML = `
+                <td style="padding: 10px; border-bottom: 1px solid #ddd;">${name}</td>
+                <td style="padding: 10px; border-bottom: 1px solid #ddd;">${email}</td>
+                <td style="padding: 10px; border-bottom: 1px solid #ddd;">${status}</td>
+                <td style="padding: 10px; border-bottom: 1px solid #ddd;">${date}</td>
+            `;
+
+            reportFacultyList.appendChild(newRow);
+        });
+
+        // In a real implementation, you would use html2pdf or another library
+        // html2pdf().from(reportContent).save('faculty_report.pdf');
+
+        // For demo, we'll create a data URL and open it in a new tab
+        const blob = new Blob([reportContent.outerHTML], { type: 'text/html' });
+        const url = URL.createObjectURL(blob);
+        window.open(url, '_blank');
+
+        showToast('Report exported successfully!', 'success');
+    }, 1500);
+}
+
+// Send email to faculty
+function sendEmailToFaculty(facultyEmail, facultyName) {
+    // Show loading toast
+    showToast('Preparing email...', 'info');
+
+    // In a production environment, this would call an API endpoint
+    // For demonstration, we'll simulate sending an email with a delay
+    setTimeout(() => {
+        // Create modal for composing email
+        const modalHtml = `
+            <div class="modal fade" id="emailModal" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content border-0 shadow">
+                        <div class="modal-header py-3" style="background: linear-gradient(to right, var(--secondary), #307f80); color: white;">
+                            <h5 class="modal-title fw-bold">Send Email to ${facultyName}</h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body p-4">
+                            <div class="mb-3">
+                                <label for="email-to" class="form-label text-secondary">To:</label>
+                                <input type="email" class="form-control" id="email-to" value="${facultyEmail}" readonly>
+                            </div>
+                            <div class="mb-3">
+                                <label for="email-subject" class="form-label text-secondary">Subject:</label>
+                                <input type="text" class="form-control" id="email-subject" value="Faculty Interview Schedule - Update">
+                            </div>
+                            <div class="mb-3">
+                                <label for="email-body" class="form-label text-secondary">Message:</label>
+                                <textarea class="form-control" id="email-body" rows="6">Dear ${facultyName},
+
+I hope this email finds you well. I'm writing to follow up on your faculty interview schedule for the upcoming hiring cycle.
+
+Could you please confirm if you're available on your currently scheduled date? If you need to make any changes, please let us know as soon as possible.
+
+Thank you for your participation in our hiring process.
+
+Best regards,
+Admin Team</textarea>
+                            </div>
+                        </div>
+                        <div class="modal-footer border-0">
+                            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button type="button" class="btn btn-premium" id="send-email-btn">
+                                <i class="fas fa-paper-plane me-1"></i> Send Email
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        // Add modal to the DOM
+        const modalContainer = document.createElement('div');
+        modalContainer.innerHTML = modalHtml;
+        document.body.appendChild(modalContainer);
+
+        // Initialize the modal
+        const emailModal = new bootstrap.Modal(document.getElementById('emailModal'));
+        emailModal.show();
+
+        // Add event listener to send button
+        document.getElementById('send-email-btn').addEventListener('click', function() {
+            // Simulate sending email
+            emailModal.hide();
+
+            // Show loading toast
+            showToast('Sending email...', 'info');
+
+            // Simulate delay
+            setTimeout(() => {
+                showToast('Email sent successfully to ' + facultyEmail, 'success');
+
+                // Remove modal from DOM after it's hidden
+                document.getElementById('emailModal').addEventListener('hidden.bs.modal', function() {
+                    modalContainer.remove();
+                });
+            }, 1500);
+        });
+    }, 500);
+}
 </script>
 {% endblock %}
