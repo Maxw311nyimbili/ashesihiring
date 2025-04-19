@@ -1,165 +1,1904 @@
-<!--<!DOCTYPE html>-->
-<!--<html lang="en">-->
-<!--<head>-->
-<!--    <meta charset="UTF-8">-->
-<!--    <meta name="viewport" content="width=device-width, initial-scale=1.0">-->
-<!--    <title>Admin Dashboard</title>-->
-<!--    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">-->
-<!--</head>-->
-<!--<body>-->
-<!--    <div class="container mt-4">-->
-<!--        <h2>Scheduled Interviews</h2>-->
-<!--        <div id="interviews-list" class="row">-->
-<!--            &lt;!&ndash; Scheduled interviews will be displayed here &ndash;&gt;-->
-<!--        </div>-->
-<!--    </div>-->
+{% extends "base.html" %}
 
-<!--    <script>-->
-<!--        document.addEventListener("DOMContentLoaded", function() {-->
-<!--            fetch('/get_scheduled_interviews')-->
-<!--                .then(response => response.json())-->
-<!--                .then(data => {-->
-<!--                    const container = document.getElementById("interviews-list");-->
-<!--                    data.forEach(interview => {-->
-<!--                        const card = document.createElement("div");-->
-<!--                        card.classList.add("col-md-4");-->
-<!--                        card.innerHTML = `-->
-<!--                            <div class="card mb-3">-->
-<!--                                <div class="card-body">-->
-<!--                                    <h5 class="card-title">${interview.applicant_name}</h5>-->
-<!--                                     <p class="card-text"><strong>Courses of interest:</strong> ${interview.courses ? interview.courses : "N/A"}</p>-->
-<!--                                    <p class="card-text">Scheduled Date: ${interview.interview_date}</p>-->
-<!--                                    <p class="card-text">Faculty: ${interview.faculty_name}</p>-->
-<!--                                    <p class="card-text">Faculty email: ${interview.email}</p>-->
-<!--                                </div>-->
-<!--                            </div>-->
-<!--                        `;-->
-<!--                        container.appendChild(card);-->
-<!--                    });-->
-<!--                });-->
-<!--        });-->
-<!--    </script>-->
-<!--</body>-->
-<!--</html>-->
+{% block title %}Admin Dashboard{% endblock %}
 
+{% block styles %}
+<style>
+    /* Premium styling enhancements */
+    .card {
+        border-radius: 0.75rem;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+        transition: all 0.3s ease;
+        border: none;
+        overflow: hidden;
+    }
 
+    .card:hover {
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+    }
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard</title>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    .card-header {
+        border-top-left-radius: 0.75rem !important;
+        border-top-right-radius: 0.75rem !important;
+        background: linear-gradient(to right, var(--primary), #c95659);
+        color: white;
+        border: none;
+    }
 
-    <!-- FontAwesome for icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    .card-header.secondary {
+        background: linear-gradient(to right, var(--secondary), #307f80);
+    }
 
-    <style>
-        body {
-            background-color: #AD4245;
-        }
-        .card {
-            border: none;
-            border-radius: 10px;
-            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s ease-in-out;
-        }
-        .card:hover {
-            transform: scale(1.02);
-        }
-        .card-body {
-            padding: 20px;
-        }
-        .card-title {
-            font-size: 1.2rem;
-            font-weight: bold;
-            color: #333;
-        }
-        .card-text {
-            font-size: 0.95rem;
-            color: #666;
-        }
-        .email-link {
-            color: #007bff;
-            text-decoration: none;
-            font-weight: bold;
-        }
-        .email-link:hover {
-            text-decoration: underline;
-        }
-    </style>
-</head>
-<body>
+    .stats-card {
+        min-height: 160px;
+        display: flex;
+        flex-direction: column;
+    }
 
-<header>
-        <nav class="navbar navbar-expand-lg bg-white shadow-sm">
-            <div class="container-fluid">
-                <a class="navbar-brand logo" href="/">
-                    <img src="../static/images/Group 13.png" alt="Logo" width="170px" style="margin-left: 100px;">
-                </a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse" id="navbarNav">
-                    <ul class="navbar-nav ms-auto" style="margin-right: 80px">
+    .stats-card .icon {
+        width: 50px;
+        height: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 12px;
+        margin-bottom: 1rem;
+    }
 
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('faculty_dashboard') }}" style="color:#AD4243; font-weight: bold;"> <i class="fa-solid fa-gauge-high"></i> Dashboard</a>
-                        </li>
+    .stats-card .icon.primary {
+        background-color: rgba(173, 66, 69, 0.1);
+        color: var(--primary);
+    }
 
-                        <li class="nav-item" style="margin-left: 20px;">
-                            <a class="nav-link" href="{{ url_for('faculty_scheduling') }}" style="color:#AD4243;"> <i class="fa-solid fa-calendar-days"></i> Interview Scheduling</a>
-                        </li>
-                        <li class="nav-item" style="margin-left: 20px;">
-                            <a class="nav-link" href="{{ url_for('logout') }}" style="color:#AD4243; "> <i class="fa-solid fa-right-from-bracket"></i> Logout</a>
-                        </li>
-                    </ul>
+    .stats-card .icon.secondary {
+        background-color: rgba(35, 100, 101, 0.1);
+        color: var(--secondary);
+    }
+
+    .stats-card .icon.success {
+        background-color: rgba(25, 135, 84, 0.1);
+        color: #198754;
+    }
+
+    .stats-card .icon.warning {
+        background-color: rgba(255, 193, 7, 0.1);
+        color: #ffc107;
+    }
+
+    .stats-card .icon i {
+        font-size: 1.5rem;
+    }
+
+    .stats-card .stat-value {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 0.25rem;
+    }
+
+    .stats-card .stat-label {
+        color: #6c757d;
+        font-size: 0.9rem;
+    }
+
+    .progress {
+        height: 8px;
+        border-radius: 4px;
+        margin-top: 0.5rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .progress-bar.bg-primary {
+        background: linear-gradient(to right, var(--primary), #c95659) !important;
+    }
+
+    .progress-bar.bg-secondary {
+        background: linear-gradient(to right, var(--secondary), #307f80) !important;
+    }
+
+    .rating-pill {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        border-radius: 50px;
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
+
+    .rating-pill.high {
+        background-color: rgba(25, 135, 84, 0.1);
+        color: #198754;
+    }
+
+    .rating-pill.medium {
+        background-color: rgba(255, 193, 7, 0.1);
+        color: #ffc107;
+    }
+
+    .rating-pill.low {
+        background-color: rgba(173, 66, 69, 0.1);
+        color: var(--primary);
+    }
+
+    .table thead th {
+        background-color: rgba(35, 100, 101, 0.1);
+        color: var(--secondary);
+        font-weight: 600;
+        border: none;
+    }
+
+    .table tbody tr:nth-child(even) {
+        background-color: rgba(248, 249, 250, 0.5);
+    }
+
+    .table-hover tbody tr:hover {
+        background-color: rgba(173, 66, 69, 0.05);
+    }
+
+    .btn-premium {
+        background: linear-gradient(to right, var(--secondary), #307f80);
+        color: white;
+        border: none;
+        box-shadow: 0 4px 10px rgba(35, 100, 101, 0.2);
+        transition: all 0.3s ease;
+    }
+
+    .btn-premium:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 15px rgba(35, 100, 101, 0.3);
+        color: white;
+    }
+
+    .btn-danger-soft {
+        background-color: rgba(173, 66, 69, 0.1);
+        color: var(--primary);
+        border: none;
+    }
+
+    .btn-danger-soft:hover {
+        background-color: var(--primary);
+        color: white;
+    }
+
+    .date-badge {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        border-radius: 50px;
+        font-size: 0.85rem;
+        font-weight: 500;
+    }
+
+    .date-badge.scheduled {
+        background-color: rgba(25, 135, 84, 0.1);
+        color: #198754;
+        border: 1px solid rgba(25, 135, 84, 0.2);
+    }
+
+    .date-badge.not-scheduled {
+        background-color: rgba(173, 66, 69, 0.1);
+        color: var(--primary);
+        border: 1px solid rgba(173, 66, 69, 0.2);
+    }
+
+    /* Animation classes */
+    .fade-in {
+        animation: fadeIn 0.5s ease-in-out forwards;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Stats counter animation */
+    .stat-count {
+        animation: countUp 2s ease-out forwards;
+    }
+
+    @keyframes countUp {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Charts container */
+    .chart-container {
+        position: relative;
+        height: 280px;
+        width: 100%;
+    }
+
+    /* Faculty status circle */
+    .status-circle {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        display: inline-block;
+        margin-right: 5px;
+    }
+
+    .status-active {
+        background-color: #198754;
+    }
+
+    .status-inactive {
+        background-color: #6c757d;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Header section with title -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-0 bg-white shadow-sm">
+                <div class="card-body p-4">
+                    <div class="row align-items-center">
+                        <div class="col-md-8">
+                            <h3 class="fw-bold text-secondary mb-2">Admin Dashboard</h3>
+                            <p class="text-muted mb-0">Manage faculty instructors and monitor hiring metrics</p>
+                        </div>
+                        <div class="col-md-4 text-end">
+                            <button class="btn btn-premium" id="refresh-data">
+                                <i class="fas fa-sync-alt me-2"></i> Refresh Data
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </nav>
-    </header>
-
-    <div class="container mt-5">
-        <h2 class="mb-4 text-center" style="color:white;">📅 Scheduled Interviews</h2>
-        <div id="interviews-list" class="row">
-            <!-- Scheduled interviews will be displayed here -->
         </div>
     </div>
 
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            fetch('/get_scheduled_interviews')
-                .then(response => response.json())
-                .then(data => {
-                    const container = document.getElementById("interviews-list");
-                    container.innerHTML = ""; // Clear any previous content
+    <!-- Key metrics cards -->
+    <div class="row mb-4">
+        <!-- Total Faculty -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card h-100 stats-card">
+                <div class="card-body p-4">
+                    <div class="icon primary">
+                        <i class="fas fa-user-tie"></i>
+                    </div>
+                    <h4 class="stat-value text-primary" id="total-faculty">0</h4>
+                    <p class="stat-label mb-0">Total Faculty</p>
+                    <div class="progress">
+                        <div class="progress-bar bg-primary" role="progressbar" style="width: 100%" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                    <p class="text-muted small mb-0 mt-2">All registered faculty instructors</p>
+                </div>
+            </div>
+        </div>
 
-                    data.forEach(interview => {
-                        const card = document.createElement("div");
-                        card.classList.add("col-lg-4", "col-md-6", "mb-4"); // Responsive grid
+        <!-- Faculty with Scheduled Interviews -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card h-100 stats-card">
+                <div class="card-body p-4">
+                    <div class="icon secondary">
+                        <i class="fas fa-calendar-check"></i>
+                    </div>
+                    <h4 class="stat-value text-secondary" id="scheduled-faculty">0</h4>
+                    <p class="stat-label mb-0">Faculty with Schedules</p>
+                    <div class="progress">
+                        <div class="progress-bar bg-secondary" role="progressbar" style="width: 0%" id="scheduled-progress" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                    <p class="text-muted small mb-0 mt-2"><span id="scheduling-percent">0%</span> of faculty have set interview dates</p>
+                </div>
+            </div>
+        </div>
 
-                        card.innerHTML = `
-                            <div class="card">
-                                <div class="card-body">
-                                    <h5 class="card-title">${interview.applicant_name}</h5>
-                                    <p class="card-text"><strong>📚 Courses of Interest:</strong> ${interview.courses ? interview.courses : "N/A"}</p>
-                                    <p class="card-text"><strong>📅 Scheduled Date:</strong> ${interview.interview_date}</p>
-                                    <p class="card-text"><strong>👨‍🏫 Faculty:</strong> ${interview.faculty_name}</p>
-                                    <p class="card-text"><strong>✉️ Faculty Email:</strong>
-                                        <a href="mailto:${interview.email}" class="email-link">${interview.email}</a>
-                                    </p>
-                                </div>
+        <!-- Total Candidates -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card h-100 stats-card">
+                <div class="card-body p-4">
+                    <div class="icon success">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <h4 class="stat-value text-success" id="total-candidates">0</h4>
+                    <p class="stat-label mb-0">Total Candidates</p>
+                    <div class="progress">
+                        <div class="progress-bar bg-success" role="progressbar" style="width: 100%" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                    <p class="text-muted small mb-0 mt-2">All applicants in the system</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Average Rating -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card h-100 stats-card">
+                <div class="card-body p-4">
+                    <div class="icon warning">
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <h4 class="stat-value text-warning" id="avg-rating">0.0</h4>
+                    <p class="stat-label mb-0">Average Rating</p>
+                    <div class="progress">
+                        <div class="progress-bar bg-warning" role="progressbar" style="width: 0%" id="rating-progress" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                    <p class="text-muted small mb-0 mt-2">Across all rated candidates</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Row -->
+    <div class="row mb-4">
+        <!-- Faculty Status Chart -->
+        <div class="col-xl-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header py-3">
+                    <h5 class="mb-0 fw-bold text-white">Faculty Interview Scheduling Status</h5>
+                </div>
+                <div class="card-body p-4">
+                    <div class="chart-container">
+                        <canvas id="faculty-status-chart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Ratings Distribution Chart -->
+        <div class="col-xl-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header py-3 secondary">
+                    <h5 class="mb-0 fw-bold text-white">Candidate Ratings Distribution</h5>
+                </div>
+                <div class="card-body p-4">
+                    <div class="chart-container">
+                        <canvas id="ratings-chart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Faculty List -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header py-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0 fw-bold text-white">Faculty Instructors</h5>
+                        <div>
+                            <div class="input-group">
+                                <input type="text" class="form-control" placeholder="Search faculty..." id="faculty-search">
+                                <button class="btn btn-light" type="button">
+                                    <i class="fas fa-search"></i>
+                                </button>
                             </div>
-                        `;
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Status</th>
+                                    <th>Interview Date</th>
+                                    <th>Scheduled Candidates</th>
+                                    <th>Avg Rating Given</th>
+                                    <th class="text-center">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="faculty-table-body">
+                                <!-- Will be populated by JavaScript -->
+                                <tr>
+                                    <td colspan="7" class="text-center py-4">
+                                        <div class="spinner-border text-secondary" role="status">
+                                            <span class="visually-hidden">Loading...</span>
+                                        </div>
+                                        <p class="text-muted mt-2 mb-0">Loading faculty data...</p>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="card-footer bg-white py-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <span class="text-muted">Showing <span id="faculty-count">0</span> faculty</span>
+                        </div>
+                        <div>
+                            <button class="btn btn-danger-soft">
+                                <i class="fas fa-file-pdf me-1"></i> Export Report
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-                        container.appendChild(card);
-                    });
-                })
-                .catch(error => console.error("Error fetching scheduled interviews:", error));
+    <!-- Additional Metrics -->
+    <div class="row">
+        <!-- Top-Rated Candidates Card -->
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header py-3 secondary">
+                    <h5 class="mb-0 fw-bold text-white">Top-Rated Candidates</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Candidate</th>
+                                    <th>Avg Rating</th>
+                                    <th>Interviews</th>
+                                </tr>
+                            </thead>
+                            <tbody id="top-candidates-body">
+                                <!-- Will be populated by JavaScript -->
+                                <tr>
+                                    <td colspan="3" class="text-center py-4">
+                                        <p class="text-muted mb-0">Loading top candidates...</p>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Upcoming Interviews Card -->
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header py-3">
+                    <h5 class="mb-0 fw-bold text-white">Upcoming Interviews</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Faculty</th>
+                                    <th>Candidates</th>
+                                </tr>
+                            </thead>
+                            <tbody id="upcoming-interviews-body">
+                                <!-- Will be populated by JavaScript -->
+                                <tr>
+                                    <td colspan="3" class="text-center py-4">
+                                        <p class="text-muted mb-0">Loading upcoming interviews...</p>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Faculty Details Modal -->
+<div class="modal fade" id="facultyDetailsModal" tabindex="-1" aria-labelledby="facultyDetailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header py-3" style="background: linear-gradient(to right, var(--primary), #c95659); color: white;">
+                <h5 class="modal-title fw-bold" id="faculty-modal-name">Faculty Details</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <h6 class="text-secondary mb-2">Contact Information</h6>
+                        <p class="mb-1"><strong>Email:</strong> <span id="modal-faculty-email"></span></p>
+                        <p class="mb-0"><strong>User ID:</strong> <span id="modal-faculty-id"></span></p>
+                    </div>
+                    <div class="col-md-6">
+                        <h6 class="text-secondary mb-2">Status</h6>
+                        <div id="modal-schedule-status"></div>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <h6 class="text-secondary mb-2">Scheduled Candidates</h6>
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Rating</th>
+                                    <th>Course</th>
+                                </tr>
+                            </thead>
+                            <tbody id="modal-candidates-list">
+                                <tr>
+                                    <td colspan="3" class="text-center py-3">
+                                        <p class="text-muted mb-0">No candidates scheduled</p>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6 class="text-secondary mb-2">Rating Statistics</h6>
+                        <div class="d-flex align-items-center mb-2">
+                            <div class="me-3">
+                                <span class="fw-bold text-secondary" id="modal-avg-rating">0.0</span>
+                                <span class="text-muted">/5</span>
+                            </div>
+                            <div id="modal-rating-stars"></div>
+                        </div>
+                        <p class="text-muted small mb-0" id="modal-rated-count">0 candidates rated</p>
+                    </div>
+                    <div class="col-md-6">
+                        <h6 class="text-secondary mb-2">Activity</h6>
+                        <p class="mb-1"><strong>Last Login:</strong> <span id="modal-last-login">N/A</span></p>
+                        <p class="mb-0"><strong>Account Created:</strong> <span id="modal-created-date">N/A</span></p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer border-0">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-premium">
+                    <i class="fas fa-envelope me-1"></i> Send Email
+                </button>
+                <button type="button" class="btn btn-danger-soft">
+                    <i class="fas fa-user-cog me-1"></i> Manage Access
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Toast container for notifications -->
+<div id="toast-container" class="position-fixed bottom-0 end-0 p-3"></div>
+{% endblock %}
+
+{% block scripts %}
+<!-- Chart.js for visualizations -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    // Initialize when DOM is loaded
+    document.addEventListener('DOMContentLoaded', function() {
+        // Load data
+        loadDashboardData();
+
+        // Initialize event listeners
+        initEventListeners();
+
+        // Initialize charts
+        initCharts();
+    });
+
+    // Initialize event listeners
+    function initEventListeners() {
+        // Refresh data button
+        document.getElementById('refresh-data').addEventListener('click', function() {
+            loadDashboardData();
+            showToast('Dashboard data refreshed', 'success');
         });
-    </script>
 
-</body>
-</html>
+        // Faculty search
+        document.getElementById('faculty-search').addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+            filterFacultyTable(searchTerm);
+        });
+    }
+
+    // Load dashboard data
+    function loadDashboardData() {
+        // In a real application, these would be API calls
+        loadFacultyData();
+        loadCandidateData();
+        loadInterviewData();
+
+        // Update charts with new data
+        updateCharts();
+    }
+
+    // Sample faculty data (would come from API)
+    const facultyData = [
+        { id: 1, name: "Dr. Sarah Johnson", email: "sjohnson@faculty.edu", status: "active", interviewDate: "2025-05-10", scheduledCount: 8, avgRating: 4.3, lastLogin: "2025-04-16", created: "2023-09-05" },
+        { id: 2, name: "Prof. Michael Chen", email: "mchen@faculty.edu", status: "active", interviewDate: "2025-05-15", scheduledCount: 6, avgRating: 3.8, lastLogin: "2025-04-18", created: "2023-10-12" },
+        { id: 3, name: "Dr. Amelia Rodriguez", email: "arodriguez@faculty.edu", status: "active", interviewDate: null, scheduledCount: 0, avgRating: 4.1, lastLogin: "2025-04-17", created: "2024-01-08" },
+        { id: 4, name: "Prof. James Williams", email: "jwilliams@faculty.edu", status: "active", interviewDate: "2025-05-12", scheduledCount: 5, avgRating: 4.5, lastLogin: "2025-04-15", created: "2023-11-22" },
+        { id: 5, name: "Dr. Emily Patel", email: "epatel@faculty.edu", status: "active", interviewDate: null, scheduledCount: 0, avgRating: 3.5, lastLogin: "2025-04-10", created: "2024-02-15" },
+        { id: 6, name: "Prof. David Thompson", email: "dthompson@faculty.edu", status: "inactive", interviewDate: null, scheduledCount: 0, avgRating: 0, lastLogin: "2025-03-05", created: "2023-10-30" },
+        { id: 7, name: "Dr. Lisa Kennedy", email: "lkennedy@faculty.edu", status: "active", interviewDate: "2025-05-20", scheduledCount: 4, avgRating: 4.2, lastLogin: "2025-04-18", created: "2024-03-10" },
+        { id: 8, name: "Prof. Robert Garcia", email: "rgarcia@faculty.edu", status: "active", interviewDate: "2025-05-18", scheduledCount: 7, avgRating: 3.9, lastLogin: "2025-04-17", created: "2023-09-15" }
+    ];
+
+    // Sample candidate data (would come from API)
+    const candidateData = [
+        { id: 1, name: "John Smith", avgRating: 4.7, interviews: 3 },
+        { id: 2, name: "Emma Johnson", avgRating: 4.6, interviews: 3 },
+        { id: 3, name: "Daniel Kim", avgRating: 4.5, interviews: 2 },
+        { id: 4, name: "Sofia Martinez", avgRating: 4.4, interviews: 2 },
+        { id: 5, name: "Alex Chen", avgRating: 4.3, interviews: 1 }
+    ];
+
+    // Sample interview data (would come from API)
+    const interviewData = [
+        { date: "2025-05-10", faculty: "Dr. Sarah Johnson", candidates: 8 },
+        { date: "2025-05-12", faculty: "Prof. James Williams", candidates: 5 },
+        { date: "2025-05-15", faculty: "Prof. Michael Chen", candidates: 6 },
+        { date: "2025-05-18", faculty: "Prof. Robert Garcia", candidates: 7 },
+        { date: "2025-05-20", faculty: "Dr. Lisa Kennedy", candidates: 4 }
+    ];
+
+    // Load faculty data
+    function loadFacultyData() {
+        // In a real application, this would be an API call
+        // For demo, we're using the sample data
+
+        // Update faculty metrics
+        const totalFaculty = facultyData.length;
+        const activeFaculty = facultyData.filter(f => f.status === 'active').length;
+        const scheduledFaculty = facultyData.filter(f => f.interviewDate !== null).length;
+        const schedulingPercent = Math.round((scheduledFaculty / activeFaculty) * 100);
+
+        // Calculate average rating across all faculty
+        let totalRatings = 0;
+        let ratingCount = 0;
+        facultyData.forEach(faculty => {
+            if (faculty.avgRating > 0) {
+                totalRatings += faculty.avgRating;
+                ratingCount++;
+            }
+        });
+        const avgRating = ratingCount > 0 ? (totalRatings / ratingCount).toFixed(1) : '0.0';
+
+        // Update DOM elements
+        document.getElementById('total-faculty').textContent = totalFaculty;
+        document.getElementById('scheduled-faculty').textContent = scheduledFaculty;
+        document.getElementById('scheduling-percent').textContent = schedulingPercent + '%';
+        document.getElementById('avg-rating').textContent = avgRating;
+        document.getElementById('faculty-count').textContent = totalFaculty;
+
+        // Update progress bars
+        document.getElementById('scheduled-progress').style.width = schedulingPercent + '%';
+        document.getElementById('scheduled-progress').setAttribute('aria-valuenow', schedulingPercent);
+
+        const ratingPercent = Math.round((parseFloat(avgRating) / 5) * 100);
+        document.getElementById('rating-progress').style.width = ratingPercent + '%';
+        document.getElementById('rating-progress').setAttribute('aria-valuenow', ratingPercent);
+
+        // Populate faculty table
+        populateFacultyTable(facultyData);
+    }
+
+    // Load candidate data
+    function loadCandidateData() {
+        // In a real application, this would be an API call
+        // For demo, we're using the sample data
+
+        // Update candidate metrics
+        const totalCandidates = 35; // Would come from API
+        document.getElementById('total-candidates').textContent = totalCandidates;
+
+        // Populate top candidates table
+        populateTopCandidatesTable(candidateData);
+    }
+
+    // Load interview data
+    function loadInterviewData() {
+        // In a real application, this would be an API call
+        // For demo, we're using the sample data
+
+        // Populate upcoming interviews table
+        populateUpcomingInterviewsTable(interviewData);
+    }
+
+    // Populate faculty table
+    function populateFacultyTable(data) {
+        const tableBody = document.getElementById('faculty-table-body');
+        tableBody.innerHTML = '';
+
+        data.forEach(faculty => {
+            const row = document.createElement('tr');
+
+            // Format the status indicator
+            const statusHtml = `
+                <div class="d-flex align-items-center">
+                    <span class="status-circle ${faculty.status === 'active' ? 'status-active' : 'status-inactive'}"></span>
+                    <span>${faculty.status === 'active' ? 'Active' : 'Inactive'}</span>
+                </div>
+            `;
+
+            // Format the interview date
+            const dateHtml = faculty.interviewDate
+                ? `<span class="date-badge scheduled">${formatDate(faculty.interviewDate)}</span>`
+                : `<span class="date-badge not-scheduled">Not Scheduled</span>`;
+
+            // Format the rating with stars
+            const ratingHtml = faculty.avgRating > 0
+                ? `<div class="d-flex align-items-center">
+                <span class="fw-bold me-2">${faculty.avgRating.toFixed(1)}</span>
+                      ${generateRatingStars(faculty.avgRating)}
+                   </div>`
+                : `<span class="text-muted">No ratings</span>`;
+
+            row.innerHTML = `
+                <td>
+                    <div class="d-flex align-items-center">
+                        <div class="me-3">
+                            <div class="avatar bg-secondary text-white rounded-circle d-flex align-items-center justify-content-center"
+                                style="width:40px; height:40px; font-weight:500">
+                                ${getInitials(faculty.name)}
+                            </div>
+                        </div>
+                        <div>
+                            <h6 class="mb-0">${faculty.name}</h6>
+                        </div>
+                    </div>
+                </td>
+                <td>${faculty.email}</td>
+                <td>${statusHtml}</td>
+                <td>${dateHtml}</td>
+                <td>
+                    <span class="fw-medium ${faculty.scheduledCount > 0 ? 'text-success' : 'text-muted'}">${faculty.scheduledCount}</span>
+                </td>
+                <td>${ratingHtml}</td>
+                <td class="text-center">
+                    <button class="btn btn-sm btn-outline-secondary view-faculty-btn" data-id="${faculty.id}">
+                        <i class="fas fa-eye me-1"></i> View
+                    </button>
+                </td>
+            `;
+
+            tableBody.appendChild(row);
+        });
+
+        // Add event listeners to view buttons
+        document.querySelectorAll('.view-faculty-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const facultyId = parseInt(this.dataset.id);
+                openFacultyModal(facultyId);
+            });
+        });
+    }
+
+    // Populate top candidates table
+    function populateTopCandidatesTable(data) {
+        const tableBody = document.getElementById('top-candidates-body');
+        tableBody.innerHTML = '';
+
+        data.forEach(candidate => {
+            const row = document.createElement('tr');
+
+            row.innerHTML = `
+                <td>
+                    <div class="d-flex align-items-center">
+                        <div class="me-3">
+                            <div class="avatar bg-primary text-white rounded-circle d-flex align-items-center justify-content-center"
+                                style="width:36px; height:36px; font-weight:500">
+                                ${getInitials(candidate.name)}
+                            </div>
+                        </div>
+                        <div>
+                            <h6 class="mb-0">${candidate.name}</h6>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <div class="d-flex align-items-center">
+                        <span class="fw-bold me-2">${candidate.avgRating.toFixed(1)}</span>
+                        ${generateRatingStars(candidate.avgRating)}
+                    </div>
+                </td>
+                <td>
+                    <span class="rating-pill ${getRatingClass(candidate.avgRating)}">
+                        <i class="fas fa-calendar-check me-1"></i> ${candidate.interviews}
+                    </span>
+                </td>
+            `;
+
+            tableBody.appendChild(row);
+        });
+    }
+
+    // Populate upcoming interviews table
+    function populateUpcomingInterviewsTable(data) {
+        const tableBody = document.getElementById('upcoming-interviews-body');
+        tableBody.innerHTML = '';
+
+        // Sort interviews by date
+        const sortedInterviews = [...data].sort((a, b) => new Date(a.date) - new Date(b.date));
+
+        sortedInterviews.forEach(interview => {
+            const row = document.createElement('tr');
+
+            row.innerHTML = `
+                <td>
+                    <div class="d-flex align-items-center">
+                        <div class="me-2 text-secondary">
+                            <i class="fas fa-calendar-day"></i>
+                        </div>
+                        <div>
+                            <h6 class="mb-0">${formatDate(interview.date)}</h6>
+                            <small class="text-muted">${getDayOfWeek(interview.date)}</small>
+                        </div>
+                    </div>
+                </td>
+                <td>${interview.faculty}</td>
+                <td>
+                    <div class="d-flex align-items-center">
+                        <span class="rating-pill high">
+                            <i class="fas fa-users me-1"></i> ${interview.candidates}
+                        </span>
+                    </div>
+                </td>
+            `;
+
+            tableBody.appendChild(row);
+        });
+    }
+
+    // Open faculty details modal
+    function openFacultyModal(facultyId) {
+        // Find the faculty member
+        const faculty = facultyData.find(f => f.id === facultyId);
+        if (!faculty) return;
+
+        // Update modal content
+        document.getElementById('faculty-modal-name').textContent = faculty.name;
+        document.getElementById('modal-faculty-email').textContent = faculty.email;
+        document.getElementById('modal-faculty-id').textContent = faculty.id;
+        document.getElementById('modal-avg-rating').textContent = faculty.avgRating.toFixed(1);
+        document.getElementById('modal-rating-stars').innerHTML = generateRatingStars(faculty.avgRating);
+        document.getElementById('modal-rated-count').textContent = `${Math.round(faculty.avgRating * 3)} candidates rated`;
+        document.getElementById('modal-last-login').textContent = formatDate(faculty.lastLogin);
+        document.getElementById('modal-created-date').textContent = formatDate(faculty.created);
+
+        // Schedule status
+        const scheduleStatusEl = document.getElementById('modal-schedule-status');
+        if (faculty.interviewDate) {
+            scheduleStatusEl.innerHTML = `
+                <div class="d-flex align-items-center p-3 rounded-3 bg-success bg-opacity-10">
+                    <div class="icon me-3 bg-success bg-opacity-20 text-success p-2 rounded-circle">
+                        <i class="fas fa-calendar-check"></i>
+                    </div>
+                    <div>
+                        <h6 class="mb-1 fw-bold text-success">Interview Date Scheduled</h6>
+                        <p class="mb-0">${formatDate(faculty.interviewDate)} (${getDayOfWeek(faculty.interviewDate)})</p>
+                    </div>
+                </div>
+            `;
+        } else {
+            scheduleStatusEl.innerHTML = `
+                <div class="d-flex align-items-center p-3 rounded-3 bg-warning bg-opacity-10">
+                    <div class="icon me-3 bg-warning bg-opacity-20 text-warning p-2 rounded-circle">
+                        <i class="fas fa-calendar-xmark"></i>
+                    </div>
+                    <div>
+                        <h6 class="mb-1 fw-bold text-warning">No Interview Date Set</h6>
+                        <p class="mb-0">This faculty has not scheduled interview dates yet.</p>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Candidates list (mock data for demo)
+        const candidatesListEl = document.getElementById('modal-candidates-list');
+        if (faculty.scheduledCount > 0) {
+            candidatesListEl.innerHTML = '';
+
+            // Create sample scheduled candidates based on the count
+            for (let i = 0; i < faculty.scheduledCount; i++) {
+                const sampleRating = (3.5 + Math.random() * 1.5).toFixed(1);
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>Candidate ${i+1}</td>
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <span class="me-1">${sampleRating}</span>
+                            ${generateRatingStars(sampleRating)}
+                        </div>
+                    </td>
+                    <td>Sample Course ${i+1}</td>
+                `;
+                candidatesListEl.appendChild(row);
+            }
+        } else {
+            candidatesListEl.innerHTML = `
+                <tr>
+                    <td colspan="3" class="text-center py-3">
+                        <p class="text-muted mb-0">No candidates scheduled</p>
+                    </td>
+                </tr>
+            `;
+        }
+
+        // Show the modal
+        const modal = new bootstrap.Modal(document.getElementById('facultyDetailsModal'));
+        modal.show();
+    }
+
+    // Filter faculty table based on search
+    function filterFacultyTable(searchTerm) {
+        const filteredFaculty = facultyData.filter(faculty => {
+            return faculty.name.toLowerCase().includes(searchTerm) ||
+                   faculty.email.toLowerCase().includes(searchTerm);
+        });
+
+        populateFacultyTable(filteredFaculty);
+        document.getElementById('faculty-count').textContent = filteredFaculty.length;
+    }
+
+    // Initialize charts
+    let facultyStatusChart = null;
+    let ratingsChart = null;
+
+    function initCharts() {
+        // Faculty status chart
+        const facultyStatusCtx = document.getElementById('faculty-status-chart').getContext('2d');
+        facultyStatusChart = new Chart(facultyStatusCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Scheduled', 'Not Scheduled', 'Inactive'],
+                datasets: [{
+                    data: [0, 0, 0],
+                    backgroundColor: [
+                        '#236465', // Scheduled (secondary color)
+                        '#c95659', // Not Scheduled (primary color)
+                        '#6c757d'  // Inactive (gray)
+                    ],
+                    borderColor: 'white',
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '65%',
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            padding: 20,
+                            usePointStyle: true,
+                            pointStyle: 'circle'
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const label = context.label || '';
+                                const value = context.formattedValue || '';
+                                const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                const percentage = ((context.raw / total) * 100).toFixed(1);
+                                return `${label}: ${value} (${percentage}%)`;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        // Ratings distribution chart
+        const ratingsCtx = document.getElementById('ratings-chart').getContext('2d');
+        ratingsChart = new Chart(ratingsCtx, {
+            type: 'bar',
+            data: {
+                labels: ['1 Star', '2 Stars', '3 Stars', '4 Stars', '5 Stars'],
+                datasets: [{
+                    label: 'Number of Candidates',
+                    data: [0, 0, 0, 0, 0],
+                    backgroundColor: [
+                        'rgba(173, 66, 69, 0.2)',
+                        'rgba(173, 66, 69, 0.4)',
+                        'rgba(173, 66, 69, 0.6)',
+                        'rgba(173, 66, 69, 0.8)',
+                        'rgba(173, 66, 69, 1.0)'
+                    ],
+                    borderColor: [
+                        'rgb(173, 66, 69)',
+                        'rgb(173, 66, 69)',
+                        'rgb(173, 66, 69)',
+                        'rgb(173, 66, 69)',
+                        'rgb(173, 66, 69)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            precision: 0
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                }
+            }
+        });
+
+        // Initial update
+        updateCharts();
+    }
+
+    // Update charts with current data
+    function updateCharts() {
+        // Update faculty status chart
+        const scheduledCount = facultyData.filter(f => f.status === 'active' && f.interviewDate !== null).length;
+        const notScheduledCount = facultyData.filter(f => f.status === 'active' && f.interviewDate === null).length;
+        const inactiveCount = facultyData.filter(f => f.status === 'inactive').length;
+
+        facultyStatusChart.data.datasets[0].data = [scheduledCount, notScheduledCount, inactiveCount];
+        facultyStatusChart.update();
+
+        // Update ratings distribution chart (mock data for demo)
+        const ratingDistribution = [2, 5, 8, 12, 8]; // Would come from API
+        ratingsChart.data.datasets[0].data = ratingDistribution;
+        ratingsChart.update();
+    }
+
+    // Utility Functions
+
+    // Format date string
+    function formatDate(dateString) {
+        if (!dateString) return 'Not Set';
+
+        const date = new Date(dateString);
+        return new Intl.DateTimeFormat('en-US', {
+            month: 'short',
+            day: 'numeric',
+            year: 'numeric'
+        }).format(date);
+    }
+
+    // Get day of week
+    function getDayOfWeek(dateString) {
+        if (!dateString) return '';
+
+        const date = new Date(dateString);
+        return new Intl.DateTimeFormat('en-US', { weekday: 'long' }).format(date);
+    }
+
+    // Get initials from name
+    function getInitials(name) {
+        return name
+            .split(' ')
+            .map(part => part.charAt(0))
+            .join('')
+            .toUpperCase();
+    }
+
+    // Generate rating stars HTML
+    function generateRatingStars(rating) {
+        const fullStars = Math.floor(rating);
+        const halfStar = rating % 1 >= 0.5;
+        const emptyStars = 5 - fullStars - (halfStar ? 1 : 0);
+
+        let starsHtml = '';
+
+        // Full stars
+        for (let i = 0; i < fullStars; i++) {
+            starsHtml += '<i class="fas fa-star text-warning"></i>';
+        }
+
+        // Half star
+        if (halfStar) {
+            starsHtml += '<i class="fas fa-star-half-alt text-warning"></i>';
+        }
+
+        // Empty stars
+        for (let i = 0; i < emptyStars; i++) {
+            starsHtml += '<i class="far fa-star text-muted"></i>';
+        }
+
+        return starsHtml;
+    }
+
+    // Get rating class based on rating value
+    function getRatingClass(rating) {
+        if (rating >= 4) return 'high';
+        if (rating >= 3) return 'medium';
+        return 'low';
+    }
+
+    // Show toast notification
+    function showToast(message, type = 'success') {
+        // Create toast container if it doesn't exist
+        let toastContainer = document.getElementById('toast-container');
+        if (!toastContainer) {
+            toastContainer = document.createElement('div');
+            toastContainer.id = 'toast-container';
+            toastContainer.className = 'position-fixed bottom-0 end-0 p-3';
+            document.body.appendChild(toastContainer);
+        }
+
+        // Create toast element
+        const toastId = 'toast-' + Date.now();
+        const toast = document.createElement('div');
+        toast.id = toastId;
+        toast.className = `toast align-items-center text-white border-0`;
+        toast.setAttribute('role', 'alert');
+        toast.setAttribute('aria-live', 'assertive');
+        toast.setAttribute('aria-atomic', 'true');
+
+        // Set appropriate background class
+        switch(type) {
+            case 'success':
+                toast.classList.add('bg-success');
+                break;
+            case 'error':
+                toast.classList.add('bg-danger');
+                break;
+            case 'warning':
+                toast.classList.add('bg-warning');
+                break;
+            case 'info':
+                toast.classList.add('bg-info');
+                break;
+            default:
+                toast.classList.add('bg-dark');
+        }
+
+        // Icon based on type
+        let icon;
+        switch(type) {
+            case 'success':
+                icon = 'check-circle';
+                break;
+            case 'error':
+                icon = 'times-circle';
+                break;
+            case 'warning':
+                icon = 'exclamation-triangle';
+                break;
+            case 'info':
+                icon = 'info-circle';
+                break;
+            default:
+                icon = 'bell';
+        }
+
+        toast.innerHTML = `
+            <div class="d-flex">
+                <div class="toast-body">
+                    <i class="fas fa-${icon} me-2"></i> ${message}
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        `;
+
+        toastContainer.appendChild(toast);
+
+        // Initialize and show toast
+        const bsToast = new bootstrap.Toast(toast, {
+            autohide: true,
+            delay: 3000
+        });
+        bsToast.show();
+
+        // Remove the toast after it's hidden
+        toast.addEventListener('hidden.bs.toast', function() {
+            if (toastContainer.contains(toast)) {
+                toastContainer.removeChild(toast);
+            }
+        });
+    }
+</script>
+{% endblock %}{% extends "base.html" %}
+
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block styles %}
+<style>
+    /* Premium styling enhancements */
+    .card {
+        border-radius: 0.75rem;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+        transition: all 0.3s ease;
+        border: none;
+        overflow: hidden;
+    }
+
+    .card:hover {
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+    }
+
+    .card-header {
+        border-top-left-radius: 0.75rem !important;
+        border-top-right-radius: 0.75rem !important;
+        background: linear-gradient(to right, var(--primary), #c95659);
+        color: white;
+        border: none;
+    }
+
+    .card-header.secondary {
+        background: linear-gradient(to right, var(--secondary), #307f80);
+    }
+
+    .stats-card {
+        min-height: 160px;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .stats-card .icon {
+        width: 50px;
+        height: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 12px;
+        margin-bottom: 1rem;
+    }
+
+    .stats-card .icon.primary {
+        background-color: rgba(173, 66, 69, 0.1);
+        color: var(--primary);
+    }
+
+    .stats-card .icon.secondary {
+        background-color: rgba(35, 100, 101, 0.1);
+        color: var(--secondary);
+    }
+
+    .stats-card .icon.success {
+        background-color: rgba(25, 135, 84, 0.1);
+        color: #198754;
+    }
+
+    .stats-card .icon.warning {
+        background-color: rgba(255, 193, 7, 0.1);
+        color: #ffc107;
+    }
+
+    .stats-card .icon i {
+        font-size: 1.5rem;
+    }
+
+    .stats-card .stat-value {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 0.25rem;
+    }
+
+    .stats-card .stat-label {
+        color: #6c757d;
+        font-size: 0.9rem;
+    }
+
+    .progress {
+        height: 8px;
+        border-radius: 4px;
+        margin-top: 0.5rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .progress-bar.bg-primary {
+        background: linear-gradient(to right, var(--primary), #c95659) !important;
+    }
+
+    .progress-bar.bg-secondary {
+        background: linear-gradient(to right, var(--secondary), #307f80) !important;
+    }
+
+    .rating-pill {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        border-radius: 50px;
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
+
+    .rating-pill.high {
+        background-color: rgba(25, 135, 84, 0.1);
+        color: #198754;
+    }
+
+    .rating-pill.medium {
+        background-color: rgba(255, 193, 7, 0.1);
+        color: #ffc107;
+    }
+
+    .rating-pill.low {
+        background-color: rgba(173, 66, 69, 0.1);
+        color: var(--primary);
+    }
+
+    .table thead th {
+        background-color: rgba(35, 100, 101, 0.1);
+        color: var(--secondary);
+        font-weight: 600;
+        border: none;
+    }
+
+    .table tbody tr:nth-child(even) {
+        background-color: rgba(248, 249, 250, 0.5);
+    }
+
+    .table-hover tbody tr:hover {
+        background-color: rgba(173, 66, 69, 0.05);
+    }
+
+    .btn-premium {
+        background: linear-gradient(to right, var(--secondary), #307f80);
+        color: white;
+        border: none;
+        box-shadow: 0 4px 10px rgba(35, 100, 101, 0.2);
+        transition: all 0.3s ease;
+    }
+
+    .btn-premium:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 15px rgba(35, 100, 101, 0.3);
+        color: white;
+    }
+
+    .btn-danger-soft {
+        background-color: rgba(173, 66, 69, 0.1);
+        color: var(--primary);
+        border: none;
+    }
+
+    .btn-danger-soft:hover {
+        background-color: var(--primary);
+        color: white;
+    }
+
+    .date-badge {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        border-radius: 50px;
+        font-size: 0.85rem;
+        font-weight: 500;
+    }
+
+    .date-badge.scheduled {
+        background-color: rgba(25, 135, 84, 0.1);
+        color: #198754;
+        border: 1px solid rgba(25, 135, 84, 0.2);
+    }
+
+    .date-badge.not-scheduled {
+        background-color: rgba(173, 66, 69, 0.1);
+        color: var(--primary);
+        border: 1px solid rgba(173, 66, 69, 0.2);
+    }
+
+    /* Animation classes */
+    .fade-in {
+        animation: fadeIn 0.5s ease-in-out forwards;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Stats counter animation */
+    .stat-count {
+        animation: countUp 2s ease-out forwards;
+    }
+
+    @keyframes countUp {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Charts container */
+    .chart-container {
+        position: relative;
+        height: 280px;
+        width: 100%;
+    }
+
+    /* Faculty status circle */
+    .status-circle {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        display: inline-block;
+        margin-right: 5px;
+    }
+
+    .status-active {
+        background-color: #198754;
+    }
+
+    .status-inactive {
+        background-color: #6c757d;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Header section with title -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-0 bg-white shadow-sm">
+                <div class="card-body p-4">
+                    <div class="row align-items-center">
+                        <div class="col-md-8">
+                            <h3 class="fw-bold text-secondary mb-2">Admin Dashboard</h3>
+                            <p class="text-muted mb-0">Manage faculty instructors and monitor hiring metrics</p>
+                        </div>
+                        <div class="col-md-4 text-end">
+                            <button class="btn btn-premium" id="refresh-data">
+                                <i class="fas fa-sync-alt me-2"></i> Refresh Data
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Key metrics cards -->
+    <div class="row mb-4">
+        <!-- Total Faculty -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card h-100 stats-card">
+                <div class="card-body p-4">
+                    <div class="icon primary">
+                        <i class="fas fa-user-tie"></i>
+                    </div>
+                    <h4 class="stat-value text-primary" id="total-faculty">0</h4>
+                    <p class="stat-label mb-0">Total Faculty</p>
+                    <div class="progress">
+                        <div class="progress-bar bg-primary" role="progressbar" style="width: 100%" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                    <p class="text-muted small mb-0 mt-2">All registered faculty instructors</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Faculty with Scheduled Interviews -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card h-100 stats-card">
+                <div class="card-body p-4">
+                    <div class="icon secondary">
+                        <i class="fas fa-calendar-check"></i>
+                    </div>
+                    <h4 class="stat-value text-secondary" id="scheduled-faculty">0</h4>
+                    <p class="stat-label mb-0">Faculty with Schedules</p>
+                    <div class="progress">
+                        <div class="progress-bar bg-secondary" role="progressbar" style="width: 0%" id="scheduled-progress" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                    <p class="text-muted small mb-0 mt-2"><span id="scheduling-percent">0%</span> of faculty have set interview dates</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Total Candidates -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card h-100 stats-card">
+                <div class="card-body p-4">
+                    <div class="icon success">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <h4 class="stat-value text-success" id="total-candidates">0</h4>
+                    <p class="stat-label mb-0">Total Candidates</p>
+                    <div class="progress">
+                        <div class="progress-bar bg-success" role="progressbar" style="width: 100%" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                    <p class="text-muted small mb-0 mt-2">All applicants in the system</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Average Rating -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card h-100 stats-card">
+                <div class="card-body p-4">
+                    <div class="icon warning">
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <h4 class="stat-value text-warning" id="avg-rating">0.0</h4>
+                    <p class="stat-label mb-0">Average Rating</p>
+                    <div class="progress">
+                        <div class="progress-bar bg-warning" role="progressbar" style="width: 0%" id="rating-progress" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                    <p class="text-muted small mb-0 mt-2">Across all rated candidates</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Row -->
+    <div class="row mb-4">
+        <!-- Faculty Status Chart -->
+        <div class="col-xl-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header py-3">
+                    <h5 class="mb-0 fw-bold text-white">Faculty Interview Scheduling Status</h5>
+                </div>
+                <div class="card-body p-4">
+                    <div class="chart-container">
+                        <canvas id="faculty-status-chart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Ratings Distribution Chart -->
+        <div class="col-xl-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header py-3 secondary">
+                    <h5 class="mb-0 fw-bold text-white">Candidate Ratings Distribution</h5>
+                </div>
+                <div class="card-body p-4">
+                    <div class="chart-container">
+                        <canvas id="ratings-chart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Faculty List -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header py-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0 fw-bold text-white">Faculty Instructors</h5>
+                        <div>
+                            <div class="input-group">
+                                <input type="text" class="form-control" placeholder="Search faculty..." id="faculty-search">
+                                <button class="btn btn-light" type="button">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Status</th>
+                                    <th>Interview Date</th>
+                                    <th>Scheduled Candidates</th>
+                                    <th>Avg Rating Given</th>
+                                    <th class="text-center">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="faculty-table-body">
+                                <!-- Will be populated by JavaScript -->
+                                <tr>
+                                    <td colspan="7" class="text-center py-4">
+                                        <div class="spinner-border text-secondary" role="status">
+                                            <span class="visually-hidden">Loading...</span>
+                                        </div>
+                                        <p class="text-muted mt-2 mb-0">Loading faculty data...</p>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="card-footer bg-white py-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <span class="text-muted">Showing <span id="faculty-count">0</span> faculty</span>
+                        </div>
+                        <div>
+                            <button class="btn btn-danger-soft">
+                                <i class="fas fa-file-pdf me-1"></i> Export Report
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Additional Metrics -->
+    <div class="row">
+        <!-- Top-Rated Candidates Card -->
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header py-3 secondary">
+                    <h5 class="mb-0 fw-bold text-white">Top-Rated Candidates</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Candidate</th>
+                                    <th>Avg Rating</th>
+                                    <th>Interviews</th>
+                                </tr>
+                            </thead>
+                            <tbody id="top-candidates-body">
+                                <!-- Will be populated by JavaScript -->
+                                <tr>
+                                    <td colspan="3" class="text-center py-4">
+                                        <p class="text-muted mb-0">Loading top candidates...</p>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Upcoming Interviews Card -->
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header py-3">
+                    <h5 class="mb-0 fw-bold text-white">Upcoming Interviews</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Faculty</th>
+                                    <th>Candidates</th>
+                                </tr>
+                            </thead>
+                            <tbody id="upcoming-interviews-body">
+                                <!-- Will be populated by JavaScript -->
+                                <tr>
+                                    <td colspan="3" class="text-center py-4">
+                                        <p class="text-muted mb-0">Loading upcoming interviews...</p>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Faculty Details Modal -->
+<div class="modal fade" id="facultyDetailsModal" tabindex="-1" aria-labelledby="facultyDetailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header py-3" style="background: linear-gradient(to right, var(--primary), #c95659); color: white;">
+                <h5 class="modal-title fw-bold" id="faculty-modal-name">Faculty Details</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <h6 class="text-secondary mb-2">Contact Information</h6>
+                        <p class="mb-1"><strong>Email:</strong> <span id="modal-faculty-email"></span></p>
+                        <p class="mb-0"><strong>User ID:</strong> <span id="modal-faculty-id"></span></p>
+                    </div>
+                    <div class="col-md-6">
+                        <h6 class="text-secondary mb-2">Status</h6>
+                        <div id="modal-schedule-status"></div>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <h6 class="text-secondary mb-2">Scheduled Candidates</h6>
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Rating</th>
+                                    <th>Course</th>
+                                </tr>
+                            </thead>
+                            <tbody id="modal-candidates-list">
+                                <tr>
+                                    <td colspan="3" class="text-center py-3">
+                                        <p class="text-muted mb-0">No candidates scheduled</p>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6 class="text-secondary mb-2">Rating Statistics</h6>
+                        <div class="d-flex align-items-center mb-2">
+                            <div class="me-3">
+                                <span class="fw-bold text-secondary" id="modal-avg-rating">0.0</span>
+                                <span class="text-muted">/5</span>
+                            </div>
+                            <div id="modal-rating-stars"></div>
+                        </div>
+                        <p class="text-muted small mb-0" id="modal-rated-count">0 candidates rated</p>
+                    </div>
+                    <div class="col-md-6">
+                        <h6 class="text-secondary mb-2">Activity</h6>
+                        <p class="mb-1"><strong>Last Login:</strong> <span id="modal-last-login">N/A</span></p>
+                        <p class="mb-0"><strong>Account Created:</strong> <span id="modal-created-date">N/A</span></p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer border-0">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-premium">
+                    <i class="fas fa-envelope me-1"></i> Send Email
+                </button>
+                <button type="button" class="btn btn-danger-soft">
+                    <i class="fas fa-user-cog me-1"></i> Manage Access
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Toast container for notifications -->
+<div id="toast-container" class="position-fixed bottom-0 end-0 p-3"></div>
+{% endblock %}
+
+{% block scripts %}
+<!-- Chart.js for visualizations -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    // Initialize when DOM is loaded
+    document.addEventListener('DOMContentLoaded', function() {
+        // Load data
+        loadDashboardData();
+
+        // Initialize event listeners
+        initEventListeners();
+
+        // Initialize charts
+        initCharts();
+    });
+
+    // Initialize event listeners
+    function initEventListeners() {
+        // Refresh data button
+        document.getElementById('refresh-data').addEventListener('click', function() {
+            loadDashboardData();
+            showToast('Dashboard data refreshed', 'success');
+        });
+
+        // Faculty search
+        document.getElementById('faculty-search').addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+            filterFacultyTable(searchTerm);
+        });
+    }
+
+    // Load dashboard data
+    function loadDashboardData() {
+        // In a real application, these would be API calls
+        loadFacultyData();
+        loadCandidateData();
+        loadInterviewData();
+
+        // Update charts with new data
+        updateCharts();
+    }
+
+    // Sample faculty data (would come from API)
+    const facultyData = [
+        { id: 1, name: "Dr. Sarah Johnson", email: "sjohnson@faculty.edu", status: "active", interviewDate: "2025-05-10", scheduledCount: 8, avgRating: 4.3, lastLogin: "2025-04-16", created: "2023-09-05" },
+        { id: 2, name: "Prof. Michael Chen", email: "mchen@faculty.edu", status: "active", interviewDate: "2025-05-15", scheduledCount: 6, avgRating: 3.8, lastLogin: "2025-04-18", created: "2023-10-12" },
+        { id: 3, name: "Dr. Amelia Rodriguez", email: "arodriguez@faculty.edu", status: "active", interviewDate: null, scheduledCount: 0, avgRating: 4.1, lastLogin: "2025-04-17", created: "2024-01-08" },
+        { id: 4, name: "Prof. James Williams", email: "jwilliams@faculty.edu", status: "active", interviewDate: "2025-05-12", scheduledCount: 5, avgRating: 4.5, lastLogin: "2025-04-15", created: "2023-11-22" },
+        { id: 5, name: "Dr. Emily Patel", email: "epatel@faculty.edu", status: "active", interviewDate: null, scheduledCount: 0, avgRating: 3.5, lastLogin: "2025-04-10", created: "2024-02-15" },
+        { id: 6, name: "Prof. David Thompson", email: "dthompson@faculty.edu", status: "inactive", interviewDate: null, scheduledCount: 0, avgRating: 0, lastLogin: "2025-03-05", created: "2023-10-30" },
+        { id: 7, name: "Dr. Lisa Kennedy", email: "lkennedy@faculty.edu", status: "active", interviewDate: "2025-05-20", scheduledCount: 4, avgRating: 4.2, lastLogin: "2025-04-18", created: "2024-03-10" },
+        { id: 8, name: "Prof. Robert Garcia", email: "rgarcia@faculty.edu", status: "active", interviewDate: "2025-05-18", scheduledCount: 7, avgRating: 3.9, lastLogin: "2025-04-17", created: "2023-09-15" }
+    ];
+
+    // Sample candidate data (would come from API)
+    const candidateData = [
+        { id: 1, name: "John Smith", avgRating: 4.7, interviews: 3 },
+        { id: 2, name: "Emma Johnson", avgRating: 4.6, interviews: 3 },
+        { id: 3, name: "Daniel Kim", avgRating: 4.5, interviews: 2 },
+        { id: 4, name: "Sofia Martinez", avgRating: 4.4, interviews: 2 },
+        { id: 5, name: "Alex Chen", avgRating: 4.3, interviews: 1 }
+    ];
+
+    // Sample interview data (would come from API)
+    const interviewData = [
+        { date: "2025-05-10", faculty: "Dr. Sarah Johnson", candidates: 8 },
+        { date: "2025-05-12", faculty: "Prof. James Williams", candidates: 5 },
+        { date: "2025-05-15", faculty: "Prof. Michael Chen", candidates: 6 },
+        { date: "2025-05-18", faculty: "Prof. Robert Garcia", candidates: 7 },
+        { date: "2025-05-20", faculty: "Dr. Lisa Kennedy", candidates: 4 }
+    ];
+
+    // Load faculty data
+    function loadFacultyData() {
+        // In a real application, this would be an API call
+        // For demo, we're using the sample data
+
+        // Update faculty metrics
+        const totalFaculty = facultyData.length;
+        const activeFaculty = facultyData.filter(f => f.status === 'active').length;
+        const scheduledFaculty = facultyData.filter(f => f.interviewDate !== null).length;
+        const schedulingPercent = Math.round((scheduledFaculty / activeFaculty) * 100);
+
+        // Calculate average rating across all faculty
+        let totalRatings = 0;
+        let ratingCount = 0;
+        facultyData.forEach(faculty => {
+            if (faculty.avgRating > 0) {
+                totalRatings += faculty.avgRating;
+                ratingCount++;
+            }
+        });
+        const avgRating = ratingCount > 0 ? (totalRatings / ratingCount).toFixed(1) : '0.0';
+
+        // Update DOM elements
+        document.getElementById('total-faculty').textContent = totalFaculty;
+        document.getElementById('scheduled-faculty').textContent = scheduledFaculty;
+        document.getElementById('scheduling-percent').textContent = schedulingPercent + '%';
+        document.getElementById('avg-rating').textContent = avgRating;
+        document.getElementById('faculty-count').textContent = totalFaculty;
+
+        // Update progress bars
+        document.getElementById('scheduled-progress').style.width = schedulingPercent + '%';
+        document.getElementById('scheduled-progress').setAttribute('aria-valuenow', schedulingPercent);
+
+        const ratingPercent = Math.round((parseFloat(avgRating) / 5) * 100);
+        document.getElementById('rating-progress').style.width = ratingPercent + '%';
+        document.getElementById('rating-progress').setAttribute('aria-valuenow', ratingPercent);
+
+        // Populate faculty table
+        populateFacultyTable(facultyData);
+    }
+
+    // Load candidate data
+    function loadCandidateData() {
+        // In a real application, this would be an API call
+        // For demo, we're using the sample data
+
+        // Update candidate metrics
+        const totalCandidates = 35; // Would come from API
+        document.getElementById('total-candidates').textContent = totalCandidates;
+
+        // Populate top candidates table
+        populateTopCandidatesTable(candidateData);
+    }
+
+    // Load interview data
+    function loadInterviewData() {
+        // In a real application, this would be an API call
+        // For demo, we're using the sample data
+
+        // Populate upcoming interviews table
+        populateUpcomingInterviewsTable(interviewData);
+    }
+
+    // Populate faculty table
+    function populateFacultyTable(data) {
+        const tableBody = document.getElementById('faculty-table-body');
+        tableBody.innerHTML = '';
+
+        data.forEach(faculty => {
+            const row = document.createElement('tr');
+
+            // Format the status indicator
+            const statusHtml = `
+                <div class="d-flex align-items-center">
+                    <span class="status-circle ${faculty.status === 'active' ? 'status-active' : 'status-inactive'}"></span>
+                    <span>${faculty.status === 'active' ? 'Active' : 'Inactive'}</span>
+                </div>
+            `;
+
+            // Format the interview date
+            const dateHtml = faculty.interviewDate
+                ? `<span class="date-badge scheduled">${formatDate(faculty.interviewDate)}</span>`
+                : `<span class="date-badge not-scheduled">Not Scheduled</span>`;
+
+            // Format the rating with stars
+            const ratingHtml = faculty.avgRating > 0
+                ? `<div class="d-flex align-items-center">

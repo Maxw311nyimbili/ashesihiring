@@ -164,9 +164,9 @@ def faculty_dashboard():
 def candidate_page():
     return render_template('candidate.html')
 
-@app.route('/admin_dashboard')
-def admin_dashboard():
-    return render_template('admin_dashboard.html')
+# @app.route('/admin_dashboard')
+# def admin_dashboard():
+#     return render_template('admin_dashboard.html')
 
 # =============================================================================
 # APPLICATION SUBMISSION
@@ -1149,6 +1149,196 @@ def remove_from_schedule():
     except Exception as e:
         app.logger.error(f"Error removing candidate from schedule: {str(e)}")
         return jsonify({"success": False, "message": str(e)}), 500
+
+
+
+
+
+# Add these routes to your existing flask_app.py
+
+@app.route('/admin_dashboard')
+def admin_dashboard():
+    """Render the admin dashboard page."""
+    # Check if user is an admin
+    if 'role' not in session or session['role'] != 'admin':
+        return redirect(url_for('login'))
+
+    return render_template('admin_dashboard.html')
+
+@app.route('/api/admin/dashboard_stats')
+def admin_dashboard_stats():
+    """API to get statistics for the admin dashboard."""
+    # Check if user is an admin
+    if 'role' not in session or session['role'] != 'admin':
+        return jsonify({"error": "Unauthorized"}), 403
+
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+
+        # Get total faculty count
+        cursor.execute("SELECT COUNT(*) as total FROM faculty_users")
+        faculty_count = cursor.fetchone()['total']
+
+        # Get faculty with scheduled interviews
+        cursor.execute("""
+            SELECT COUNT(DISTINCT faculty_id) as scheduled_count 
+            FROM interviews
+        """)
+        scheduled_faculty = cursor.fetchone()['scheduled_count']
+
+        # Get total applicants count
+        cursor.execute("SELECT COUNT(*) as total FROM applicants")
+        applicant_count = cursor.fetchone()['total']
+
+        # Get average rating across all rated applicants
+        cursor.execute("""
+            SELECT AVG(rating) as avg_rating, COUNT(*) as rated_count 
+            FROM comments 
+            WHERE rating IS NOT NULL
+        """)
+        rating_data = cursor.fetchone()
+        avg_rating = float(rating_data['avg_rating']) if rating_data['avg_rating'] else 0
+        rated_count = rating_data['rated_count']
+
+        # Get rating distribution
+        cursor.execute("""
+            SELECT 
+                FLOOR(rating) as rating_value,
+                COUNT(*) as count
+            FROM comments
+            WHERE rating IS NOT NULL
+            GROUP BY FLOOR(rating)
+            ORDER BY rating_value
+        """)
+        rating_distribution = cursor.fetchall()
+
+        # Format rating distribution for Chart.js
+        rating_labels = []
+        rating_counts = []
+        for i in range(1, 6):  # 1-5 stars
+            found = False
+            for item in rating_distribution:
+                if item['rating_value'] == i:
+                    rating_counts.append(item['count'])
+                    found = True
+                    break
+            if not found:
+                rating_counts.append(0)
+            rating_labels.append(f"{i} Star{'s' if i > 1 else ''}")
+
+        # Get faculty data with interview counts
+        cursor.execute("""
+            SELECT 
+                f.id, 
+                f.username, 
+                f.email,
+                f.created_at,
+                CASE WHEN MAX(i.id) IS NOT NULL THEN 'active' ELSE 'inactive' END as status,
+                COUNT(DISTINCT i.id) as interview_count,
+                AVG(c.rating) as avg_rating_given,
+                COUNT(DISTINCT c.id) as ratings_given,
+                MAX(i.interview_date) as latest_interview_date
+            FROM faculty_users f
+            LEFT JOIN interviews i ON f.id = i.faculty_id
+            LEFT JOIN comments c ON f.id = c.faculty_id
+            GROUP BY f.id, f.username, f.email, f.created_at
+        """)
+        faculty_data = cursor.fetchall()
+
+        # Process faculty data for the frontend
+        processed_faculty = []
+        for faculty in faculty_data:
+            processed_faculty.append({
+                "id": faculty['id'],
+                "name": faculty['username'],
+                "email": faculty['email'],
+                "status": faculty['status'],
+                "interviewDate": faculty['latest_interview_date'].isoformat() if faculty['latest_interview_date'] else None,
+                "scheduledCount": faculty['interview_count'],
+                "avgRating": float(faculty['avg_rating_given']) if faculty['avg_rating_given'] else 0,
+                "created": faculty['created_at'].isoformat(),
+                "lastLogin": None  # We don't track this yet, would need to add to schema
+            })
+
+        # Get top-rated candidates
+        cursor.execute("""
+            SELECT 
+                a.id,
+                CONCAT(a.first_name, ' ', a.last_name) as name,
+                AVG(c.rating) as avg_rating,
+                COUNT(DISTINCT i.id) as interview_count
+            FROM applicants a
+            JOIN comments c ON a.id = c.application_id
+            LEFT JOIN interviews i ON a.id = i.applicant_id
+            GROUP BY a.id, a.first_name, a.last_name
+            HAVING AVG(c.rating) >= 4
+            ORDER BY avg_rating DESC, interview_count DESC
+            LIMIT 5
+        """)
+        top_candidates = cursor.fetchall()
+
+        # Process candidate data for the frontend
+        processed_candidates = []
+        for candidate in top_candidates:
+            processed_candidates.append({
+                "id": candidate['id'],
+                "name": candidate['name'],
+                "avgRating": float(candidate['avg_rating']),
+                "interviews": candidate['interview_count']
+            })
+
+        # Get upcoming interviews
+        cursor.execute("""
+            SELECT 
+                i.interview_date as date,
+                f.username as faculty_name,
+                COUNT(DISTINCT i.applicant_id) as candidate_count
+            FROM interviews i
+            JOIN faculty_users f ON i.faculty_id = f.id
+            WHERE i.interview_date >= CURDATE()
+            GROUP BY i.interview_date, f.username
+            ORDER BY i.interview_date
+            LIMIT 5
+        """)
+        upcoming_interviews = cursor.fetchall()
+
+        # Process interview data for the frontend
+        processed_interviews = []
+        for interview in upcoming_interviews:
+            processed_interviews.append({
+                "date": interview['date'].isoformat(),
+                "faculty": interview['faculty_name'],
+                "candidates": interview['candidate_count']
+            })
+
+        conn.close()
+
+        return jsonify({
+            "faculty": {
+                "total": faculty_count,
+                "scheduled": scheduled_faculty,
+                "schedulingPercent": round((scheduled_faculty / faculty_count) * 100) if faculty_count > 0 else 0,
+                "data": processed_faculty
+            },
+            "candidates": {
+                "total": applicant_count,
+                "rated": rated_count,
+                "avgRating": round(avg_rating, 1),
+                "ratingDistribution": {
+                    "labels": rating_labels,
+                    "data": rating_counts
+                },
+                "topRated": processed_candidates
+            },
+            "interviews": {
+                "upcoming": processed_interviews
+            }
+        })
+
+    except Exception as e:
+        app.logger.error(f"Error getting admin dashboard stats: {str(e)}", exc_info=True)
+        return jsonify({"error": str(e)}), 500
 
 
 # =============================================================================
