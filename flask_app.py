@@ -1151,28 +1151,31 @@ def remove_from_schedule():
         return jsonify({"success": False, "message": str(e)}), 500
 
 
-
-
-
-# Add these routes to your existing flask_app.py
+# This file contains the fixed backend code portions for the admin dashboard
+# Add/update these functions in your flask_app.py
 
 @app.route('/admin_dashboard')
 def admin_dashboard():
     """Render the admin dashboard page."""
-    # Check if user is an admin
-    # if 'role' not in session or session['role'] != 'admin':
-    #     return redirect(url_for('login'))
+    try:
+        # Temporarily disable admin role check for testing
+        # if 'role' not in session or session['role'] != 'admin':
+        #     return redirect(url_for('login'))
 
-    return render_template('admin_dashboard.html')
+        return render_template('admin_dashboard.html')
+    except Exception as e:
+        app.logger.error(f"Error rendering admin dashboard: {str(e)}", exc_info=True)
+        return f"An error occurred: {str(e)}", 500
+
 
 @app.route('/api/admin/dashboard_stats')
 def admin_dashboard_stats():
     """API to get statistics for the admin dashboard."""
-    # Check if user is an admin
-    # if 'role' not in session or session['role'] != 'admin':
-    #     return jsonify({"error": "Unauthorized"}), 403
-
     try:
+        # Temporarily disable admin role check for testing
+        # if 'role' not in session or session['role'] != 'admin':
+        #     return jsonify({"error": "Unauthorized"}), 403
+
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
 
@@ -1185,11 +1188,13 @@ def admin_dashboard_stats():
             SELECT COUNT(DISTINCT faculty_id) as scheduled_count 
             FROM interviews
         """)
-        scheduled_faculty = cursor.fetchone()['scheduled_count']
+        result = cursor.fetchone()
+        scheduled_faculty = result['scheduled_count'] if result and 'scheduled_count' in result else 0
 
         # Get total applicants count
         cursor.execute("SELECT COUNT(*) as total FROM applicants")
-        applicant_count = cursor.fetchone()['total']
+        result = cursor.fetchone()
+        applicant_count = result['total'] if result and 'total' in result else 0
 
         # Get average rating across all rated applicants
         cursor.execute("""
@@ -1197,9 +1202,9 @@ def admin_dashboard_stats():
             FROM comments 
             WHERE rating IS NOT NULL
         """)
-        rating_data = cursor.fetchone()
-        avg_rating = float(rating_data['avg_rating']) if rating_data['avg_rating'] else 0
-        rated_count = rating_data['rated_count']
+        result = cursor.fetchone()
+        avg_rating = float(result['avg_rating']) if result and result['avg_rating'] else 0
+        rated_count = result['rated_count'] if result and 'rated_count' in result else 0
 
         # Get rating distribution
         cursor.execute("""
@@ -1211,7 +1216,7 @@ def admin_dashboard_stats():
             GROUP BY FLOOR(rating)
             ORDER BY rating_value
         """)
-        rating_distribution = cursor.fetchall()
+        rating_distribution = cursor.fetchall() or []
 
         # Format rating distribution for Chart.js
         rating_labels = []
@@ -1234,31 +1239,49 @@ def admin_dashboard_stats():
                 f.username, 
                 f.email,
                 f.created_at,
-                CASE WHEN MAX(i.id) IS NOT NULL THEN 'active' ELSE 'inactive' END as status,
                 COUNT(DISTINCT i.id) as interview_count,
-                AVG(c.rating) as avg_rating_given,
-                COUNT(DISTINCT c.id) as ratings_given,
+                (SELECT AVG(c.rating) FROM comments c WHERE c.faculty_id = f.id) as avg_rating_given,
+                (SELECT COUNT(DISTINCT c.id) FROM comments c WHERE c.faculty_id = f.id) as ratings_given,
                 MAX(i.interview_date) as latest_interview_date
             FROM faculty_users f
             LEFT JOIN interviews i ON f.id = i.faculty_id
-            LEFT JOIN comments c ON f.id = c.faculty_id
             GROUP BY f.id, f.username, f.email, f.created_at
         """)
-        faculty_data = cursor.fetchall()
+        faculty_data = cursor.fetchall() or []
 
         # Process faculty data for the frontend
         processed_faculty = []
         for faculty in faculty_data:
+            # Determine status - assume active if they've given ratings or scheduled interviews
+            status = 'active' if faculty['interview_count'] > 0 or (
+                        faculty['ratings_given'] and faculty['ratings_given'] > 0) else 'inactive'
+
+            # Handle date conversion safely
+            interview_date = None
+            if faculty['latest_interview_date']:
+                try:
+                    interview_date = faculty['latest_interview_date'].strftime('%Y-%m-%d')
+                except (AttributeError, ValueError):
+                    # If it's already a string or another conversion error
+                    interview_date = str(faculty['latest_interview_date'])
+
+            created_date = None
+            if faculty['created_at']:
+                try:
+                    created_date = faculty['created_at'].strftime('%Y-%m-%d')
+                except (AttributeError, ValueError):
+                    created_date = str(faculty['created_at'])
+
             processed_faculty.append({
                 "id": faculty['id'],
                 "name": faculty['username'],
                 "email": faculty['email'],
-                "status": faculty['status'],
-                "interviewDate": faculty['latest_interview_date'].isoformat() if faculty['latest_interview_date'] else None,
+                "status": status,
+                "interviewDate": interview_date,
                 "scheduledCount": faculty['interview_count'],
                 "avgRating": float(faculty['avg_rating_given']) if faculty['avg_rating_given'] else 0,
-                "created": faculty['created_at'].isoformat(),
-                "lastLogin": None  # We don't track this yet, would need to add to schema
+                "created": created_date,
+                "lastLogin": None  # We don't track this yet
             })
 
         # Get top-rated candidates
@@ -1276,7 +1299,7 @@ def admin_dashboard_stats():
             ORDER BY avg_rating DESC, interview_count DESC
             LIMIT 5
         """)
-        top_candidates = cursor.fetchall()
+        top_candidates = cursor.fetchall() or []
 
         # Process candidate data for the frontend
         processed_candidates = []
@@ -1284,7 +1307,7 @@ def admin_dashboard_stats():
             processed_candidates.append({
                 "id": candidate['id'],
                 "name": candidate['name'],
-                "avgRating": float(candidate['avg_rating']),
+                "avgRating": float(candidate['avg_rating']) if candidate['avg_rating'] else 0,
                 "interviews": candidate['interview_count']
             })
 
@@ -1301,13 +1324,21 @@ def admin_dashboard_stats():
             ORDER BY i.interview_date
             LIMIT 5
         """)
-        upcoming_interviews = cursor.fetchall()
+        upcoming_interviews = cursor.fetchall() or []
 
         # Process interview data for the frontend
         processed_interviews = []
         for interview in upcoming_interviews:
+            # Handle date conversion
+            interview_date = None
+            if interview['date']:
+                try:
+                    interview_date = interview['date'].strftime('%Y-%m-%d')
+                except (AttributeError, ValueError):
+                    interview_date = str(interview['date'])
+
             processed_interviews.append({
-                "date": interview['date'].isoformat(),
+                "date": interview_date,
                 "faculty": interview['faculty_name'],
                 "candidates": interview['candidate_count']
             })
@@ -1338,6 +1369,33 @@ def admin_dashboard_stats():
 
     except Exception as e:
         app.logger.error(f"Error getting admin dashboard stats: {str(e)}", exc_info=True)
+        return jsonify({"error": str(e)}), 500
+
+
+# Add this test route to help debug database issues
+@app.route('/test_db_schema')
+def test_db_schema():
+    """Test route to examine database schema."""
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        # List all tables
+        cursor.execute("SHOW TABLES")
+        tables = cursor.fetchall()
+
+        # Get columns for each table
+        table_info = {}
+        for table in tables:
+            table_name = table[0]
+            cursor.execute(f"DESCRIBE {table_name}")
+            columns = cursor.fetchall()
+            table_info[table_name] = columns
+
+        conn.close()
+        return jsonify({"tables": tables, "table_info": table_info})
+    except Exception as e:
+        app.logger.error(f"Error testing database schema: {str(e)}", exc_info=True)
         return jsonify({"error": str(e)}), 500
 
 
