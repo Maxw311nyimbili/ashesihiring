@@ -1275,7 +1275,7 @@ def faculty_scheduling():
     faculty_id = session.get('faculty_id')
     faculty_name = session.get('faculty_name', 'Unknown')
 
-    return render_template('faculty_scheduling.html',
+    return render_template('faculty_interview_scheduling.html',
                            faculty_id=faculty_id,
                            faculty_name=faculty_name)
 
