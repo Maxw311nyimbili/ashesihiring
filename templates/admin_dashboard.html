@@ -173,6 +173,31 @@
         from { opacity: 0; transform: translateY(10px); }
         to { opacity: 1; transform: translateY(0); }
     }
+
+    /* Rating stars */
+    .rating-stars {
+        color: #ffc107;
+    }
+
+    /* Tab styling */
+    .nav-tabs .nav-link {
+        border: none;
+        color: #6c757d;
+        font-weight: 500;
+        padding: 0.75rem 1.25rem;
+        border-radius: 0;
+        margin-right: 0.5rem;
+    }
+
+    .nav-tabs .nav-link.active {
+        color: var(--secondary);
+        background-color: transparent;
+        border-bottom: 3px solid var(--secondary);
+    }
+
+    .nav-tabs .nav-link:hover:not(.active) {
+        border-bottom: 3px solid #e9ecef;
+    }
 </style>
 {% endblock %}
 
@@ -185,8 +210,8 @@
                 <div class="card-body p-4">
                     <div class="row align-items-center">
                         <div class="col-md-8">
-                            <h3 class="fw-bold text-secondary mb-2">Available Interview Dates</h3>
-                            <p class="text-muted mb-0">Set dates when faculty can schedule interviews with candidates</p>
+                            <h3 class="fw-bold text-secondary mb-2">Admin Dashboard</h3>
+                            <p class="text-muted mb-0">Manage interview dates, faculty schedules, and candidate information</p>
                         </div>
                         <div class="col-md-4 text-end">
                             <button class="btn btn-premium" id="refresh-data">
@@ -244,123 +269,202 @@
         </div>
     </div>
 
-    <!-- Main content row -->
-    <div class="row">
-        <!-- Calendar Column -->
-        <div class="col-lg-6 mb-4">
-            <div class="card h-100">
-                <div class="card-header py-3">
-                    <h5 class="mb-0 fw-bold text-white">Select Available Dates</h5>
-                </div>
-                <div class="card-body p-4">
-                    <p class="text-muted mb-4">
-                        Choose dates that will be available for faculty interviews. These dates will be shown to faculty members for them to select when they can conduct interviews.
-                    </p>
+    <!-- Main tabs navigation -->
+    <ul class="nav nav-tabs mb-4" id="adminTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="dates-tab" data-bs-toggle="tab" data-bs-target="#dates" type="button" role="tab" aria-controls="dates" aria-selected="true">
+                <i class="fas fa-calendar-alt me-2"></i> Interview Dates
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="faculty-tab" data-bs-toggle="tab" data-bs-target="#faculty" type="button" role="tab" aria-controls="faculty" aria-selected="false">
+                <i class="fas fa-users me-2"></i> Faculty
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="candidates-tab" data-bs-toggle="tab" data-bs-target="#candidates" type="button" role="tab" aria-controls="candidates" aria-selected="false">
+                <i class="fas fa-user-graduate me-2"></i> Candidates
+            </button>
+        </li>
+    </ul>
 
-                    <div id="loading-calendar" class="text-center py-4">
-                        <div class="spinner-border text-secondary" role="status">
-                            <span class="visually-hidden">Loading...</span>
+    <!-- Tab content -->
+    <div class="tab-content" id="adminTabsContent">
+        <!-- Interview Dates Tab -->
+        <div class="tab-pane fade show active" id="dates" role="tabpanel" aria-labelledby="dates-tab">
+            <div class="row">
+                <!-- Calendar Column -->
+                <div class="col-lg-6 mb-4">
+                    <div class="card h-100">
+                        <div class="card-header py-3">
+                            <h5 class="mb-0 fw-bold text-white">Select Available Dates</h5>
                         </div>
-                        <p class="mt-2 text-muted">Loading calendar...</p>
-                    </div>
+                        <div class="card-body p-4">
+                            <p class="text-muted mb-4">
+                                Choose dates that will be available for faculty interviews. These dates will be shown to faculty members for them to select when they can conduct interviews.
+                            </p>
 
-                    <div id="admin-calendar-container" class="calendar-container d-none">
-                        <div id="admin-date-calendar"></div>
-                    </div>
+                            <div id="loading-calendar" class="text-center py-4">
+                                <div class="spinner-border text-secondary" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                                <p class="mt-2 text-muted">Loading calendar...</p>
+                            </div>
 
-                    <div class="d-flex justify-content-between mt-4">
-                        <button class="btn btn-primary" id="add-date-btn">
-                            <i class="fas fa-plus-circle me-2"></i> Add Selected Date
-                        </button>
-                        <button class="btn btn-danger-soft" id="clear-selection-btn">
-                            <i class="fas fa-times-circle me-2"></i> Clear Selection
-                        </button>
+                            <div id="admin-calendar-container" class="calendar-container d-none">
+                                <div id="admin-date-calendar"></div>
+                            </div>
+
+                            <div class="d-flex justify-content-between mt-4">
+                                <button class="btn btn-primary" id="add-date-btn">
+                                    <i class="fas fa-plus-circle me-2"></i> Add Selected Date
+                                </button>
+                                <button class="btn btn-danger-soft" id="clear-selection-btn">
+                                    <i class="fas fa-times-circle me-2"></i> Clear Selection
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dates List Column -->
+                <div class="col-lg-6 mb-4">
+                    <div class="card h-100">
+                        <div class="card-header secondary py-3">
+                            <h5 class="mb-0 fw-bold text-white">Available Interview Dates</h5>
+                        </div>
+                        <div class="card-body p-4">
+                            <p class="text-muted mb-4">
+                                Below are dates that have been set as available for faculty interviews. Faculty members will be able to select from these dates.
+                            </p>
+
+                            <div id="loading-dates-list" class="text-center py-4">
+                                <div class="spinner-border text-secondary" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                                <p class="mt-2 text-muted">Loading available dates...</p>
+                            </div>
+
+                            <div id="no-dates-message" class="alert alert-info mt-4 d-none">
+                                <i class="fas fa-info-circle me-2"></i> There are currently no available dates set. Use the calendar to add available dates.
+                            </div>
+
+                            <div id="available-dates-container" class="d-none">
+                                <div id="dates-container" class="mb-4"></div>
+
+                                <div class="d-flex justify-content-between">
+                                    <button class="btn btn-danger-soft" id="remove-all-dates-btn">
+                                        <i class="fas fa-trash-alt me-2"></i> Remove All Dates
+                                    </button>
+                                    <button class="btn btn-premium" id="save-dates-btn">
+                                        <i class="fas fa-save me-2"></i> Save Changes
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Dates List Column -->
-        <div class="col-lg-6 mb-4">
-            <div class="card h-100">
-                <div class="card-header secondary py-3">
-                    <h5 class="mb-0 fw-bold text-white">Available Interview Dates</h5>
-                </div>
-                <div class="card-body p-4">
-                    <p class="text-muted mb-4">
-                        Below are dates that have been set as available for faculty interviews. Faculty members will be able to select from these dates.
-                    </p>
-
-                    <div id="loading-dates-list" class="text-center py-4">
-                        <div class="spinner-border text-secondary" role="status">
-                            <span class="visually-hidden">Loading...</span>
+        <!-- Faculty Tab -->
+        <div class="tab-pane fade" id="faculty" role="tabpanel" aria-labelledby="faculty-tab">
+            <div class="row">
+                <div class="col-12 mb-4">
+                    <div class="card">
+                        <div class="card-header py-3">
+                            <h5 class="mb-0 fw-bold text-white">Faculty Interview Scheduling Status</h5>
                         </div>
-                        <p class="mt-2 text-muted">Loading available dates...</p>
-                    </div>
-
-                    <div id="no-dates-message" class="alert alert-info mt-4 d-none">
-                        <i class="fas fa-info-circle me-2"></i> There are currently no available dates set. Use the calendar to add available dates.
-                    </div>
-
-                    <div id="available-dates-container" class="d-none">
-                        <div id="dates-container" class="mb-4"></div>
-
-                        <div class="d-flex justify-content-between">
-                            <button class="btn btn-danger-soft" id="remove-all-dates-btn">
-                                <i class="fas fa-trash-alt me-2"></i> Remove All Dates
-                            </button>
-                            <button class="btn btn-premium" id="save-dates-btn">
-                                <i class="fas fa-save me-2"></i> Save Changes
-                            </button>
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-hover mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th>Faculty Name</th>
+                                            <th>Email</th>
+                                            <th>Interview Date</th>
+                                            <th class="text-center">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="faculty-schedule-table">
+                                        <!-- Will be populated by JavaScript -->
+                                        <tr>
+                                            <td colspan="4" class="text-center py-4">
+                                                <div class="spinner-border text-secondary" role="status">
+                                                    <span class="visually-hidden">Loading...</span>
+                                                </div>
+                                                <p class="text-muted mt-2 mb-0">Loading faculty data...</p>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="card-footer bg-white py-3">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <span class="text-muted">Showing <span id="faculty-count">0</span> faculty</span>
+                                </div>
+                                <div>
+                                    <button class="btn btn-premium" id="send-all-reminders-btn">
+                                        <i class="fas fa-paper-plane me-1"></i> Send All Reminders
+                                    </button>
+                                    <button class="btn btn-danger-soft" id="export-report-btn">
+                                        <i class="fas fa-file-pdf me-1"></i> Export Report
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- Faculty Scheduling Status -->
-    <div class="row">
-        <div class="col-12 mb-4">
-            <div class="card">
-                <div class="card-header py-3">
-                    <h5 class="mb-0 fw-bold text-white">Faculty Interview Scheduling Status</h5>
-                </div>
-                <div class="card-body p-0">
-                    <div class="table-responsive">
-                        <table class="table table-hover mb-0">
-                            <thead>
-                                <tr>
-                                    <th>Faculty Name</th>
-                                    <th>Email</th>
-                                    <th>Interview Date</th>
-                                    <th>Status</th>
-                                    <th class="text-center">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody id="faculty-schedule-table">
-                                <!-- Will be populated by JavaScript -->
-                                <tr>
-                                    <td colspan="5" class="text-center py-4">
-                                        <div class="spinner-border text-secondary" role="status">
-                                            <span class="visually-hidden">Loading...</span>
-                                        </div>
-                                        <p class="text-muted mt-2 mb-0">Loading faculty data...</p>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-                <div class="card-footer bg-white py-3">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <span class="text-muted">Showing <span id="faculty-count">0</span> faculty</span>
+        <!-- Candidates Tab -->
+        <div class="tab-pane fade" id="candidates" role="tabpanel" aria-labelledby="candidates-tab">
+            <div class="row">
+                <div class="col-12 mb-4">
+                    <div class="card">
+                        <div class="card-header py-3">
+                            <h5 class="mb-0 fw-bold text-white">Candidate Ratings & Interview Status</h5>
                         </div>
-                        <div>
-                            <button class="btn btn-danger-soft" id="export-report-btn">
-                                <i class="fas fa-file-pdf me-1"></i> Export Report
-                            </button>
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-hover mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th>Candidate</th>
+                                            <th>Average Rating</th>
+                                            <th class="text-center">Raters</th>
+                                            <th>Interview Status</th>
+                                            <th class="text-center">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="candidates-table">
+                                        <!-- Will be populated by JavaScript -->
+                                        <tr>
+                                            <td colspan="5" class="text-center py-4">
+                                                <div class="spinner-border text-secondary" role="status">
+                                                    <span class="visually-hidden">Loading...</span>
+                                                </div>
+                                                <p class="text-muted mt-2 mb-0">Loading candidate data...</p>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="card-footer bg-white py-3">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <span class="text-muted">Showing <span id="candidates-count">0</span> candidates</span>
+                                </div>
+                                <div>
+                                    <button class="btn btn-premium" id="export-candidates-btn">
+                                        <i class="fas fa-file-excel me-1"></i> Export Candidates
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

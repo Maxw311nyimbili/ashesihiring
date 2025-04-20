@@ -1239,6 +1239,86 @@ def get_all_faculty():
         return jsonify({"error": str(e)}), 500
 
 
+# Add this to your flask_app.py
+
+@app.route('/api/candidates_with_ratings')
+def get_candidates_with_ratings():
+    """API to get all candidates with their average ratings."""
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+
+        # Get all candidates with their average ratings
+        cursor.execute("""
+            SELECT 
+                a.id,
+                CONCAT(a.first_name, ' ', a.last_name) AS name,
+                AVG(c.rating) AS avg_rating,
+                COUNT(DISTINCT c.faculty_id) AS rater_count
+            FROM applicants a
+            LEFT JOIN comments c ON a.id = c.application_id
+            GROUP BY a.id, a.first_name, a.last_name
+            ORDER BY avg_rating DESC
+        """)
+
+        candidates = cursor.fetchall()
+
+        # Enhance the data for each candidate
+        for candidate in candidates:
+            # Set a default value for avg_rating if NULL
+            if candidate['avg_rating'] is None:
+                candidate['avg_rating'] = 0
+
+            # Get course interests for each candidate
+            cursor.execute("""
+                SELECT course_name
+                FROM course_preferences
+                WHERE applicant_id = %s
+            """, (candidate['id'],))
+
+            interests = [row["course_name"] for row in cursor.fetchall()]
+            candidate['interests'] = interests
+
+            # Get interview status
+            cursor.execute("""
+                SELECT i.id, i.interview_date, f.username
+                FROM interviews i
+                JOIN faculty_users f ON i.faculty_id = f.id
+                WHERE i.applicant_id = %s
+                ORDER BY i.interview_date
+            """, (candidate['id'],))
+
+            interviews = cursor.fetchall()
+
+            if interviews:
+                next_interview = interviews[0]
+                interview_date = next_interview['interview_date']
+                faculty_name = next_interview['username']
+
+                # Format the date
+                if interview_date:
+                    from datetime import datetime
+                    formatted_date = interview_date.strftime('%B %d, %Y')
+                    candidate['interview_status'] = f"Scheduled with {faculty_name} on {formatted_date}"
+                else:
+                    candidate['interview_status'] = f"Pending with {faculty_name}"
+            else:
+                if candidate['avg_rating'] >= 4:
+                    candidate['interview_status'] = "Ready for scheduling"
+                elif candidate['avg_rating'] > 0:
+                    candidate['interview_status'] = "Under review"
+                else:
+                    candidate['interview_status'] = "Not reviewed"
+
+        cursor.close()
+        conn.close()
+
+        return jsonify(candidates)
+
+    except Exception as e:
+        app.logger.error(f"Error getting candidates with ratings: {str(e)}")
+        return jsonify({"error": str(e)}), 500
+
 
 # =============================================================================
 # FACULTY RATED CANDIDATES ROUTES
