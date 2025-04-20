@@ -1152,19 +1152,15 @@ def get_scheduled_interviews():
 #         return jsonify({"success": False, "message": str(e)}), 500
 
 
-"""
-The following routes should be added to your existing Flask application
-to support the admin available dates and faculty scheduling features.
-"""
 
 
 # =============================================================================
-# ADMIN AVAILABLE DATES ROUTES
+# ADMIN DASHBOARD ROUTES
 # =============================================================================
 
-@app.route('/admin/available_dates')
-def admin_available_dates():
-    """Render the admin available dates page."""
+@app.route('/admin_dashboard')
+def admin_dashboard():
+    """Render the admin dashboard page."""
     # In a production app, you would check for admin permissions here
     # if 'role' not in session or session['role'] != 'admin':
     #     return redirect(url_for('login'))
@@ -1172,48 +1168,152 @@ def admin_available_dates():
     return render_template('admin_dashboard.html')
 
 
+@app.route('/api/admin/dashboard_stats')
+def admin_dashboard_stats():
+    """API to get statistics for the admin dashboard."""
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
 
-@app.route('/api/admin/save_available_dates', methods=['POST'])
-def save_available_dates():
-    """API to save available dates set by admin."""
+        # Get faculty stats
+        cursor.execute("""
+            SELECT 
+                COUNT(DISTINCT faculty_id) as total,
+                COUNT(DISTINCT CASE WHEN interview_date IS NOT NULL THEN faculty_id END) as scheduled
+            FROM faculty_users f
+            LEFT JOIN interviews i ON f.id = i.faculty_id
+        """)
+
+        faculty_stats = cursor.fetchone()
+
+        # Get interview stats
+        cursor.execute("""
+            SELECT 
+                COUNT(*) as total,
+                SUM(CASE WHEN interview_date >= CURDATE() THEN 1 ELSE 0 END) as upcoming,
+                SUM(CASE WHEN interview_date < CURDATE() THEN 1 ELSE 0 END) as past
+            FROM interviews
+        """)
+
+        interview_stats = cursor.fetchone()
+
+        # Get upcoming interviews grouped by date
+        cursor.execute("""
+            SELECT 
+                DATE(interview_date) as date,
+                COUNT(*) as candidates,
+                COUNT(DISTINCT faculty_id) as faculty
+            FROM interviews
+            WHERE interview_date >= CURDATE()
+            GROUP BY DATE(interview_date)
+            ORDER BY date ASC
+            LIMIT 10
+        """)
+
+        upcoming_interviews = cursor.fetchall()
+
+        # Get candidate stats
+        cursor.execute("""
+            SELECT 
+                COUNT(*) as total,
+                SUM(CASE WHEN EXISTS (
+                    SELECT 1 FROM comments c WHERE c.application_id = a.id AND c.rating >= 4
+                ) THEN 1 ELSE 0 END) as shortlisted,
+                SUM(CASE WHEN EXISTS (
+                    SELECT 1 FROM interviews i WHERE i.applicant_id = a.id
+                ) THEN 1 ELSE 0 END) as scheduled
+            FROM applicants a
+        """)
+
+        candidate_stats = cursor.fetchone()
+
+        cursor.close()
+        conn.close()
+
+        return jsonify({
+            "faculty": faculty_stats,
+            "candidates": candidate_stats,
+            "interviews": {
+                "stats": interview_stats,
+                "upcoming": upcoming_interviews
+            }
+        })
+
+    except Exception as e:
+        app.logger.error(f"Error getting admin dashboard stats: {str(e)}")
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route('/api/admin/send_reminder', methods=['POST'])
+def send_faculty_reminder():
+    """API to send a reminder email to a faculty member."""
     # In a production app, you would check for admin permissions here
     # if 'role' not in session or session['role'] != 'admin':
     #     return jsonify({"error": "Unauthorized"}), 403
 
     data = request.json
-    dates = data.get('dates', [])
+    faculty_id = data.get('faculty_id')
 
-    if not dates:
-        return jsonify({"success": False, "message": "No dates provided"}), 400
+    if not faculty_id:
+        return jsonify({"success": False, "message": "Missing faculty ID"}), 400
 
     try:
         conn = get_db_connection()
-        cursor = conn.cursor()
+        cursor = conn.cursor(dictionary=True)
 
-        # Clear existing dates
-        cursor.execute("DELETE FROM available_dates")
+        # Get faculty information
+        cursor.execute("""
+            SELECT id, username, email
+            FROM faculty_users
+            WHERE id = %s
+        """, (faculty_id,))
 
-        # Insert new dates
-        for date in dates:
-            cursor.execute("""
-                INSERT INTO available_dates (date)
-                VALUES (%s)
-            """, (date,))
+        faculty = cursor.fetchone()
 
-        conn.commit()
+        if not faculty:
+            return jsonify({"success": False, "message": "Faculty not found"}), 404
+
+        # Get available dates to include in the email
+        cursor.execute("""
+            SELECT date
+            FROM available_dates
+            WHERE date >= CURDATE()
+            ORDER BY date ASC
+            LIMIT 5
+        """)
+
+        available_dates = cursor.fetchall()
+
         cursor.close()
         conn.close()
 
-        return jsonify({"success": True, "message": "Available dates saved successfully"})
+        # In a real application, you would send an actual email here
+        # For now, we'll just log the action and return success
+        app.logger.info(f"Sending reminder to faculty {faculty['username']} ({faculty['email']})")
+
+        # Construct the dates string for the log
+        dates_str = ", ".join([date['date'].strftime('%Y-%m-%d') for date in
+                               available_dates]) if available_dates else "No dates available"
+        app.logger.info(f"Available dates: {dates_str}")
+
+        return jsonify({
+            "success": True,
+            "message": f"Reminder sent to {faculty['username']} ({faculty['email']})",
+            "email": {
+                "to": faculty['email'],
+                "subject": "Reminder: Select Your Interview Date",
+                "dates": [date['date'].strftime('%Y-%m-%d') for date in available_dates]
+            }
+        })
 
     except Exception as e:
-        app.logger.error(f"Error saving available dates: {str(e)}")
+        app.logger.error(f"Error sending faculty reminder: {str(e)}")
         return jsonify({"success": False, "message": str(e)}), 500
 
 
-@app.route('/api/admin/all_faculty')
-def get_all_faculty():
-    """API to get all faculty users."""
+@app.route('/api/admin/send_bulk_reminders', methods=['POST'])
+def send_bulk_reminders():
+    """API to send reminder emails to all unscheduled faculty members."""
     # In a production app, you would check for admin permissions here
     # if 'role' not in session or session['role'] != 'admin':
     #     return jsonify({"error": "Unauthorized"}), 403
@@ -1222,28 +1322,303 @@ def get_all_faculty():
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
 
+        # Get all faculty without scheduled interviews
         cursor.execute("""
-            SELECT id, username, email, created_at
-            FROM faculty_users
-            ORDER BY username
+            SELECT f.id, f.username, f.email
+            FROM faculty_users f
+            LEFT JOIN (
+                SELECT DISTINCT faculty_id 
+                FROM interviews 
+                WHERE interview_date IS NOT NULL
+            ) i ON f.id = i.faculty_id
+            WHERE i.faculty_id IS NULL
         """)
 
-        faculty = cursor.fetchall()
+        unscheduled_faculty = cursor.fetchall()
+
+        if not unscheduled_faculty:
+            return jsonify({"success": True, "message": "No unscheduled faculty found"}), 200
+
+        # Get available dates to include in the emails
+        cursor.execute("""
+            SELECT date
+            FROM available_dates
+            WHERE date >= CURDATE()
+            ORDER BY date ASC
+            LIMIT 5
+        """)
+
+        available_dates = cursor.fetchall()
+        dates_list = [date['date'].strftime('%Y-%m-%d') for date in available_dates]
+
         cursor.close()
         conn.close()
 
-        return jsonify(faculty)
+        # In a real application, you would send actual emails here
+        # For now, we'll just log the action and return success
+        faculty_count = len(unscheduled_faculty)
+        app.logger.info(f"Sending reminders to {faculty_count} unscheduled faculty members")
+
+        # Log each faculty member being reminded
+        for faculty in unscheduled_faculty:
+            app.logger.info(f"Reminder for: {faculty['username']} ({faculty['email']})")
+
+        return jsonify({
+            "success": True,
+            "message": f"Reminders sent to {faculty_count} faculty members",
+            "faculty_count": faculty_count,
+            "available_dates": dates_list
+        })
 
     except Exception as e:
-        app.logger.error(f"Error getting all faculty: {str(e)}")
+        app.logger.error(f"Error sending bulk reminders: {str(e)}")
+        return jsonify({"success": False, "message": str(e)}), 500
+
+
+@app.route('/api/admin/candidate_details/<int:candidate_id>')
+def get_candidate_details(candidate_id):
+    """API to get detailed information about a specific candidate."""
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+
+        # Get candidate information
+        cursor.execute("""
+            SELECT 
+                a.id,
+                a.first_name,
+                a.last_name,
+                a.telephone,
+                a.gender,
+                a.course_selection,
+                a.cv_path,
+                a.cover_letter_path,
+                a.transcript_path,
+                a.created_at
+            FROM applicants a
+            WHERE a.id = %s
+        """, (candidate_id,))
+
+        candidate = cursor.fetchone()
+
+        if not candidate:
+            return jsonify({"error": "Candidate not found"}), 404
+
+        # Format the candidate data
+        candidate_data = {
+            "id": candidate["id"],
+            "name": f"{candidate['first_name']} {candidate['last_name']}",
+            "first_name": candidate["first_name"],
+            "last_name": candidate["last_name"],
+            "telephone": candidate["telephone"],
+            "gender": candidate["gender"],
+            "course_selection": candidate["course_selection"],
+            "application_date": candidate["created_at"].strftime("%Y-%m-%d")
+        }
+
+        # Get course preferences
+        cursor.execute("""
+            SELECT course_name, preference
+            FROM course_preferences
+            WHERE applicant_id = %s
+        """, (candidate_id,))
+
+        preferences = cursor.fetchall()
+        candidate_data["preferences"] = preferences
+
+        # Get ratings and comments
+        cursor.execute("""
+            SELECT 
+                c.id,
+                c.rating,
+                c.interest_prompt,
+                c.comment,
+                c.created_at,
+                f.username AS faculty_name,
+                f.id AS faculty_id
+            FROM comments c
+            JOIN faculty_users f ON c.faculty_id = f.id
+            WHERE c.application_id = %s
+            ORDER BY c.created_at DESC
+        """, (candidate_id,))
+
+        comments = cursor.fetchall()
+
+        # Calculate average rating
+        total_rating = 0
+        for comment in comments:
+            total_rating += comment["rating"]
+
+        avg_rating = total_rating / len(comments) if comments else 0
+
+        candidate_data["ratings"] = {
+            "average": avg_rating,
+            "count": len(comments),
+            "comments": comments
+        }
+
+        # Get scheduled interviews
+        cursor.execute("""
+            SELECT 
+                i.id,
+                i.interview_date,
+                f.username AS faculty_name,
+                f.id AS faculty_id,
+                f.email AS faculty_email
+            FROM interviews i
+            JOIN faculty_users f ON i.faculty_id = f.id
+            WHERE i.applicant_id = %s
+            ORDER BY i.interview_date
+        """, (candidate_id,))
+
+        interviews = cursor.fetchall()
+        candidate_data["interviews"] = interviews
+
+        # Get document paths for display
+        base_url = "/download_file/"
+
+        cv_filename = os.path.basename(candidate['cv_path']) if candidate['cv_path'] else None
+        cover_letter_filename = os.path.basename(candidate['cover_letter_path']) if candidate[
+            'cover_letter_path'] else None
+        transcript_filename = os.path.basename(candidate['transcript_path']) if candidate['transcript_path'] else None
+
+        candidate_data["documents"] = {
+            "cv": {
+                "filename": cv_filename,
+                "url": f"{base_url}?file={cv_filename}" if cv_filename else None
+            },
+            "cover_letter": {
+                "filename": cover_letter_filename,
+                "url": f"{base_url}?file={cover_letter_filename}" if cover_letter_filename else None
+            },
+            "transcript": {
+                "filename": transcript_filename,
+                "url": f"{base_url}?file={transcript_filename}" if transcript_filename else None
+            }
+        }
+
+        cursor.close()
+        conn.close()
+
+        return jsonify(candidate_data)
+
+    except Exception as e:
+        app.logger.error(f"Error getting candidate details: {str(e)}")
         return jsonify({"error": str(e)}), 500
 
 
-# Add this to your flask_app.py
+@app.route('/api/admin/interested_faculty/<int:candidate_id>')
+def get_interested_faculty(candidate_id):
+    """API to get faculty members who have rated a specific candidate highly."""
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
 
-@app.route('/api/candidates_with_ratings')
-def get_candidates_with_ratings():
-    """API to get all candidates with their average ratings."""
+        # Get faculty who rated this candidate 4 or higher
+        cursor.execute("""
+            SELECT 
+                f.id,
+                f.username,
+                f.email,
+                c.rating,
+                c.interest_prompt,
+                c.comment,
+                c.created_at
+            FROM comments c
+            JOIN faculty_users f ON c.faculty_id = f.id
+            WHERE c.application_id = %s AND (c.rating >= 4 OR c.interest_prompt = 'Yes')
+            ORDER BY c.rating DESC, c.created_at DESC
+        """, (candidate_id,))
+
+        interested_faculty = cursor.fetchall()
+
+        # Get the candidate's name
+        cursor.execute("""
+            SELECT CONCAT(first_name, ' ', last_name) AS name
+            FROM applicants
+            WHERE id = %s
+        """, (candidate_id,))
+
+        candidate = cursor.fetchone()
+
+        cursor.close()
+        conn.close()
+
+        if not candidate:
+            return jsonify({"error": "Candidate not found"}), 404
+
+        return jsonify({
+            "candidate": {
+                "id": candidate_id,
+                "name": candidate["name"]
+            },
+            "interested_faculty": interested_faculty,
+            "count": len(interested_faculty)
+        })
+
+    except Exception as e:
+        app.logger.error(f"Error getting interested faculty: {str(e)}")
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route('/api/admin/export_report')
+def export_scheduling_report():
+    """API to generate a report of faculty scheduling status."""
+    # In a real implementation, this would generate and return a CSV or PDF file
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+
+        # Get all faculty scheduling information
+        cursor.execute("""
+            SELECT 
+                f.id AS faculty_id,
+                f.username AS faculty_name,
+                f.email,
+                i.interview_date,
+                COUNT(DISTINCT a.id) AS candidate_count
+            FROM faculty_users f
+            LEFT JOIN interviews i ON f.id = i.faculty_id
+            LEFT JOIN applicants a ON i.applicant_id = a.id
+            GROUP BY f.id, f.username, f.email, i.interview_date
+            ORDER BY f.username
+        """)
+
+        faculty_data = cursor.fetchall()
+
+        # Get all available dates
+        cursor.execute("""
+            SELECT date
+            FROM available_dates
+            WHERE date >= CURDATE()
+            ORDER BY date ASC
+        """)
+
+        available_dates = cursor.fetchall()
+
+        cursor.close()
+        conn.close()
+
+        # In a real application, you would generate a file here
+        # For now, we'll just return the data as JSON
+
+        return jsonify({
+            "report_generated": True,
+            "timestamp": None,  # In a real implementation, this would be the current timestamp
+            "faculty_count": len(faculty_data),
+            "faculty": faculty_data,
+            "available_dates": [date["date"].strftime('%Y-%m-%d') for date in available_dates]
+        })
+
+    except Exception as e:
+        app.logger.error(f"Error generating scheduling report: {str(e)}")
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route('/api/admin/export_candidates')
+def export_candidates_report():
+    """API to generate a report of all candidates with their ratings."""
+    # In a real implementation, this would generate and return a CSV or Excel file
     try:
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
@@ -1252,80 +1627,73 @@ def get_candidates_with_ratings():
         cursor.execute("""
             SELECT 
                 a.id,
-                CONCAT(a.first_name, ' ', a.last_name) AS name,
+                a.first_name,
+                a.last_name,
+                a.gender,
+                a.course_selection,
+                a.created_at AS application_date,
                 AVG(c.rating) AS avg_rating,
-                COUNT(DISTINCT c.faculty_id) AS rater_count
+                COUNT(DISTINCT c.faculty_id) AS rater_count,
+                COUNT(DISTINCT i.id) AS interviews_count
             FROM applicants a
             LEFT JOIN comments c ON a.id = c.application_id
-            GROUP BY a.id, a.first_name, a.last_name
-            ORDER BY avg_rating DESC
+            LEFT JOIN interviews i ON a.id = i.applicant_id
+            GROUP BY a.id, a.first_name, a.last_name, a.gender, a.course_selection, a.created_at
+            ORDER BY avg_rating DESC, a.created_at DESC
         """)
 
         candidates = cursor.fetchall()
 
-        # Enhance the data for each candidate
+        # Format the data for export
+        candidate_data = []
         for candidate in candidates:
-            # Set a default value for avg_rating if NULL
-            if candidate['avg_rating'] is None:
-                candidate['avg_rating'] = 0
-
-            # Get course interests for each candidate
+            # Get course preferences
             cursor.execute("""
-                SELECT course_name
+                SELECT course_name, preference
                 FROM course_preferences
                 WHERE applicant_id = %s
-            """, (candidate['id'],))
+            """, (candidate["id"],))
 
-            interests = [row["course_name"] for row in cursor.fetchall()]
-            candidate['interests'] = interests
+            preferences = cursor.fetchall()
 
-            # Get interview status
-            cursor.execute("""
-                SELECT i.id, i.interview_date, f.username
-                FROM interviews i
-                JOIN faculty_users f ON i.faculty_id = f.id
-                WHERE i.applicant_id = %s
-                ORDER BY i.interview_date
-            """, (candidate['id'],))
+            # Format the candidate entry
+            candidate_entry = {
+                "id": candidate["id"],
+                "name": f"{candidate['first_name']} {candidate['last_name']}",
+                "first_name": candidate["first_name"],
+                "last_name": candidate["last_name"],
+                "gender": candidate["gender"],
+                "course_selection": candidate["course_selection"],
+                "application_date": candidate["application_date"].strftime("%Y-%m-%d"),
+                "avg_rating": float(candidate["avg_rating"]) if candidate["avg_rating"] else 0,
+                "rater_count": candidate["rater_count"],
+                "interviews_count": candidate["interviews_count"],
+                "preferences": preferences
+            }
 
-            interviews = cursor.fetchall()
-
-            if interviews:
-                next_interview = interviews[0]
-                interview_date = next_interview['interview_date']
-                faculty_name = next_interview['username']
-
-                # Format the date
-                if interview_date:
-                    from datetime import datetime
-                    formatted_date = interview_date.strftime('%B %d, %Y')
-                    candidate['interview_status'] = f"Scheduled with {faculty_name} on {formatted_date}"
-                else:
-                    candidate['interview_status'] = f"Pending with {faculty_name}"
-            else:
-                if candidate['avg_rating'] >= 4:
-                    candidate['interview_status'] = "Ready for scheduling"
-                elif candidate['avg_rating'] > 0:
-                    candidate['interview_status'] = "Under review"
-                else:
-                    candidate['interview_status'] = "Not reviewed"
+            candidate_data.append(candidate_entry)
 
         cursor.close()
         conn.close()
 
-        return jsonify(candidates)
+        # In a real application, you would generate a file here
+        # For now, we'll just return the data as JSON
+
+        return jsonify({
+            "report_generated": True,
+            "timestamp": None,  # In a real implementation, this would be the current timestamp
+            "candidate_count": len(candidate_data),
+            "candidates": candidate_data
+        })
 
     except Exception as e:
-        app.logger.error(f"Error getting candidates with ratings: {str(e)}")
+        app.logger.error(f"Error generating candidates report: {str(e)}")
         return jsonify({"error": str(e)}), 500
 
 
 # =============================================================================
 # FACULTY RATED CANDIDATES ROUTES
 # =============================================================================
-
-
-
 
 @app.route('/faculty_scheduling')
 def faculty_scheduling():
