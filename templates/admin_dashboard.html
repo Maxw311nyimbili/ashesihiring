@@ -221,6 +221,67 @@
     .status-inactive {
         background-color: #6c757d;
     }
+
+    /* Student list enhancements */
+    .student-card {
+        transition: all 0.2s ease;
+    }
+
+    .student-card:hover {
+        transform: translateY(-3px);
+    }
+
+    .rating-badge {
+        font-size: 0.8rem;
+        font-weight: 700;
+        padding: 0.35rem 0.65rem;
+        border-radius: 50px;
+    }
+
+    .rating-stars {
+        color: #ffc107;
+        letter-spacing: -2px;
+    }
+
+    .search-container {
+        position: relative;
+    }
+
+    .search-container .form-control {
+        padding-left: 2.5rem;
+        border-radius: 50px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    }
+
+    .search-container .search-icon {
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #6c757d;
+    }
+
+    .filters-container {
+        display: flex;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .filter-pill {
+        background-color: rgba(35, 100, 101, 0.1);
+        border: 1px solid rgba(35, 100, 101, 0.2);
+        color: var(--secondary);
+        border-radius: 50px;
+        padding: 0.35rem 0.75rem;
+        font-size: 0.85rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .filter-pill:hover, .filter-pill.active {
+        background-color: var(--secondary);
+        color: white;
+    }
 </style>
 {% endblock %}
 
@@ -250,7 +311,7 @@
     <!-- Key metrics cards -->
     <div class="row mb-4">
         <!-- Total Faculty -->
-        <div class="col-xl-3 col-md-6 mb-4">
+        <div class="col-xl-4 col-md-6 mb-4">
             <div class="card h-100 stats-card">
                 <div class="card-body p-4">
                     <div class="icon primary">
@@ -267,7 +328,7 @@
         </div>
 
         <!-- Faculty with Scheduled Interviews -->
-        <div class="col-xl-3 col-md-6 mb-4">
+        <div class="col-xl-4 col-md-6 mb-4">
             <div class="card h-100 stats-card">
                 <div class="card-body p-4">
                     <div class="icon secondary">
@@ -284,7 +345,7 @@
         </div>
 
         <!-- Total Candidates -->
-        <div class="col-xl-3 col-md-6 mb-4">
+        <div class="col-xl-4 col-md-12 mb-4">
             <div class="card h-100 stats-card">
                 <div class="card-body p-4">
                     <div class="icon success">
@@ -296,23 +357,6 @@
                         <div class="progress-bar bg-success" role="progressbar" style="width: 100%" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
                     </div>
                     <p class="text-muted small mb-0 mt-2">All applicants in the system</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Average Rating -->
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card h-100 stats-card">
-                <div class="card-body p-4">
-                    <div class="icon warning">
-                        <i class="fas fa-star"></i>
-                    </div>
-                    <h4 class="stat-value text-warning" id="avg-rating">0.0</h4>
-                    <p class="stat-label mb-0">Average Rating</p>
-                    <div class="progress">
-                        <div class="progress-bar bg-warning" role="progressbar" style="width: 0%" id="rating-progress" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
-                    </div>
-                    <p class="text-muted small mb-0 mt-2">Across all rated candidates</p>
                 </div>
             </div>
         </div>
@@ -373,17 +417,15 @@
                                 <tr>
                                     <th>Name</th>
                                     <th>Email</th>
-                                    <th>Status</th>
                                     <th>Interview Date</th>
                                     <th>Scheduled Candidates</th>
-                                    <th>Avg Rating Given</th>
                                     <th class="text-center">Actions</th>
                                 </tr>
                             </thead>
                             <tbody id="faculty-table-body">
                                 <!-- Will be populated by JavaScript -->
                                 <tr>
-                                    <td colspan="7" class="text-center py-4">
+                                    <td colspan="5" class="text-center py-4">
                                         <div class="spinner-border text-secondary" role="status">
                                             <span class="visually-hidden">Loading...</span>
                                         </div>
@@ -410,40 +452,55 @@
         </div>
     </div>
 
-    <!-- Additional Metrics -->
-    <div class="row">
-        <!-- Top-Rated Candidates Card -->
-        <div class="col-md-6 mb-4">
+    <!-- Candidates List (New Section) -->
+    <div class="row mb-4">
+        <div class="col-12">
             <div class="card">
                 <div class="card-header py-3 secondary">
-                    <h5 class="mb-0 fw-bold text-white">Top-Rated Candidates</h5>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0 fw-bold text-white">All Candidates</h5>
+                        <div class="search-container">
+                            <i class="fas fa-search search-icon"></i>
+                            <input type="text" class="form-control" placeholder="Search candidates..." id="candidate-search">
+                        </div>
+                    </div>
                 </div>
-                <div class="card-body p-0">
-                    <div class="table-responsive">
-                        <table class="table mb-0">
-                            <thead>
-                                <tr>
-                                    <th>Candidate</th>
-                                    <th>Avg Rating</th>
-                                    <th>Interviews</th>
-                                </tr>
-                            </thead>
-                            <tbody id="top-candidates-body">
-                                <!-- Will be populated by JavaScript -->
-                                <tr>
-                                    <td colspan="3" class="text-center py-4">
-                                        <p class="text-muted mb-0">Loading top candidates...</p>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
+                <div class="card-body p-3">
+                    <div class="filters-container">
+                        <div class="filter-pill active" data-filter="all">All Candidates</div>
+                        <div class="filter-pill" data-filter="high">Highly Rated (4+)</div>
+                        <div class="filter-pill" data-filter="medium">Medium Rated (3-4)</div>
+                        <div class="filter-pill" data-filter="low">Low Rated (<3)</div>
+                        <div class="filter-pill" data-filter="unrated">Unrated</div>
+                    </div>
+
+                    <div class="row" id="candidates-container">
+                        <!-- Will be populated by JavaScript -->
+                        <div class="col-12 text-center py-4">
+                            <div class="spinner-border text-secondary" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                            <p class="text-muted mt-2 mb-0">Loading candidate data...</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer bg-white py-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <span class="text-muted">Showing <span id="candidates-count">0</span> candidates</span>
+                        </div>
+                        <button class="btn btn-premium" id="load-more-candidates">
+                            <i class="fas fa-plus-circle me-1"></i> Load More
+                        </button>
                     </div>
                 </div>
             </div>
         </div>
+    </div>
 
-        <!-- Upcoming Interviews Card -->
-        <div class="col-md-6 mb-4">
+    <!-- Upcoming Interviews Card -->
+    <div class="row">
+        <div class="col-12 mb-4">
             <div class="card">
                 <div class="card-header py-3">
                     <h5 class="mb-0 fw-bold text-white">Upcoming Interviews</h5>
@@ -456,12 +513,13 @@
                                     <th>Date</th>
                                     <th>Faculty</th>
                                     <th>Candidates</th>
+                                    <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody id="upcoming-interviews-body">
                                 <!-- Will be populated by JavaScript -->
                                 <tr>
-                                    <td colspan="3" class="text-center py-4">
+                                    <td colspan="4" class="text-center py-4">
                                         <p class="text-muted mb-0">Loading upcoming interviews...</p>
                                     </td>
                                 </tr>
@@ -502,13 +560,12 @@
                             <thead>
                                 <tr>
                                     <th>Name</th>
-                                    <th>Rating</th>
                                     <th>Course</th>
                                 </tr>
                             </thead>
                             <tbody id="modal-candidates-list">
                                 <tr>
-                                    <td colspan="3" class="text-center py-3">
+                                    <td colspan="2" class="text-center py-3">
                                         <p class="text-muted mb-0">No candidates scheduled</p>
                                     </td>
                                 </tr>
@@ -518,17 +575,6 @@
                 </div>
 
                 <div class="row">
-                    <div class="col-md-6">
-                        <h6 class="text-secondary mb-2">Rating Statistics</h6>
-                        <div class="d-flex align-items-center mb-2">
-                            <div class="me-3">
-                                <span class="fw-bold text-secondary" id="modal-avg-rating">0.0</span>
-                                <span class="text-muted">/5</span>
-                            </div>
-                            <div id="modal-rating-stars"></div>
-                        </div>
-                        <p class="text-muted small mb-0" id="modal-rated-count">0 candidates rated</p>
-                    </div>
                     <div class="col-md-6">
                         <h6 class="text-secondary mb-2">Activity</h6>
                         <p class="mb-1"><strong>Last Login:</strong> <span id="modal-last-login">N/A</span></p>
@@ -543,6 +589,66 @@
                 </button>
                 <button type="button" class="btn btn-danger-soft">
                     <i class="fas fa-user-cog me-1"></i> Manage Access
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Candidate Details Modal -->
+<div class="modal fade" id="candidateDetailsModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header py-3" style="background: linear-gradient(to right, var(--secondary), #307f80); color: white;">
+                <h5 class="modal-title fw-bold" id="candidate-modal-name">Candidate Details</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <h6 class="text-secondary mb-2">Candidate Information</h6>
+                        <p class="mb-1"><strong>ID:</strong> <span id="modal-candidate-id"></span></p>
+                        <p class="mb-0"><strong>Average Rating:</strong> <span id="modal-candidate-rating"></span></p>
+                    </div>
+                    <div class="col-md-6">
+                        <h6 class="text-secondary mb-2">Interests</h6>
+                        <div id="modal-candidate-interests"></div>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <h6 class="text-secondary mb-2">Faculty Ratings</h6>
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Faculty</th>
+                                    <th>Rating</th>
+                                    <th>Comment</th>
+                                </tr>
+                            </thead>
+                            <tbody id="modal-ratings-list">
+                                <tr>
+                                    <td colspan="3" class="text-center py-3">
+                                        <p class="text-muted mb-0">No ratings yet</p>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <h6 class="text-secondary mb-2">Interview Schedule</h6>
+                    <div id="modal-candidate-schedule">
+                        <p class="text-muted">Not scheduled for any interviews</p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer border-0">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-premium" id="view-candidate-documents">
+                    <i class="fas fa-file-alt me-1"></i> View Documents
                 </button>
             </div>
         </div>
@@ -575,15 +681,6 @@
         exportFacultyReport();
     });
 
-    // In the openFacultyModal function, add event listener for the Send Email button:
-    // Add this code after setting up the modal content but before showing the modal
-
-    document.querySelector('#facultyDetailsModal .btn-premium').addEventListener('click', function() {
-        const facultyEmail = document.getElementById('modal-faculty-email').textContent;
-        const facultyName = document.getElementById('faculty-modal-name').textContent;
-        sendEmailToFaculty(facultyEmail, facultyName);
-    });
-
     // Initialize event listeners
     function initEventListeners() {
         // Refresh data button
@@ -596,6 +693,29 @@
         document.getElementById('faculty-search').addEventListener('input', function() {
             const searchTerm = this.value.toLowerCase();
             filterFacultyTable(searchTerm);
+        });
+
+        // Candidate search
+        document.getElementById('candidate-search').addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+            filterCandidates(searchTerm);
+        });
+
+        // Candidate filters
+        document.querySelectorAll('.filter-pill').forEach(pill => {
+            pill.addEventListener('click', function() {
+                // Remove active class from all pills
+                document.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
+                // Add active class to clicked pill
+                this.classList.add('active');
+                // Apply filter
+                filterCandidatesByRating(this.dataset.filter);
+            });
+        });
+
+        // Load more candidates button
+        document.getElementById('load-more-candidates').addEventListener('click', function() {
+            loadMoreCandidates();
         });
     }
 
@@ -633,19 +753,14 @@
 
         // Update candidate stats
         document.getElementById('total-candidates').textContent = data.candidates.total;
-        document.getElementById('avg-rating').textContent = data.candidates.avgRating.toFixed(1);
-
-        // Update rating progress bar
-        const ratingPercent = Math.round((data.candidates.avgRating / 5) * 100);
-        document.getElementById('rating-progress').style.width = ratingPercent + '%';
-        document.getElementById('rating-progress').setAttribute('aria-valuenow', ratingPercent);
 
         // Populate faculty table
         populateFacultyTable(data.faculty.data);
         document.getElementById('faculty-count').textContent = data.faculty.data.length;
 
-        // Populate top candidates table
-        populateTopCandidatesTable(data.candidates.topRated);
+        // Populate candidates grid
+        populateCandidatesGrid(data.candidates.allCandidates || generateSampleCandidates());
+        document.getElementById('candidates-count').textContent = (data.candidates.allCandidates || []).length;
 
         // Populate upcoming interviews table
         populateUpcomingInterviewsTable(data.interviews.upcoming);
@@ -659,17 +774,10 @@
     function loadSampleData() {
         // Sample faculty data
         const facultyData = [
-            { id: 1, name: "Dr. Sarah Johnson", email: "sjohnson@faculty.edu", status: "active", interviewDate: "2025-05-10", scheduledCount: 8, avgRating: 4.3, lastLogin: "2025-04-16", created: "2023-09-05" },
-            { id: 2, name: "Prof. Michael Chen", email: "mchen@faculty.edu", status: "active", interviewDate: "2025-05-15", scheduledCount: 6, avgRating: 3.8, lastLogin: "2025-04-18", created: "2023-10-12" },
-            { id: 3, name: "Dr. Amelia Rodriguez", email: "arodriguez@faculty.edu", status: "active", interviewDate: null, scheduledCount: 0, avgRating: 4.1, lastLogin: "2025-04-17", created: "2024-01-08" },
-            { id: 4, name: "Prof. James Williams", email: "jwilliams@faculty.edu", status: "active", interviewDate: "2025-05-12", scheduledCount: 5, avgRating: 4.5, lastLogin: "2025-04-15", created: "2023-11-22" }
-        ];
-
-        // Sample candidate data
-        const candidateData = [
-            { id: 1, name: "John Smith", avgRating: 4.7, interviews: 3 },
-            { id: 2, name: "Emma Johnson", avgRating: 4.6, interviews: 3 },
-            { id: 3, name: "Daniel Kim", avgRating: 4.5, interviews: 2 }
+            { id: 1, name: "Dr. Sarah Johnson", email: "sjohnson@faculty.edu", interviewDate: "2025-05-10", scheduledCount: 8, lastLogin: "2025-04-16", created: "2023-09-05" },
+            { id: 2, name: "Prof. Michael Chen", email: "mchen@faculty.edu", interviewDate: "2025-05-15", scheduledCount: 6, lastLogin: "2025-04-18", created: "2023-10-12" },
+            { id: 3, name: "Dr. Amelia Rodriguez", email: "arodriguez@faculty.edu", interviewDate: null, scheduledCount: 0, lastLogin: "2025-04-17", created: "2024-01-08" },
+            { id: 4, name: "Prof. James Williams", email: "jwilliams@faculty.edu", interviewDate: "2025-05-12", scheduledCount: 5, lastLogin: "2025-04-15", created: "2023-11-22" }
         ];
 
         // Sample interview data
@@ -679,47 +787,69 @@
             { date: "2025-05-15", faculty: "Prof. Michael Chen", candidates: 6 }
         ];
 
+        // Sample candidate data
+        const candidateData = generateSampleCandidates();
+
         // Update faculty metrics
         const totalFaculty = facultyData.length;
-        const activeFaculty = facultyData.filter(f => f.status === 'active').length;
         const scheduledFaculty = facultyData.filter(f => f.interviewDate !== null).length;
-        const schedulingPercent = Math.round((scheduledFaculty / activeFaculty) * 100);
-
-        // Calculate average rating
-        let totalRatings = 0;
-        let ratingCount = 0;
-        facultyData.forEach(faculty => {
-            if (faculty.avgRating > 0) {
-                totalRatings += faculty.avgRating;
-                ratingCount++;
-            }
-        });
-        const avgRating = ratingCount > 0 ? (totalRatings / ratingCount).toFixed(1) : '0.0';
+        const schedulingPercent = Math.round((scheduledFaculty / totalFaculty) * 100);
 
         // Update DOM elements with sample data
         document.getElementById('total-faculty').textContent = totalFaculty;
         document.getElementById('scheduled-faculty').textContent = scheduledFaculty;
         document.getElementById('scheduling-percent').textContent = schedulingPercent + '%';
-        document.getElementById('avg-rating').textContent = avgRating;
-        document.getElementById('total-candidates').textContent = 35; // Sample value
+        document.getElementById('total-candidates').textContent = candidateData.length;
         document.getElementById('faculty-count').textContent = totalFaculty;
 
         // Update progress bars
         document.getElementById('scheduled-progress').style.width = schedulingPercent + '%';
         document.getElementById('scheduled-progress').setAttribute('aria-valuenow', schedulingPercent);
 
-        const ratingPercent = Math.round((parseFloat(avgRating) / 5) * 100);
-        document.getElementById('rating-progress').style.width = ratingPercent + '%';
-        document.getElementById('rating-progress').setAttribute('aria-valuenow', ratingPercent);
-
-        // Populate tables with sample data
+        // Populate tables and grid with sample data
         populateFacultyTable(facultyData);
-        populateTopCandidatesTable(candidateData);
+        populateCandidatesGrid(candidateData);
         populateUpcomingInterviewsTable(interviewData);
+        document.getElementById('candidates-count').textContent = candidateData.length;
 
         // Update charts with sample data
         updateFacultyStatusChartWithSample();
         updateRatingsChartWithSample();
+    }
+
+    // Generate sample candidates
+    function generateSampleCandidates() {
+        const names = [
+            "John Smith", "Emma Johnson", "Daniel Kim", "Sophia Martinez", "James Wilson",
+            "Olivia Garcia", "Alexander Brown", "Ava Davis", "William Miller", "Isabella Jones",
+            "Michael Lee", "Emily Wilson", "Benjamin Davis", "Grace White", "Ethan Taylor",
+            "Charlotte Anderson", "Jacob Thomas", "Amelia Robinson", "Liam Harris", "Harper Scott"
+        ];
+
+        const interests = [
+            ["Computer Science", "Data Science"],
+            ["Mathematics", "Statistics"],
+            ["Physics", "Engineering"],
+            ["Chemistry", "Biology"],
+            ["English Literature", "Creative Writing"]
+        ];
+
+        const candidates = [];
+
+        for (let i = 0; i < 20; i++) {
+            const randomRating = Math.random() > 0.15 ? (2 + Math.random() * 3).toFixed(1) : null;
+            const randomInterests = interests[Math.floor(Math.random() * interests.length)];
+
+            candidates.push({
+                id: i + 1,
+                name: names[i],
+                avgRating: randomRating,
+                interests: randomInterests,
+                ratings: Math.floor(Math.random() * 5) + (randomRating ? 1 : 0)
+            });
+        }
+
+        return candidates;
     }
 
     // Populate faculty table
@@ -730,26 +860,10 @@
         data.forEach(faculty => {
             const row = document.createElement('tr');
 
-            // Format the status indicator
-            const statusHtml = `
-                <div class="d-flex align-items-center">
-                    <span class="status-circle ${faculty.status === 'active' ? 'status-active' : 'status-inactive'}"></span>
-                    <span>${faculty.status === 'active' ? 'Active' : 'Inactive'}</span>
-                </div>
-            `;
-
             // Format the interview date
             const dateHtml = faculty.interviewDate
                 ? `<span class="date-badge scheduled">${formatDate(faculty.interviewDate)}</span>`
                 : `<span class="date-badge not-scheduled">Not Scheduled</span>`;
-
-            // Format the rating with stars
-            const ratingHtml = faculty.avgRating > 0
-                ? `<div class="d-flex align-items-center">
-                      <span class="fw-bold me-2">${faculty.avgRating.toFixed(1)}</span>
-                      ${generateRatingStars(faculty.avgRating)}
-                   </div>`
-                : `<span class="text-muted">No ratings</span>`;
 
             row.innerHTML = `
                 <td>
@@ -766,12 +880,10 @@
                     </div>
                 </td>
                 <td>${faculty.email}</td>
-                <td>${statusHtml}</td>
                 <td>${dateHtml}</td>
                 <td>
                     <span class="fw-medium ${faculty.scheduledCount > 0 ? 'text-success' : 'text-muted'}">${faculty.scheduledCount}</span>
                 </td>
-                <td>${ratingHtml}</td>
                 <td class="text-center">
                     <button class="btn btn-sm btn-outline-secondary view-faculty-btn" data-id="${faculty.id}">
                         <i class="fas fa-eye me-1"></i> View
@@ -791,54 +903,186 @@
         });
     }
 
-    // Populate top candidates table
-    function populateTopCandidatesTable(data) {
-        const tableBody = document.getElementById('top-candidates-body');
-        tableBody.innerHTML = '';
+    // Populate candidates grid
+    function populateCandidatesGrid(data) {
+        const container = document.getElementById('candidates-container');
+        container.innerHTML = '';
 
         if (!data || data.length === 0) {
-            tableBody.innerHTML = `
-                <tr>
-                    <td colspan="3" class="text-center py-4">
-                        <p class="text-muted mb-0">No top-rated candidates found</p>
-                    </td>
-                </tr>
+            container.innerHTML = `
+                <div class="col-12 text-center py-4">
+                    <p class="text-muted mb-0">No candidates found</p>
+                </div>
             `;
             return;
         }
 
         data.forEach(candidate => {
-            const row = document.createElement('tr');
+            const col = document.createElement('div');
+            col.className = 'col-xl-3 col-lg-4 col-md-6 mb-3';
+            col.dataset.rating = candidate.avgRating || 0;
 
-            row.innerHTML = `
-                <td>
-                    <div class="d-flex align-items-center">
-                        <div class="me-3">
-                            <div class="avatar bg-primary text-white rounded-circle d-flex align-items-center justify-content-center"
-                                style="width:36px; height:36px; font-weight:500">
-                                ${getInitials(candidate.name)}
+            // Calculate rating class
+            let ratingClass = 'secondary';
+            let ratingBadgeClass = '';
+            if (candidate.avgRating) {
+                const rating = parseFloat(candidate.avgRating);
+                if (rating >= 4) {
+                    ratingClass = 'success';
+                    ratingBadgeClass = 'high';
+                } else if (rating >= 3) {
+                    ratingClass = 'warning';
+                    ratingBadgeClass = 'medium';
+                } else {
+                    ratingClass = 'danger';
+                    ratingBadgeClass = 'low';
+                }
+            }
+
+            // Generate stars HTML
+            const starsHtml = candidate.avgRating
+                ? generateRatingStars(candidate.avgRating)
+                : '<span class="text-muted">Not rated</span>';
+
+            // Generate interests badges
+            const interestsHtml = candidate.interests && candidate.interests.length > 0
+                ? candidate.interests.map(interest =>
+                    `<span class="badge bg-light text-secondary me-1 mb-1">${interest}</span>`).join('')
+                : '<span class="text-muted fst-italic">No interests listed</span>';
+
+            col.innerHTML = `
+                <div class="card h-100 student-card" data-id="${candidate.id}">
+                    <div class="card-body p-3">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <div class="d-flex align-items-center">
+                                <div class="me-2">
+                                    <div class="avatar bg-${ratingClass} text-white rounded-circle d-flex align-items-center justify-content-center"
+                                        style="width:42px; height:42px; font-weight:500">
+                                        ${getInitials(candidate.name)}
+                                    </div>
+                                </div>
+                                <div>
+                                    <h6 class="mb-0 text-truncate" style="max-width: 150px;">${candidate.name}</h6>
+                                    <small class="text-muted">ID: ${candidate.id}</small>
+                                </div>
+                            </div>
+                            <div>
+                                ${candidate.avgRating
+                                    ? `<span class="rating-badge bg-${ratingClass} bg-opacity-10 text-${ratingClass}">${candidate.avgRating} <i class="fas fa-star"></i></span>`
+                                    : ''}
                             </div>
                         </div>
-                        <div>
-                            <h6 class="mb-0">${candidate.name}</h6>
+                        <div class="mb-3 rating-stars">
+                            ${starsHtml}
+                        </div>
+                        <div class="small text-muted mb-2">Interests:</div>
+                        <div class="mb-2">
+                            ${interestsHtml}
+                        </div>
+                        <div class="mt-3 d-flex justify-content-between align-items-center">
+                            <span class="small text-muted">${candidate.ratings} ${candidate.ratings === 1 ? 'rating' : 'ratings'}</span>
+                            <button class="btn btn-sm btn-outline-secondary view-candidate-btn">
+                                <i class="fas fa-eye me-1"></i> View
+                            </button>
                         </div>
                     </div>
-                </td>
-                <td>
-                    <div class="d-flex align-items-center">
-                        <span class="fw-bold me-2">${candidate.avgRating.toFixed(1)}</span>
-                        ${generateRatingStars(candidate.avgRating)}
-                    </div>
-                </td>
-                <td>
-                    <span class="rating-pill ${getRatingClass(candidate.avgRating)}">
-                        <i class="fas fa-calendar-check me-1"></i> ${candidate.interviews}
-                    </span>
-                </td>
+                </div>
             `;
 
-            tableBody.appendChild(row);
+            container.appendChild(col);
         });
+
+        // Add event listeners to view buttons
+        document.querySelectorAll('.view-candidate-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const candidateCard = this.closest('.student-card');
+                const candidateId = parseInt(candidateCard.dataset.id);
+                openCandidateModal(candidateId, data);
+            });
+        });
+    }
+
+    // Filter candidates by search term
+    function filterCandidates(searchTerm) {
+        const candidateCards = document.querySelectorAll('.student-card');
+        let visibleCount = 0;
+
+        candidateCards.forEach(card => {
+            const parent = card.parentElement;
+            const candidateName = card.querySelector('h6').textContent.toLowerCase();
+
+            if (candidateName.includes(searchTerm)) {
+                parent.style.display = '';
+                visibleCount++;
+            } else {
+                parent.style.display = 'none';
+            }
+        });
+
+        document.getElementById('candidates-count').textContent = visibleCount;
+    }
+
+    // Filter candidates by rating
+    function filterCandidatesByRating(filter) {
+        const candidateCards = document.querySelectorAll('.student-card');
+        let visibleCount = 0;
+
+        candidateCards.forEach(card => {
+            const parent = card.parentElement;
+            const rating = parseFloat(parent.dataset.rating || 0);
+
+            let show = false;
+
+            switch(filter) {
+                case 'all':
+                    show = true;
+                    break;
+                case 'high':
+                    show = rating >= 4;
+                    break;
+                case 'medium':
+                    show = rating >= 3 && rating < 4;
+                    break;
+                case 'low':
+                    show = rating > 0 && rating < 3;
+                    break;
+                case 'unrated':
+                    show = rating === 0;
+                    break;
+            }
+
+            if (show) {
+                parent.style.display = '';
+                visibleCount++;
+            } else {
+                parent.style.display = 'none';
+            }
+        });
+
+        document.getElementById('candidates-count').textContent = visibleCount;
+    }
+
+    // Load more candidates
+    function loadMoreCandidates() {
+        // In a real application, this would load the next page of candidates
+        // For demo purposes, we'll just show a toast message
+        showToast('Loading more candidates...', 'info');
+
+        setTimeout(() => {
+            // Add some more sample candidates
+            const container = document.getElementById('candidates-container');
+            const currentCount = container.querySelectorAll('.student-card').length;
+            const moreCandidates = generateSampleCandidates().slice(0, 4);
+
+            // Update the display
+            populateCandidatesGrid([...moreCandidates]);
+
+            // Update count
+            document.getElementById('candidates-count').textContent =
+                parseInt(document.getElementById('candidates-count').textContent) + moreCandidates.length;
+
+            showToast('More candidates loaded', 'success');
+        }, 1000);
     }
 
     // Populate upcoming interviews table
@@ -849,7 +1093,7 @@
         if (!data || data.length === 0) {
             tableBody.innerHTML = `
                 <tr>
-                    <td colspan="3" class="text-center py-4">
+                    <td colspan="4" class="text-center py-4">
                         <p class="text-muted mb-0">No upcoming interviews scheduled</p>
                     </td>
                 </tr>
@@ -883,6 +1127,11 @@
                         </span>
                     </div>
                 </td>
+                <td>
+                    <button class="btn btn-sm btn-outline-secondary">
+                        <i class="fas fa-clipboard-list me-1"></i> View Schedule
+                    </button>
+                </td>
             `;
 
             tableBody.appendChild(row);
@@ -899,9 +1148,6 @@
         document.getElementById('faculty-modal-name').textContent = faculty.name;
         document.getElementById('modal-faculty-email').textContent = faculty.email;
         document.getElementById('modal-faculty-id').textContent = faculty.id;
-        document.getElementById('modal-avg-rating').textContent = faculty.avgRating.toFixed(1);
-        document.getElementById('modal-rating-stars').innerHTML = generateRatingStars(faculty.avgRating);
-        document.getElementById('modal-rated-count').textContent = `${Math.round(faculty.avgRating * 3)} candidates rated`;
         document.getElementById('modal-last-login').textContent = formatDate(faculty.lastLogin) || 'N/A';
         document.getElementById('modal-created-date').textContent = formatDate(faculty.created) || 'N/A';
 
@@ -940,16 +1186,9 @@
 
             // Create sample scheduled candidates based on the count
             for (let i = 0; i < faculty.scheduledCount; i++) {
-                const sampleRating = (3.5 + Math.random() * 1.5).toFixed(1);
                 const row = document.createElement('tr');
                 row.innerHTML = `
                     <td>Candidate ${i+1}</td>
-                    <td>
-                        <div class="d-flex align-items-center">
-                            <span class="me-1">${sampleRating}</span>
-                            ${generateRatingStars(sampleRating)}
-                        </div>
-                    </td>
                     <td>Sample Course ${i+1}</td>
                 `;
                 candidatesListEl.appendChild(row);
@@ -957,7 +1196,7 @@
         } else {
             candidatesListEl.innerHTML = `
                 <tr>
-                    <td colspan="3" class="text-center py-3">
+                    <td colspan="2" class="text-center py-3">
                         <p class="text-muted mb-0">No candidates scheduled</p>
                     </td>
                 </tr>
@@ -969,24 +1208,150 @@
         modal.show();
     }
 
+    // Open candidate details modal
+    function openCandidateModal(candidateId, candidateDataArray) {
+        // Find the candidate
+        const candidate = candidateDataArray.find(c => c.id === candidateId);
+        if (!candidate) return;
+
+        // Update modal content
+        document.getElementById('candidate-modal-name').textContent = candidate.name;
+        document.getElementById('modal-candidate-id').textContent = candidate.id;
+
+        const ratingHtml = candidate.avgRating
+            ? `<span class="fw-bold">${candidate.avgRating}</span> <span class="rating-stars">${generateRatingStars(candidate.avgRating)}</span> (${candidate.ratings} ${candidate.ratings === 1 ? 'rating' : 'ratings'})`
+            : 'Not yet rated';
+        document.getElementById('modal-candidate-rating').innerHTML = ratingHtml;
+
+        // Interests
+        const interestsEl = document.getElementById('modal-candidate-interests');
+        if (candidate.interests && candidate.interests.length > 0) {
+            interestsEl.innerHTML = candidate.interests.map(interest =>
+                `<span class="badge bg-secondary bg-opacity-10 text-secondary p-2 me-1 mb-1">${interest}</span>`
+            ).join('');
+        } else {
+            interestsEl.innerHTML = '<p class="text-muted mb-0">No interests listed</p>';
+        }
+
+        // Ratings list (mock data for demo)
+        const ratingsListEl = document.getElementById('modal-ratings-list');
+        if (candidate.ratings > 0) {
+            ratingsListEl.innerHTML = '';
+
+            // Create sample ratings based on the count
+            const facultyNames = ["Dr. Sarah Johnson", "Prof. Michael Chen", "Dr. Amelia Rodriguez", "Prof. James Williams"];
+
+            for (let i = 0; i < candidate.ratings; i++) {
+                // Randomly generate a rating between 1 and 5 stars that averages to the candidate's avgRating
+                const randomRating = Math.max(1, Math.min(5,
+                    parseFloat(candidate.avgRating) + (Math.random() * 1.5 - 0.75)
+                )).toFixed(1);
+
+                // Random faculty name
+                const facultyName = facultyNames[Math.floor(Math.random() * facultyNames.length)];
+
+                // Random comment
+                const comments = [
+                    "Strong candidate with good potential.",
+                    "Shows excellent knowledge in the field.",
+                    "Good communication skills, but needs improvement in technical areas.",
+                    "Impressive background, recommended for interview.",
+                    "Average performance, could improve with more experience."
+                ];
+                const comment = randomRating >= 3.5 ?
+                    comments[Math.floor(Math.random() * 2)] :
+                    comments[Math.floor(Math.random() * comments.length)];
+
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${facultyName}</td>
+                    <td>${generateRatingStars(randomRating)}</td>
+                    <td>${comment}</td>
+                `;
+                ratingsListEl.appendChild(row);
+            }
+        } else {
+            ratingsListEl.innerHTML = `
+                <tr>
+                    <td colspan="3" class="text-center py-3">
+                        <p class="text-muted mb-0">No ratings yet</p>
+                    </td>
+                </tr>
+            `;
+        }
+
+        // Schedule information (mock data)
+        const scheduleEl = document.getElementById('modal-candidate-schedule');
+        // 40% chance of having a schedule if rated highly
+        const hasSchedule = candidate.avgRating && parseFloat(candidate.avgRating) >= 3.8 && Math.random() > 0.6;
+
+        if (hasSchedule) {
+            // Random interview date in the next 2 weeks
+            const randomDays = Math.floor(Math.random() * 14) + 1;
+            const interviewDate = new Date();
+            interviewDate.setDate(interviewDate.getDate() + randomDays);
+
+            // Random faculty
+            const facultyNames = ["Dr. Sarah Johnson", "Prof. Michael Chen", "Prof. James Williams"];
+            const facultyName = facultyNames[Math.floor(Math.random() * facultyNames.length)];
+
+            scheduleEl.innerHTML = `
+                <div class="d-flex align-items-center p-3 rounded-3 bg-success bg-opacity-10">
+                    <div class="icon me-3 bg-success bg-opacity-20 text-success p-2 rounded-circle">
+                        <i class="fas fa-calendar-check"></i>
+                    </div>
+                    <div>
+                        <h6 class="mb-1 fw-bold text-success">Interview Scheduled</h6>
+                        <p class="mb-1"><strong>Date:</strong> ${formatDate(interviewDate)} (${getDayOfWeek(interviewDate)})</p>
+                        <p class="mb-0"><strong>Faculty:</strong> ${facultyName}</p>
+                    </div>
+                </div>
+            `;
+        } else {
+            scheduleEl.innerHTML = `
+                <div class="d-flex align-items-center p-3 rounded-3 bg-secondary bg-opacity-10">
+                    <div class="icon me-3 bg-secondary bg-opacity-20 text-secondary p-2 rounded-circle">
+                        <i class="fas fa-calendar-xmark"></i>
+                    </div>
+                    <div>
+                        <h6 class="mb-1 fw-bold text-secondary">Not Scheduled</h6>
+                        <p class="mb-0">This candidate has not been scheduled for interviews yet.</p>
+                    </div>
+                </div>
+            `;
+        }
+
+        // View documents button event
+        document.getElementById('view-candidate-documents').addEventListener('click', function() {
+            showToast('Opening candidate documents...', 'info');
+            setTimeout(() => {
+                showToast('Documents opened in new tab', 'success');
+            }, 1000);
+        });
+
+        // Show the modal
+        const modal = new bootstrap.Modal(document.getElementById('candidateDetailsModal'));
+        modal.show();
+    }
+
     // Filter faculty table based on search
     function filterFacultyTable(searchTerm) {
-        // In a real implementation, you'd filter your data array
-        // For now, let's simulate by fetching all data again and filtering
-        fetch('/api/admin/dashboard_stats')
-            .then(response => response.json())
-            .then(data => {
-                const filteredFaculty = data.faculty.data.filter(faculty => {
-                    return faculty.name.toLowerCase().includes(searchTerm) ||
-                           faculty.email.toLowerCase().includes(searchTerm);
-                });
+        const rows = document.querySelectorAll('#faculty-table-body tr');
+        let visibleCount = 0;
 
-                populateFacultyTable(filteredFaculty);
-                document.getElementById('faculty-count').textContent = filteredFaculty.length;
-            })
-            .catch(error => {
-                console.error('Error filtering faculty:', error);
-            });
+        rows.forEach(row => {
+            const facultyName = row.querySelector('td:first-child h6')?.textContent.toLowerCase() || '';
+            const facultyEmail = row.querySelector('td:nth-child(2)')?.textContent.toLowerCase() || '';
+
+            if (facultyName.includes(searchTerm) || facultyEmail.includes(searchTerm)) {
+                row.style.display = '';
+                visibleCount++;
+            } else {
+                row.style.display = 'none';
+            }
+        });
+
+        document.getElementById('faculty-count').textContent = visibleCount;
     }
 
     // Initialize charts
@@ -999,13 +1364,12 @@
         facultyStatusChart = new Chart(facultyStatusCtx, {
             type: 'doughnut',
             data: {
-                labels: ['Scheduled', 'Not Scheduled', 'Inactive'],
+                labels: ['Scheduled', 'Not Scheduled'],
                 datasets: [{
-                    data: [0, 0, 0],
+                    data: [0, 0],
                     backgroundColor: [
                         '#236465', // Scheduled (secondary color)
-                        '#c95659', // Not Scheduled (primary color)
-                        '#6c757d'  // Inactive (gray)
+                        '#c95659'  // Not Scheduled (primary color)
                     ],
                     borderColor: 'white',
                     borderWidth: 2
@@ -1091,9 +1455,8 @@
 
         const scheduledCount = facultyData.scheduled;
         const notScheduledCount = facultyData.total - facultyData.scheduled;
-        const inactiveCount = 0; // You might want to get this from API data
 
-        facultyStatusChart.data.datasets[0].data = [scheduledCount, notScheduledCount, inactiveCount];
+        facultyStatusChart.data.datasets[0].data = [scheduledCount, notScheduledCount];
         facultyStatusChart.update();
     }
 
@@ -1102,10 +1465,9 @@
         if (!facultyStatusChart) return;
 
         const scheduledCount = 5;
-        const notScheduledCount = 2;
-        const inactiveCount = 1;
+        const notScheduledCount = 3;
 
-        facultyStatusChart.data.datasets[0].data = [scheduledCount, notScheduledCount, inactiveCount];
+        facultyStatusChart.data.datasets[0].data = [scheduledCount, notScheduledCount];
         facultyStatusChart.update();
     }
 
@@ -1290,115 +1652,152 @@
         });
     }
 
+    // Export faculty report as PDF
+    function exportFacultyReport() {
+        // Show loading toast
+        showToast('Generating PDF report...', 'info');
 
-    // Add these functions to your admin dashboard JavaScript
+        // In a production environment, this would call an API endpoint
+        // For demonstration, we'll simulate the export with a delay
+        setTimeout(() => {
+            // Create a simple export using html2pdf.js library
+            // Note: In a real implementation, you would include html2pdf.js or use a server-side PDF generation
 
-// Export faculty report as PDF
-function exportFacultyReport() {
-    // Show loading toast
-    showToast('Generating PDF report...', 'info');
+            // Create content to export
+            const reportContent = document.createElement('div');
+            reportContent.innerHTML = `
+                <div style="padding: 20px; font-family: Arial, sans-serif;">
+                    <h2 style="color: #AD4245;">Faculty Instructor Report</h2>
+                    <p style="color: #666;">Generated on ${new Date().toLocaleDateString()} at ${new Date().toLocaleTimeString()}</p>
+                    <hr>
+                    <h3 style="color: #236465;">Overview Statistics</h3>
+                    <p><strong>Total Faculty:</strong> ${document.getElementById('total-faculty').textContent}</p>
+                    <p><strong>Faculty with Schedules:</strong> ${document.getElementById('scheduled-faculty').textContent}</p>
+                    <p><strong>Scheduling Rate:</strong> ${document.getElementById('scheduling-percent').textContent}</p>
+                    <p><strong>Total Candidates:</strong> ${document.getElementById('total-candidates').textContent}</p>
+                    <hr>
+                    <h3 style="color: #236465;">Faculty List</h3>
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <thead>
+                            <tr style="background-color: #f2f2f2;">
+                                <th style="padding: 10px; text-align: left; border-bottom: 1px solid #ddd;">Name</th>
+                                <th style="padding: 10px; text-align: left; border-bottom: 1px solid #ddd;">Email</th>
+                                <th style="padding: 10px; text-align: left; border-bottom: 1px solid #ddd;">Interview Date</th>
+                                <th style="padding: 10px; text-align: left; border-bottom: 1px solid #ddd;">Scheduled Candidates</th>
+                            </tr>
+                        </thead>
+                        <tbody id="report-faculty-list">
+                        </tbody>
+                    </table>
 
-    // In a production environment, this would call an API endpoint
-    // For demonstration, we'll simulate the export with a delay
-    setTimeout(() => {
-        // Create a simple export using html2pdf.js library
-        // Note: In a real implementation, you would include html2pdf.js or use a server-side PDF generation
-
-        // Create content to export
-        const reportContent = document.createElement('div');
-        reportContent.innerHTML = `
-            <div style="padding: 20px; font-family: Arial, sans-serif;">
-                <h2 style="color: #AD4245;">Faculty Instructor Report</h2>
-                <p style="color: #666;">Generated on ${new Date().toLocaleDateString()} at ${new Date().toLocaleTimeString()}</p>
-                <hr>
-                <h3 style="color: #236465;">Overview Statistics</h3>
-                <p><strong>Total Faculty:</strong> ${document.getElementById('total-faculty').textContent}</p>
-                <p><strong>Faculty with Schedules:</strong> ${document.getElementById('scheduled-faculty').textContent}</p>
-                <p><strong>Scheduling Rate:</strong> ${document.getElementById('scheduling-percent').textContent}</p>
-                <p><strong>Average Rating:</strong> ${document.getElementById('avg-rating').textContent}/5</p>
-                <p><strong>Total Candidates:</strong> ${document.getElementById('total-candidates').textContent}</p>
-                <hr>
-                <h3 style="color: #236465;">Faculty List</h3>
-                <table style="width: 100%; border-collapse: collapse;">
-                    <thead>
-                        <tr style="background-color: #f2f2f2;">
-                            <th style="padding: 10px; text-align: left; border-bottom: 1px solid #ddd;">Name</th>
-                            <th style="padding: 10px; text-align: left; border-bottom: 1px solid #ddd;">Email</th>
-                            <th style="padding: 10px; text-align: left; border-bottom: 1px solid #ddd;">Status</th>
-                            <th style="padding: 10px; text-align: left; border-bottom: 1px solid #ddd;">Interview Date</th>
-                        </tr>
-                    </thead>
-                    <tbody id="report-faculty-list">
-                    </tbody>
-                </table>
-            </div>
-        `;
-
-        // Add faculty data to the report
-        const reportFacultyList = reportContent.querySelector('#report-faculty-list');
-        document.querySelectorAll('#faculty-table-body tr').forEach(row => {
-            const newRow = document.createElement('tr');
-
-            // Get faculty name
-            const nameCell = row.querySelector('td:first-child');
-            const name = nameCell ? nameCell.querySelector('h6').textContent : 'N/A';
-
-            // Get email, status, and date
-            const email = row.querySelector('td:nth-child(2)') ? row.querySelector('td:nth-child(2)').textContent : 'N/A';
-            const status = row.querySelector('td:nth-child(3) span:last-child') ? row.querySelector('td:nth-child(3) span:last-child').textContent : 'N/A';
-            const date = row.querySelector('td:nth-child(4) span') ? row.querySelector('td:nth-child(4) span').textContent : 'N/A';
-
-            newRow.innerHTML = `
-                <td style="padding: 10px; border-bottom: 1px solid #ddd;">${name}</td>
-                <td style="padding: 10px; border-bottom: 1px solid #ddd;">${email}</td>
-                <td style="padding: 10px; border-bottom: 1px solid #ddd;">${status}</td>
-                <td style="padding: 10px; border-bottom: 1px solid #ddd;">${date}</td>
+                    <h3 style="color: #236465; margin-top: 20px;">Top Rated Candidates</h3>
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <thead>
+                            <tr style="background-color: #f2f2f2;">
+                                <th style="padding: 10px; text-align: left; border-bottom: 1px solid #ddd;">Name</th>
+                                <th style="padding: 10px; text-align: left; border-bottom: 1px solid #ddd;">Average Rating</th>
+                                <th style="padding: 10px; text-align: left; border-bottom: 1px solid #ddd;">Interests</th>
+                            </tr>
+                        </thead>
+                        <tbody id="report-candidate-list">
+                        </tbody>
+                    </table>
+                </div>
             `;
 
-            reportFacultyList.appendChild(newRow);
-        });
+            // Add faculty data to the report
+            const reportFacultyList = reportContent.querySelector('#report-faculty-list');
+            document.querySelectorAll('#faculty-table-body tr').forEach(row => {
+                const newRow = document.createElement('tr');
 
-        // In a real implementation, you would use html2pdf or another library
-        // html2pdf().from(reportContent).save('faculty_report.pdf');
+                // Get faculty name
+                const nameCell = row.querySelector('td:first-child');
+                const name = nameCell ? nameCell.querySelector('h6').textContent : 'N/A';
 
-        // For demo, we'll create a data URL and open it in a new tab
-        const blob = new Blob([reportContent.outerHTML], { type: 'text/html' });
-        const url = URL.createObjectURL(blob);
-        window.open(url, '_blank');
+                // Get email, date, and scheduled count
+                const email = row.querySelector('td:nth-child(2)') ? row.querySelector('td:nth-child(2)').textContent : 'N/A';
+                const date = row.querySelector('td:nth-child(3) span') ? row.querySelector('td:nth-child(3) span').textContent : 'N/A';
+                const scheduledCount = row.querySelector('td:nth-child(4)') ? row.querySelector('td:nth-child(4)').textContent : '0';
 
-        showToast('Report exported successfully!', 'success');
-    }, 1500);
-}
+                newRow.innerHTML = `
+                    <td style="padding: 10px; border-bottom: 1px solid #ddd;">${name}</td>
+                    <td style="padding: 10px; border-bottom: 1px solid #ddd;">${email}</td>
+                    <td style="padding: 10px; border-bottom: 1px solid #ddd;">${date}</td>
+                    <td style="padding: 10px; border-bottom: 1px solid #ddd;">${scheduledCount}</td>
+                `;
 
-// Send email to faculty
-function sendEmailToFaculty(facultyEmail, facultyName) {
-    // Show loading toast
-    showToast('Preparing email...', 'info');
+                reportFacultyList.appendChild(newRow);
+            });
 
-    // In a production environment, this would call an API endpoint
-    // For demonstration, we'll simulate sending an email with a delay
-    setTimeout(() => {
-        // Create modal for composing email
-        const modalHtml = `
-            <div class="modal fade" id="emailModal" tabindex="-1" aria-hidden="true">
-                <div class="modal-dialog modal-dialog-centered">
-                    <div class="modal-content border-0 shadow">
-                        <div class="modal-header py-3" style="background: linear-gradient(to right, var(--secondary), #307f80); color: white;">
-                            <h5 class="modal-title fw-bold">Send Email to ${facultyName}</h5>
-                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
-                        <div class="modal-body p-4">
-                            <div class="mb-3">
-                                <label for="email-to" class="form-label text-secondary">To:</label>
-                                <input type="email" class="form-control" id="email-to" value="${facultyEmail}" readonly>
+            // Add top candidate data to the report
+            const reportCandidateList = reportContent.querySelector('#report-candidate-list');
+            // Get only visible candidates with high ratings
+            const highRatedCandidates = Array.from(document.querySelectorAll('.student-card'))
+                .filter(card => {
+                    const rating = parseFloat(card.closest('[data-rating]').dataset.rating || 0);
+                    return rating >= 4;
+                })
+                .slice(0, 5); // Get top 5
+
+            highRatedCandidates.forEach(card => {
+                const newRow = document.createElement('tr');
+                const name = card.querySelector('h6').textContent;
+                const rating = card.querySelector('.rating-badge') ?
+                    card.querySelector('.rating-badge').textContent.trim() : 'N/A';
+                const interests = Array.from(card.querySelectorAll('.badge'))
+                    .map(badge => badge.textContent)
+                    .join(', ');
+
+                newRow.innerHTML = `
+                    <td style="padding: 10px; border-bottom: 1px solid #ddd;">${name}</td>
+                    <td style="padding: 10px; border-bottom: 1px solid #ddd;">${rating}</td>
+                    <td style="padding: 10px; border-bottom: 1px solid #ddd;">${interests}</td>
+                `;
+
+                reportCandidateList.appendChild(newRow);
+            });
+
+            // In a real implementation, you would use html2pdf or another library
+            // html2pdf().from(reportContent).save('faculty_report.pdf');
+
+            // For demo, we'll create a data URL and open it in a new tab
+            const blob = new Blob([reportContent.outerHTML], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            window.open(url, '_blank');
+
+            showToast('Report exported successfully!', 'success');
+        }, 1500);
+    }
+
+    // Send email to faculty
+    function sendEmailToFaculty(facultyEmail, facultyName) {
+        // Show loading toast
+        showToast('Preparing email...', 'info');
+
+        // In a production environment, this would call an API endpoint
+        // For demonstration, we'll simulate sending an email with a delay
+        setTimeout(() => {
+            // Create modal for composing email
+            const modalHtml = `
+                <div class="modal fade" id="emailModal" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content border-0 shadow">
+                            <div class="modal-header py-3" style="background: linear-gradient(to right, var(--secondary), #307f80); color: white;">
+                                <h5 class="modal-title fw-bold">Send Email to ${facultyName}</h5>
+                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
-                            <div class="mb-3">
-                                <label for="email-subject" class="form-label text-secondary">Subject:</label>
-                                <input type="text" class="form-control" id="email-subject" value="Faculty Interview Schedule - Update">
-                            </div>
-                            <div class="mb-3">
-                                <label for="email-body" class="form-label text-secondary">Message:</label>
-                                <textarea class="form-control" id="email-body" rows="6">Dear ${facultyName},
+                            <div class="modal-body p-4">
+                                <div class="mb-3">
+                                    <label for="email-to" class="form-label text-secondary">To:</label>
+                                    <input type="email" class="form-control" id="email-to" value="${facultyEmail}" readonly>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="email-subject" class="form-label text-secondary">Subject:</label>
+                                    <input type="text" class="form-control" id="email-subject" value="Faculty Interview Schedule - Update">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="email-body" class="form-label text-secondary">Message:</label>
+                                    <textarea class="form-control" id="email-body" rows="6">Dear ${facultyName},
 
 I hope this email finds you well. I'm writing to follow up on your faculty interview schedule for the upcoming hiring cycle.
 
@@ -1408,47 +1807,47 @@ Thank you for your participation in our hiring process.
 
 Best regards,
 Admin Team</textarea>
+                                </div>
                             </div>
-                        </div>
-                        <div class="modal-footer border-0">
-                            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
-                            <button type="button" class="btn btn-premium" id="send-email-btn">
-                                <i class="fas fa-paper-plane me-1"></i> Send Email
-                            </button>
+                            <div class="modal-footer border-0">
+                                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                                <button type="button" class="btn btn-premium" id="send-email-btn">
+                                    <i class="fas fa-paper-plane me-1"></i> Send Email
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        `;
+            `;
 
-        // Add modal to the DOM
-        const modalContainer = document.createElement('div');
-        modalContainer.innerHTML = modalHtml;
-        document.body.appendChild(modalContainer);
+            // Add modal to the DOM
+            const modalContainer = document.createElement('div');
+            modalContainer.innerHTML = modalHtml;
+            document.body.appendChild(modalContainer);
 
-        // Initialize the modal
-        const emailModal = new bootstrap.Modal(document.getElementById('emailModal'));
-        emailModal.show();
+            // Initialize the modal
+            const emailModal = new bootstrap.Modal(document.getElementById('emailModal'));
+            emailModal.show();
 
-        // Add event listener to send button
-        document.getElementById('send-email-btn').addEventListener('click', function() {
-            // Simulate sending email
-            emailModal.hide();
+            // Add event listener to send button
+            document.getElementById('send-email-btn').addEventListener('click', function() {
+                // Simulate sending email
+                emailModal.hide();
 
-            // Show loading toast
-            showToast('Sending email...', 'info');
+                // Show loading toast
+                showToast('Sending email...', 'info');
 
-            // Simulate delay
-            setTimeout(() => {
-                showToast('Email sent successfully to ' + facultyEmail, 'success');
+                // Simulate delay
+                setTimeout(() => {
+                    showToast('Email sent successfully to ' + facultyEmail, 'success');
 
-                // Remove modal from DOM after it's hidden
-                document.getElementById('emailModal').addEventListener('hidden.bs.modal', function() {
-                    modalContainer.remove();
-                });
-            }, 1500);
-        });
-    }, 500);
-}
+                    // Remove modal from DOM after it's hidden
+                    document.getElementById('emailModal').addEventListener('hidden.bs.modal', function() {
+                        modalContainer.remove();
+                    });
+                }, 1500);
+            });
+        }, 500);
+    }
 </script>
 {% endblock %}

@@ -533,9 +533,9 @@ def add_comment():
 
         if rating >= 4:
             cursor.execute("""
-                INSERT INTO comments (application_id, rating, faculty_id, interest_prompt, comment)
-                VALUES (%s, %s, %s, NULL, NULL)
-            """, (application_id, rating, user_id))
+                            INSERT INTO comments (application_id, rating, faculty_id, interest_prompt, comment)
+                            VALUES (%s, %s, %s, NULL, NULL)
+                    """, (application_id, rating, user_id))
         else:
             if not interest_prompt or not comment_text:
                 return jsonify({'success': False, 'message': 'Interest Prompt and Comment are required for ratings below 4.'}), 400
