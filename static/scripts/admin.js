@@ -923,3 +923,4 @@ function showToast(message, type = 'success') {
             toastContainer.removeChild(toast);
         }
     });
+    }
