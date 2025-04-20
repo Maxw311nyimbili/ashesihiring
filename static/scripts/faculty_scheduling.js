@@ -7,6 +7,7 @@ let calendar = null;
 let confirmationModal = null;
 let scheduledCandidates = [];
 let currentSchedule = null;
+let ratedCandidates = [];
 
 // Initialize when DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
@@ -14,8 +15,10 @@ document.addEventListener('DOMContentLoaded', function() {
     facultyId = document.getElementById('faculty-id').value;
     facultyName = document.getElementById('faculty-name').value;
 
-    // Initialize Bootstrap modal
+    // Initialize Bootstrap modals
     confirmationModal = new bootstrap.Modal(document.getElementById('confirmationModal'));
+    candidateDetailsModal = new bootstrap.Modal(document.getElementById('candidateDetailsModal'));
+    scheduledCandidatesModal = new bootstrap.Modal(document.getElementById('scheduledCandidatesModal'));
 
     // Initialize event listeners
     initEventListeners();
@@ -23,7 +26,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Load data
     loadAvailableDates();
     loadScheduleStatus();
-    loadScheduledCandidates();
+    loadRatedCandidates();
 });
 
 // Load available dates from API
@@ -240,17 +243,25 @@ function loadScheduleStatus() {
         });
 }
 
-// Load scheduled candidates
-function loadScheduledCandidates() {
-    const candidatesContainer = document.getElementById('candidates-list');
+// Load rated candidates
+function loadRatedCandidates() {
+    const candidateList = document.getElementById('candidate-list');
 
-    // Show loading
-    document.getElementById('loading-candidates').classList.remove('d-none');
-    document.getElementById('scheduled-candidates-container').classList.add('d-none');
-    document.getElementById('no-candidates-message').classList.add('d-none');
+    // Clear the list and show loading placeholders
+    candidateList.innerHTML = `
+        <li class="list-group-item px-3 py-3">
+            <div class="shimmer shimmer-item"></div>
+        </li>
+        <li class="list-group-item px-3 py-3">
+            <div class="shimmer shimmer-item"></div>
+        </li>
+        <li class="list-group-item px-3 py-3">
+            <div class="shimmer shimmer-item"></div>
+        </li>
+    `;
 
-    // Fetch scheduled candidates
-    fetch(`/api/faculty_interviews?faculty_id=${facultyId}`)
+    // Fetch rated candidates from API
+    fetch(`/api/faculty_rated_applicants`)
         .then(response => {
             if (!response.ok) {
                 throw new Error('Network response was not ok');
@@ -258,67 +269,196 @@ function loadScheduledCandidates() {
             return response.json();
         })
         .then(data => {
-            // Hide loading
-            document.getElementById('loading-candidates').classList.add('d-none');
-
-            // Filter interviews for this faculty
-            scheduledCandidates = data.filter(interview => interview.faculty_id == facultyId);
-
-            if (scheduledCandidates.length === 0) {
-                // Show no candidates message
-                document.getElementById('no-candidates-message').classList.remove('d-none');
-                return;
-            }
-
-            // Show candidates container
-            document.getElementById('scheduled-candidates-container').classList.remove('d-none');
-
-            // Update candidate count
-            document.getElementById('candidate-count').textContent = scheduledCandidates.length;
-
-            // Display candidates
-            candidatesContainer.innerHTML = '';
-
-            scheduledCandidates.forEach(candidate => {
-                // Determine rating class for badge
-                let ratingClass = 'low-rating';
-                if (candidate.rating >= 4) {
-                    ratingClass = 'high-rating';
-                } else if (candidate.rating >= 3) {
-                    ratingClass = 'medium-rating';
-                }
-
-                // Create candidate item
-                const candidateItem = document.createElement('div');
-                candidateItem.className = 'candidate-item';
-                candidateItem.innerHTML = `
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h6 class="mb-1">${candidate.applicant_name}</h6>
-                            <div class="text-muted small">
-                                <span class="me-2"><i class="fas fa-book me-1"></i> ${candidate.course_name || 'No course preference'}</span>
-                                <span><i class="fas fa-award me-1"></i> Preference: ${candidate.preference || 'None'}</span>
-                            </div>
-                        </div>
-                        <span class="rating-badge ${ratingClass}">
-                            <i class="fas fa-star me-1"></i> Rating: ${candidate.rating || 'N/A'}
-                        </span>
-                    </div>
-                `;
-
-                candidatesContainer.appendChild(candidateItem);
-            });
+            ratedCandidates = data;
+            displayRatedCandidates(ratedCandidates);
+            updateCandidateStats(ratedCandidates);
         })
         .catch(error => {
-            console.error('Error loading scheduled candidates:', error);
-
-            // Hide loading, show error
-            document.getElementById('loading-candidates').classList.add('d-none');
-            document.getElementById('no-candidates-message').classList.remove('d-none');
-            document.getElementById('no-candidates-message').innerHTML = `
-                <i class="fas fa-exclamation-circle me-2"></i> Error loading scheduled candidates. Please try again later.
+            console.error('Error loading rated candidates:', error);
+            candidateList.innerHTML = `
+                <li class="list-group-item text-center py-4">
+                    <div class="text-danger mb-2">
+                        <i class="fas fa-exclamation-circle fa-2x"></i>
+                    </div>
+                    <p class="mb-0">Error loading your rated candidates. Please try again later.</p>
+                </li>
             `;
         });
+}
+
+// Display rated candidates
+function displayRatedCandidates(candidates) {
+    const candidateList = document.getElementById('candidate-list');
+    const candidateCount = document.getElementById('candidate-count');
+
+    // Update candidate count
+    candidateCount.textContent = candidates.length;
+
+    // Clear the list
+    candidateList.innerHTML = '';
+
+    if (candidates.length === 0) {
+        candidateList.innerHTML = `
+            <li class="list-group-item text-center py-4">
+                <div class="text-muted mb-2">
+                    <i class="fas fa-user-slash fa-2x"></i>
+                </div>
+                <p class="mb-0">You haven't rated any candidates yet.</p>
+            </li>
+        `;
+        return;
+    }
+
+    // Sort candidates by rating (highest first)
+    candidates.sort((a, b) => b.rating - a.rating);
+
+    // Add candidates to the list
+    candidates.forEach(candidate => {
+        const listItem = document.createElement('li');
+        listItem.className = 'list-group-item px-3 py-3';
+        listItem.dataset.id = candidate.id;
+
+        // Determine rating class
+        let ratingClass = 'low-rating';
+        if (candidate.rating >= 4) {
+            ratingClass = 'high-rating';
+        } else if (candidate.rating >= 3) {
+            ratingClass = 'medium-rating';
+        }
+
+        // Create interest tags
+        const interestTags = candidate.interests ?
+            candidate.interests.map(interest => `<span class="tag-pill">${interest}</span>`).join(' ') : '';
+
+        listItem.innerHTML = `
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h6 class="mb-1">${candidate.name}</h6>
+                    <div class="mt-1 mb-2">
+                        ${interestTags}
+                    </div>
+                </div>
+                <span class="candidate-badge ${ratingClass}">
+                    <i class="fas fa-star me-1"></i> ${candidate.rating}
+                </span>
+            </div>
+            <div class="d-flex justify-content-end">
+                <button class="btn btn-sm btn-outline-secondary view-candidate-btn" data-id="${candidate.id}">
+                    <i class="fas fa-eye me-1"></i> View Details
+                </button>
+            </div>
+        `;
+
+        candidateList.appendChild(listItem);
+
+        // Add click event for the view details button
+        listItem.querySelector('.view-candidate-btn').addEventListener('click', function() {
+            showCandidateDetails(candidate);
+        });
+    });
+
+    // Add search functionality
+    document.getElementById('candidate-search').addEventListener('input', function(e) {
+        const searchTerm = e.target.value.toLowerCase();
+        filterCandidates(searchTerm);
+    });
+}
+
+// Filter candidates based on search term
+function filterCandidates(searchTerm) {
+    const candidates = document.querySelectorAll('#candidate-list li[data-id]');
+
+    candidates.forEach(candidate => {
+        const candidateName = candidate.querySelector('h6').textContent.toLowerCase();
+        const interests = Array.from(candidate.querySelectorAll('.tag-pill'))
+            .map(tag => tag.textContent.toLowerCase());
+
+        // Check if search term is in name or interests
+        const matchesName = candidateName.includes(searchTerm);
+        const matchesInterest = interests.some(interest => interest.includes(searchTerm));
+
+        if (matchesName || matchesInterest || searchTerm === '') {
+            candidate.classList.remove('d-none');
+        } else {
+            candidate.classList.add('d-none');
+        }
+    });
+}
+
+// Update candidate statistics
+function updateCandidateStats(candidates) {
+    const totalRatedCount = document.getElementById('total-rated-count');
+    const highRatedCount = document.getElementById('high-rated-count');
+
+    // Count total and high-rated candidates
+    const total = candidates.length;
+    const highRated = candidates.filter(c => c.rating >= 4).length;
+
+    totalRatedCount.textContent = total;
+    highRatedCount.textContent = highRated;
+}
+
+// Show candidate details in modal
+function showCandidateDetails(candidate) {
+    // Set candidate name in modal title
+    document.getElementById('candidate-modal-name').textContent = candidate.name;
+
+    // Display rating with stars
+    const modalRating = document.getElementById('modal-display-rating');
+    let ratingHtml = '';
+
+    for (let i = 1; i <= 5; i++) {
+        if (i <= candidate.rating) {
+            ratingHtml += '<i class="fas fa-star text-warning me-1"></i>';
+        } else {
+            ratingHtml += '<i class="far fa-star text-warning me-1"></i>';
+        }
+    }
+    ratingHtml += ` <span class="ms-2">${candidate.rating}/5</span>`;
+    modalRating.innerHTML = ratingHtml;
+
+    // Display interests
+    const interestsContainer = document.getElementById('modal-display-interests');
+    if (candidate.interests && candidate.interests.length > 0) {
+        interestsContainer.innerHTML = candidate.interests.map(
+            interest => `<span class="tag-pill">${interest}</span>`
+        ).join(' ');
+    } else {
+        interestsContainer.innerHTML = '<span class="text-muted">No interests specified</span>';
+    }
+
+    // Display interest prompt
+    const promptContainer = document.getElementById('modal-interest-prompt-container');
+    const promptDisplay = document.getElementById('modal-display-interest-prompt');
+
+    if (candidate.interest_prompt) {
+        promptDisplay.textContent = candidate.interest_prompt;
+        promptContainer.classList.remove('d-none');
+    } else {
+        promptContainer.classList.add('d-none');
+    }
+
+    // Display comment
+    const commentContainer = document.getElementById('modal-comment-container');
+    const commentDisplay = document.getElementById('modal-display-comment');
+
+    if (candidate.comment) {
+        commentDisplay.textContent = candidate.comment;
+        commentContainer.classList.remove('d-none');
+    } else {
+        commentContainer.classList.add('d-none');
+    }
+
+    // Display document links
+    const documentLinks = document.getElementById('modal-document-links');
+    if (candidate.details) {
+        documentLinks.innerHTML = candidate.details;
+    } else {
+        documentLinks.innerHTML = '<span class="text-muted">No documents available</span>';
+    }
+
+    // Show the modal
+    candidateDetailsModal.show();
 }
 
 // Save faculty schedule
@@ -354,7 +494,6 @@ function saveSchedule() {
 
             // Refresh data
             loadScheduleStatus();
-            loadScheduledCandidates();
 
             // Update current schedule
             currentSchedule = {
@@ -371,6 +510,103 @@ function saveSchedule() {
     });
 }
 
+// Load scheduled candidates
+function loadScheduledCandidates() {
+    if (!currentSchedule) {
+        showToast('You need to schedule an interview date first', 'warning');
+        return;
+    }
+
+    // Show loading
+    document.getElementById('scheduled-loading').classList.remove('d-none');
+    document.getElementById('scheduled-candidate-list').classList.add('d-none');
+
+    // Display the interview date
+    document.getElementById('scheduled-date-display').textContent = formatDateForDisplay(currentSchedule.date);
+
+    // Fetch scheduled candidates
+    fetch(`/api/faculty_interviews?faculty_id=${facultyId}`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            // Filter interviews for this faculty and date
+            scheduledCandidates = data.filter(interview =>
+                interview.faculty_id == facultyId &&
+                interview.interview_date === currentSchedule.date
+            );
+
+            // Hide loading, show content
+            document.getElementById('scheduled-loading').classList.add('d-none');
+            document.getElementById('scheduled-candidate-list').classList.remove('d-none');
+
+            const container = document.getElementById('scheduled-candidates-container');
+            const noScheduledMessage = document.getElementById('no-scheduled-message');
+
+            if (scheduledCandidates.length === 0) {
+                noScheduledMessage.classList.remove('d-none');
+                container.innerHTML = '';
+                return;
+            }
+
+            noScheduledMessage.classList.add('d-none');
+            container.innerHTML = '';
+
+            // Display each scheduled candidate
+            scheduledCandidates.forEach((candidate, index) => {
+                const candidateEl = document.createElement('div');
+                candidateEl.className = 'candidate-item fade-in';
+
+                // Determine rating class
+                let ratingClass = 'low-rating';
+                if (candidate.rating >= 4) {
+                    ratingClass = 'high-rating';
+                } else if (candidate.rating >= 3) {
+                    ratingClass = 'medium-rating';
+                }
+
+                candidateEl.innerHTML = `
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-1">${candidate.applicant_name}</h6>
+                            <div class="text-muted small">
+                                <span class="me-2"><i class="fas fa-book me-1"></i> ${candidate.course_name || 'No course preference'}</span>
+                                <span><i class="fas fa-award me-1"></i> Preference: ${candidate.preference || 'None'}</span>
+                            </div>
+                        </div>
+                        <span class="rating-badge ${ratingClass}">
+                            <i class="fas fa-star me-1"></i> Rating: ${candidate.rating || 'N/A'}
+                        </span>
+                    </div>
+                `;
+
+                container.appendChild(candidateEl);
+            });
+
+            // Show the modal
+            scheduledCandidatesModal.show();
+        })
+        .catch(error => {
+            console.error('Error loading scheduled candidates:', error);
+
+            // Hide loading, show error
+            document.getElementById('scheduled-loading').classList.add('d-none');
+            document.getElementById('scheduled-candidate-list').classList.remove('d-none');
+
+            document.getElementById('scheduled-candidates-container').innerHTML = `
+                <div class="alert alert-danger">
+                    <i class="fas fa-exclamation-circle me-2"></i> Error loading scheduled candidates. Please try again later.
+                </div>
+            `;
+
+            // Show the modal despite the error
+            scheduledCandidatesModal.show();
+        });
+}
+
 // Print interview schedule
 function printInterviewSchedule() {
     if (!currentSchedule) {
@@ -379,10 +615,33 @@ function printInterviewSchedule() {
     }
 
     if (scheduledCandidates.length === 0) {
-        showToast('No candidates are scheduled for interviews', 'info');
-        return;
-    }
+        // Load scheduled candidates first
+        fetch(`/api/faculty_interviews?faculty_id=${facultyId}`)
+            .then(response => response.json())
+            .then(data => {
+                scheduledCandidates = data.filter(interview =>
+                    interview.faculty_id == facultyId &&
+                    interview.interview_date === currentSchedule.date
+                );
 
+                if (scheduledCandidates.length === 0) {
+                    showToast('No candidates are scheduled for interviews', 'info');
+                    return;
+                }
+
+                generatePrintableSchedule();
+            })
+            .catch(error => {
+                console.error('Error loading scheduled candidates for print:', error);
+                showToast('Error loading candidates. Please try again.', 'error');
+            });
+    } else {
+        generatePrintableSchedule();
+    }
+}
+
+// Generate printable schedule
+function generatePrintableSchedule() {
     // Create printable content
     const printWindow = window.open('', '_blank');
 
@@ -581,7 +840,7 @@ function initEventListeners() {
     document.getElementById('refresh-data').addEventListener('click', function() {
         loadAvailableDates();
         loadScheduleStatus();
-        loadScheduledCandidates();
+        loadRatedCandidates();
         showToast('Data refreshed', 'success');
     });
 
@@ -606,5 +865,21 @@ function initEventListeners() {
     // Print schedule button
     document.getElementById('print-schedule-btn').addEventListener('click', function() {
         printInterviewSchedule();
+    });
+
+    // Print schedule button (in modal)
+    document.getElementById('print-modal-btn').addEventListener('click', function() {
+        printInterviewSchedule();
+    });
+
+    // View scheduled candidates button
+    document.getElementById('view-scheduled-btn').addEventListener('click', function() {
+        loadScheduledCandidates();
+    });
+
+    // Candidate search functionality
+    document.getElementById('candidate-search').addEventListener('input', function(e) {
+        const searchTerm = e.target.value.toLowerCase();
+        filterCandidates(searchTerm);
     });
 }

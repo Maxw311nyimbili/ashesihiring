@@ -1171,30 +1171,6 @@ def admin_available_dates():
     return render_template('admin_dashboard.html')
 
 
-@app.route('/api/available_dates')
-def get_available_dates():
-    """API to get all available dates set by admin."""
-    try:
-        conn = get_db_connection()
-        cursor = conn.cursor(dictionary=True)
-
-        cursor.execute("""
-            SELECT id, date
-            FROM available_dates
-            WHERE date >= CURDATE()
-            ORDER BY date ASC
-        """)
-
-        available_dates = cursor.fetchall()
-        cursor.close()
-        conn.close()
-
-        return jsonify(available_dates)
-
-    except Exception as e:
-        app.logger.error(f"Error getting available dates: {str(e)}")
-        return jsonify({"error": str(e)}), 500
-
 
 @app.route('/api/admin/save_available_dates', methods=['POST'])
 def save_available_dates():
@@ -1262,15 +1238,17 @@ def get_all_faculty():
         return jsonify({"error": str(e)}), 500
 
 
+
 # =============================================================================
-# FACULTY SCHEDULING ROUTES
+# FACULTY RATED CANDIDATES ROUTES
 # =============================================================================
 
+# Flask route for the faculty scheduling page
 @app.route('/faculty_scheduling')
 def faculty_scheduling():
     """Render the faculty scheduling page."""
-    # if 'faculty_id' not in session:
-    #     return redirect(url_for('faculty_login'))
+    if 'faculty_id' not in session:
+        return redirect(url_for('faculty_login'))
 
     faculty_id = session.get('faculty_id')
     faculty_name = session.get('faculty_name', 'Unknown')
@@ -1279,12 +1257,37 @@ def faculty_scheduling():
                            faculty_id=faculty_id,
                            faculty_name=faculty_name)
 
+# API endpoint to get all available dates set by admin
+@app.route('/api/available_dates')
+def get_available_dates():
+    """API to get all available dates set by admin."""
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
 
+        cursor.execute("""
+            SELECT id, date
+            FROM available_dates
+            WHERE date >= CURDATE()
+            ORDER BY date ASC
+        """)
+
+        available_dates = cursor.fetchall()
+        cursor.close()
+        conn.close()
+
+        return jsonify(available_dates)
+
+    except Exception as e:
+        app.logger.error(f"Error getting available dates: {str(e)}")
+        return jsonify({"error": str(e)}), 500
+
+# API endpoint to update faculty's interview schedule
 @app.route('/api/update_faculty_schedule', methods=['POST'])
 def update_faculty_schedule():
     """API to update a faculty's interview schedule."""
-    # if 'faculty_id' not in session:
-    #     return jsonify({"success": False, "message": "Unauthorized"}), 403
+    if 'faculty_id' not in session:
+        return jsonify({"success": False, "message": "Unauthorized"}), 403
 
     data = request.json
     new_date = data.get('new_date')
@@ -1330,9 +1333,7 @@ def update_faculty_schedule():
                     WHERE faculty_id = %s
                 """, (new_date, faculty_id))
             else:
-                # No existing interviews, this is initial scheduling
-                # At this point, we might want to assign some candidates to this faculty
-                # based on their ratings and preferences, but for now we'll just create a placeholder
+                # No existing interviews, create a placeholder entry
                 cursor.execute("""
                     INSERT INTO interviews (faculty_id, interview_date)
                     VALUES (%s, %s)
@@ -1348,25 +1349,45 @@ def update_faculty_schedule():
         app.logger.error(f"Error updating faculty schedule: {str(e)}")
         return jsonify({"success": False, "message": str(e)}), 500
 
+# API endpoint to get all faculty interviews
+@app.route('/api/faculty_interviews')
+def faculty_interviews():
+    """API to get all scheduled interviews."""
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
 
+        # Get all scheduled interviews with details
+        cursor.execute("""
+            SELECT
+                i.id,
+                i.applicant_id,
+                i.faculty_id,
+                i.interview_date,
+                f.username AS faculty_name,
+                f.email,
+                CONCAT(a.first_name, ' ', a.last_name) AS applicant_name,
+                cp.course_name,
+                cp.preference,
+                COALESCE(c.rating, 0) as rating
+            FROM interviews i
+            JOIN faculty_users f ON i.faculty_id = f.id
+            LEFT JOIN applicants a ON i.applicant_id = a.id
+            LEFT JOIN course_preferences cp ON a.id = cp.applicant_id
+            LEFT JOIN comments c ON a.id = c.application_id AND c.faculty_id = i.faculty_id
+            ORDER BY i.interview_date, f.username
+        """)
 
-# =============================================================================
-# FACULTY RATED CANDIDATES ROUTES
-# =============================================================================
+        interviews = cursor.fetchall()
+        conn.close()
 
-@app.route('/faculty_rated_candidates')
-def faculty_rated_candidates():
-    """Render the faculty rated candidates page."""
-    if 'faculty_id' not in session:
-        return redirect(url_for('faculty_login'))
+        return jsonify(interviews)
 
-    faculty_id = session.get('faculty_id')
-    faculty_name = session.get('faculty_name', 'Unknown')
+    except Exception as e:
+        app.logger.error(f"Error getting scheduled interviews: {str(e)}")
+        return jsonify({"error": str(e)}), 500
 
-    return render_template('faculty_rated_candidates.html',
-                           faculty_id=faculty_id,
-                           faculty_name=faculty_name)
-
+# API endpoint to get rated applicants for the current faculty
 @app.route('/api/faculty_rated_applicants')
 def get_faculty_rated_applicants():
     """API to get applicants rated by the current faculty."""
@@ -1403,7 +1424,7 @@ def get_faculty_rated_applicants():
                 WHERE applicant_id = %s
             """, (applicant['id'],))
 
-            interests = [row['course_name'] for row in cursor.fetchall()]
+            interests = [row["course_name"] for row in cursor.fetchall()]
             applicant['interests'] = interests
 
             # Get document links

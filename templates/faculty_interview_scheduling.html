@@ -252,6 +252,107 @@
         from { opacity: 0; transform: translateY(10px); }
         to { opacity: 1; transform: translateY(0); }
     }
+
+    /* Candidate list styles (from faculty_rated_candidates) */
+    .candidate-badge {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        border-radius: 50px;
+        font-size: 0.85rem;
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+        transition: all 0.3s ease;
+    }
+
+    .candidate-badge.high-rating {
+        background-color: rgba(25, 135, 84, 0.1);
+        color: #198754;
+        border: 1px solid rgba(25, 135, 84, 0.2);
+    }
+
+    .candidate-badge.medium-rating {
+        background-color: rgba(255, 193, 7, 0.1);
+        color: #ffc107;
+        border: 1px solid rgba(255, 193, 7, 0.2);
+    }
+
+    .candidate-badge.low-rating {
+        background-color: rgba(173, 66, 69, 0.1);
+        color: var(--primary);
+        border: 1px solid rgba(173, 66, 69, 0.2);
+    }
+
+    /* Shimmer loading effect */
+    .shimmer {
+        background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+        background-size: 200% 100%;
+        animation: shimmer 1.5s infinite;
+    }
+
+    @keyframes shimmer {
+        0% {
+            background-position: -200% 0;
+        }
+        100% {
+            background-position: 200% 0;
+        }
+    }
+
+    .shimmer-item {
+        height: 60px;
+        margin-bottom: 10px;
+        border-radius: 8px;
+    }
+
+    /* Custom scrollbar for candidate list */
+    .candidate-list-container {
+        scrollbar-width: thin;
+        scrollbar-color: rgba(173, 66, 69, 0.3) #f1f1f1;
+    }
+
+    .candidate-list-container::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .candidate-list-container::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 10px;
+    }
+
+    .candidate-list-container::-webkit-scrollbar-thumb {
+        background-color: rgba(173, 66, 69, 0.3);
+        border-radius: 10px;
+    }
+
+    .candidate-list-container::-webkit-scrollbar-thumb:hover {
+        background-color: rgba(173, 66, 69, 0.5);
+    }
+
+    /* Tag pills for interests */
+    .tag-pill {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        border-radius: 50px;
+        font-size: 0.85rem;
+        font-weight: 500;
+        margin-right: 5px;
+        margin-bottom: 5px;
+        background-color: rgba(35, 100, 101, 0.1);
+        color: var(--secondary);
+    }
+
+    /* Document links styling */
+    .document-links a {
+        display: inline-block;
+        margin-right: 10px;
+        color: var(--secondary);
+        text-decoration: none;
+        transition: all 0.2s ease;
+    }
+
+    .document-links a:hover {
+        color: var(--primary);
+    }
 </style>
 {% endblock %}
 
@@ -278,19 +379,33 @@
         </div>
     </div>
 
-    <!-- Status Overview Row -->
+    <!-- Stats Overview Row -->
     <div class="row mb-4">
         <div class="col-12">
             <div class="card">
                 <div class="card-body p-4">
-                    <h5 class="text-secondary mb-3">Your Schedule Status</h5>
-                    <div id="schedule-status-container">
-                        <!-- Will be populated by JavaScript -->
-                        <div class="text-center py-2">
-                            <div class="spinner-border text-secondary" role="status">
-                                <span class="visually-hidden">Loading...</span>
+                    <div class="row align-items-center">
+                        <div class="col-md-8">
+                            <h5 class="text-secondary mb-3">Your Schedule Status</h5>
+                            <div id="schedule-status-container">
+                                <!-- Will be populated by JavaScript -->
+                                <div class="text-center py-2">
+                                    <div class="spinner-border text-secondary" role="status">
+                                        <span class="visually-hidden">Loading...</span>
+                                    </div>
+                                    <p class="text-muted mt-2 mb-0">Loading your schedule status...</p>
+                                </div>
                             </div>
-                            <p class="text-muted mt-2 mb-0">Loading your schedule status...</p>
+                        </div>
+                        <div class="col-md-4 text-end">
+                            <div class="stat-count d-inline-block text-center me-3">
+                                <h4 class="mb-0 fw-bold text-danger" id="total-rated-count">0</h4>
+                                <span class="text-muted small">Rated</span>
+                            </div>
+                            <div class="stat-count d-inline-block text-center">
+                                <h4 class="mb-0 fw-bold text-success" id="high-rated-count">0</h4>
+                                <span class="text-muted small">High Rated</span>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -355,65 +470,76 @@
             </div>
         </div>
 
-        <!-- Right Column: Scheduled Candidates -->
+        <!-- Right Column: Rated Candidates -->
         <div class="col-lg-6 mb-4">
             <div class="card h-100">
                 <div class="card-header py-3 secondary">
-                    <h5 class="mb-0 fw-bold text-white">Scheduled Candidates</h5>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0 fw-bold text-white">My Rated Candidates</h5>
+                        <div>
+                            <span class="badge bg-white text-primary rounded-pill" id="candidate-count">0</span>
+                        </div>
+                    </div>
                 </div>
+                <div class="card-body p-0">
+                    <div class="p-3 bg-light border-bottom">
+                        <div class="input-group">
+                            <span class="input-group-text bg-white border-end-0">
+                                <i class="fas fa-search text-muted"></i>
+                            </span>
+                            <input type="text" class="form-control border-start-0" id="candidate-search"
+                                placeholder="Search candidates..." aria-label="Search">
+                        </div>
+                    </div>
+                    <div class="candidate-list-container" style="max-height: 600px; overflow-y: auto;">
+                        <ul class="list-group list-group-flush" id="candidate-list">
+                            <!-- Loading placeholders -->
+                            <li class="list-group-item px-3 py-3">
+                                <div class="shimmer shimmer-item"></div>
+                            </li>
+                            <li class="list-group-item px-3 py-3">
+                                <div class="shimmer shimmer-item"></div>
+                            </li>
+                            <li class="list-group-item px-3 py-3">
+                                <div class="shimmer shimmer-item"></div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Actions Row -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
                 <div class="card-body p-4">
-                    <p class="text-muted mb-4">
-                        These are candidates who will be interviewed on your selected date.
-                    </p>
-
-                    <div id="loading-candidates" class="text-center py-4">
-                        <div class="spinner-border text-secondary" role="status">
-                            <span class="visually-hidden">Loading...</span>
-                        </div>
-                        <p class="mt-2 text-muted">Loading scheduled candidates...</p>
-                    </div>
-
-                    <div id="no-candidates-message" class="alert alert-info mt-4 d-none">
-                        <i class="fas fa-info-circle me-2"></i> You have no scheduled candidates yet. Once you set your interview date, candidates may be assigned for interviews.
-                    </div>
-
-                    <div id="scheduled-candidates-container" class="d-none">
-                        <div class="mb-3 d-flex justify-content-between align-items-center">
-                            <h6 class="text-secondary mb-0">Your Scheduled Candidates:</h6>
-                            <span class="badge bg-secondary rounded-pill" id="candidate-count">0</span>
-                        </div>
-
-                        <div id="candidates-list">
-                            <!-- Candidates will be listed here -->
-                        </div>
-
-                        <div class="alert alert-secondary mt-4 small">
-                            <i class="fas fa-info-circle me-2"></i> Candidates are automatically assigned based on their ratings and preferences.
-                        </div>
-                    </div>
-
-                    <div class="mt-4">
-                        <h6 class="text-secondary mb-3">Quick Actions</h6>
-                        <div class="action-card">
-                            <div class="icon secondary">
-                                <i class="fas fa-user-check"></i>
+                    <h5 class="text-secondary mb-3">Quick Actions</h5>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="action-card">
+                                <div class="icon secondary">
+                                    <i class="fas fa-user-check"></i>
+                                </div>
+                                <h6 class="mb-2">Review Scheduled Candidates</h6>
+                                <p class="text-muted small mb-3">View all candidates scheduled for your interview date.</p>
+                                <button class="btn btn-sm btn-outline-secondary" id="view-scheduled-btn">
+                                    <i class="fas fa-external-link-alt me-1"></i> View Scheduled Candidates
+                                </button>
                             </div>
-                            <h6 class="mb-2">Review Rated Candidates</h6>
-                            <p class="text-muted small mb-3">View all candidates you have previously rated.</p>
-                            <a href="/faculty_rated_candidates" class="btn btn-sm btn-outline-secondary">
-                                <i class="fas fa-external-link-alt me-1"></i> View Candidates
-                            </a>
                         </div>
-
-                        <div class="action-card">
-                            <div class="icon primary">
-                                <i class="fas fa-file-alt"></i>
+                        <div class="col-md-6">
+                            <div class="action-card">
+                                <div class="icon primary">
+                                    <i class="fas fa-file-alt"></i>
+                                </div>
+                                <h6 class="mb-2">Print Interview Schedule</h6>
+                                <p class="text-muted small mb-3">Generate a printable interview schedule with candidate details.</p>
+                                <button class="btn btn-sm btn-outline-primary" id="print-schedule-btn">
+                                    <i class="fas fa-print me-1"></i> Print Schedule
+                                </button>
                             </div>
-                            <h6 class="mb-2">Print Interview Schedule</h6>
-                            <p class="text-muted small mb-3">Generate a printable interview schedule with candidate details.</p>
-                            <button class="btn btn-sm btn-outline-primary" id="print-schedule-btn">
-                                <i class="fas fa-print me-1"></i> Print Schedule
-                            </button>
                         </div>
                     </div>
                 </div>
@@ -443,6 +569,96 @@
             <div class="modal-footer border-0">
                 <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
                 <button type="button" class="btn btn-primary" id="confirm-schedule-btn">Confirm Schedule</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Candidate Details Modal -->
+<div class="modal fade" id="candidateDetailsModal" tabindex="-1" aria-labelledby="candidateDetailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header py-3" style="background: linear-gradient(to right, var(--primary), #c95659); color: white;">
+                <h5 class="modal-title fw-bold" id="candidate-modal-name">Candidate Details</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <h6 class="text-secondary mb-2">Your Rating</h6>
+                            <div class="rating-display" id="modal-display-rating"></div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <h6 class="text-secondary mb-2">Course Interests</h6>
+                            <div id="modal-display-interests" class="interests-container"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-3" id="modal-interest-prompt-container">
+                    <h6 class="text-secondary mb-2">Interest Prompt Response</h6>
+                    <p class="mb-0 p-3 bg-light rounded-3" id="modal-display-interest-prompt"></p>
+                </div>
+
+                <div class="mb-4" id="modal-comment-container">
+                    <h6 class="text-secondary mb-2">Your Comment</h6>
+                    <p class="mb-0 p-3 bg-light rounded-3 fst-italic" id="modal-display-comment"></p>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="mb-3">
+                            <h6 class="text-secondary mb-2">Documents</h6>
+                            <div id="modal-document-links" class="document-links"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer border-0">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Scheduled Candidates Modal -->
+<div class="modal fade" id="scheduledCandidatesModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header py-3" style="background: linear-gradient(to right, var(--secondary), #307f80); color: white;">
+                <h5 class="modal-title fw-bold">Scheduled Candidates</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <div id="scheduled-loading" class="text-center py-3">
+                    <div class="spinner-border text-secondary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p class="mt-2 text-muted">Loading scheduled candidates...</p>
+                </div>
+
+                <div id="scheduled-candidate-list" class="d-none">
+                    <div class="alert alert-info mb-4">
+                        <i class="fas fa-info-circle me-2"></i> Showing candidates scheduled for <strong id="scheduled-date-display"></strong>
+                    </div>
+
+                    <div id="scheduled-candidates-container">
+                        <!-- Scheduled candidates will be listed here -->
+                    </div>
+
+                    <div id="no-scheduled-message" class="alert alert-warning mt-3 d-none">
+                        <i class="fas fa-exclamation-triangle me-2"></i> No candidates are currently scheduled for this date.
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer border-0">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-premium" id="print-modal-btn">
+                    <i class="fas fa-print me-2"></i> Print Schedule
+                </button>
             </div>
         </div>
     </div>
