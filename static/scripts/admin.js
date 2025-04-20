@@ -525,7 +525,7 @@ function displayFacultyScheduleTable(interviews) {
         return;
     }
 
-    // Group by faculty
+    // Group by faculty only
     const facultyMap = {};
     interviews.forEach(interview => {
         if (!facultyMap[interview.faculty_id]) {
