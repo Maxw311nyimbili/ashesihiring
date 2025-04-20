@@ -1715,9 +1715,12 @@ def get_candidates_with_ratings():
 
         # Enhance the data for each candidate
         for candidate in candidates:
-            # Set a default value for avg_rating if NULL
+            # Set a default value for avg_rating if NULL AND convert to float
             if candidate['avg_rating'] is None:
                 candidate['avg_rating'] = 0
+            else:
+                # Explicitly convert to float - this is the key change
+                candidate['avg_rating'] = float(candidate['avg_rating'])
 
             # Get course interests for each candidate
             cursor.execute("""
