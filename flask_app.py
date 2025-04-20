@@ -884,179 +884,429 @@ def get_scheduled_interviews():
 # INTERVIEW SCHEDULING ROUTES
 # =============================================================================
 
-@app.route('/faculty_scheduling_interview')
-def faculty_scheduling_interview():
-    """Render the faculty scheduling page."""
-    if 'faculty_id' not in session:
-        return redirect(url_for('faculty_login'))
+# @app.route('/faculty_scheduling_interview')
+# def faculty_scheduling_interview():
+#     """Render the faculty scheduling page."""
+#     if 'faculty_id' not in session:
+#         return redirect(url_for('faculty_login'))
+#
+#     faculty_name = session.get('faculty_name', 'Unknown')
+#
+#     # Get current date for min date attribute
+#     from datetime import datetime, timedelta
+#     today = datetime.now().strftime('%Y-%m-%d')
+#
+#     return render_template('faculty_interview_scheduling.html',
+#                            faculty_name=faculty_name,
+#                            min_date=today)
+#
+#
+# # New endpoint name to avoid conflict
+# @app.route('/api/faculty_rated_applicants')
+# def faculty_rated_applicants():
+#     """API to get applicants that the current faculty has rated."""
+#     if 'faculty_id' not in session:
+#         return jsonify({"error": "Unauthorized"}), 403
+#
+#     faculty_id = session.get('faculty_id')
+#
+#     try:
+#         conn = get_db_connection()
+#         cursor = conn.cursor(dictionary=True)
+#
+#         # Get applicants that this faculty has rated
+#         cursor.execute("""
+#             SELECT
+#                 a.id,
+#                 CONCAT(a.first_name, ' ', a.last_name) AS name,
+#                 c.rating,
+#                 c.interest_prompt,
+#                 c.comment
+#             FROM applicants a
+#             JOIN comments c ON a.id = c.application_id
+#             WHERE c.faculty_id = %s
+#             ORDER BY c.rating DESC, a.first_name
+#         """, (faculty_id,))
+#
+#         applicants = cursor.fetchall()
+#
+#         # For each applicant, get their course interests
+#         for applicant in applicants:
+#             cursor.execute("""
+#                 SELECT course_name
+#                 FROM course_preferences
+#                 WHERE applicant_id = %s
+#             """, (applicant['id'],))
+#
+#             interests = [row['course_name'] for row in cursor.fetchall()]
+#             applicant['interests'] = interests
+#
+#         conn.close()
+#         return jsonify(applicants)
+#
+#     except Exception as e:
+#         app.logger.error(f"Error getting shortlisted applicants: {str(e)}")
+#         return jsonify({"error": str(e)}), 500
+#
+#
+# # New endpoint name to avoid conflict
+# @app.route('/api/create_interview', methods=['POST'])
+# def create_interview():
+#     """API to schedule an interview with an applicant."""
+#     if 'faculty_id' not in session:
+#         return jsonify({"error": "Unauthorized"}), 403
+#
+#     data = request.json
+#     applicant_id = data.get("applicant_id")
+#     interview_date = data.get("date")
+#     faculty_id = session.get("faculty_id")
+#
+#     if not applicant_id or not interview_date:
+#         return jsonify({"error": "Missing required fields"}), 400
+#
+#     try:
+#         conn = get_db_connection()
+#         cursor = conn.cursor()
+#
+#         # Check if this applicant is already scheduled with this faculty
+#         cursor.execute("""
+#             SELECT id
+#             FROM interviews
+#             WHERE applicant_id = %s AND faculty_id = %s
+#         """, (applicant_id, faculty_id))
+#
+#         existing = cursor.fetchone()
+#
+#         if existing:
+#             # Update existing interview
+#             cursor.execute("""
+#                 UPDATE interviews
+#                 SET interview_date = %s
+#                 WHERE applicant_id = %s AND faculty_id = %s
+#             """, (interview_date, applicant_id, faculty_id))
+#             message = "Interview updated successfully"
+#         else:
+#             # Create new interview
+#             cursor.execute("""
+#                 INSERT INTO interviews (applicant_id, faculty_id, interview_date)
+#                 VALUES (%s, %s, %s)
+#             """, (applicant_id, faculty_id, interview_date))
+#             message = "Interview scheduled successfully"
+#
+#         conn.commit()
+#         conn.close()
+#
+#         return jsonify({"message": message})
+#
+#     except Exception as e:
+#         app.logger.error(f"Error scheduling interview: {str(e)}")
+#         return jsonify({"error": str(e)}), 500
+#
+#
+# # New endpoint name to avoid conflict
+# @app.route('/api/faculty_interviews')
+# def faculty_interviews():
+#     """API to get all scheduled interviews."""
+#     try:
+#         conn = get_db_connection()
+#         cursor = conn.cursor(dictionary=True)
+#
+#         # Get all scheduled interviews with details
+#         cursor.execute("""
+#             SELECT
+#                 i.id,
+#                 i.applicant_id,
+#                 i.faculty_id,
+#                 i.interview_date,
+#                 f.username AS faculty_name,
+#                 f.email,
+#                 CONCAT(a.first_name, ' ', a.last_name) AS applicant_name,
+#                 cp.course_name,
+#                 cp.preference
+#             FROM interviews i
+#             JOIN faculty_users f ON i.faculty_id = f.id
+#             JOIN applicants a ON i.applicant_id = a.id
+#             LEFT JOIN course_preferences cp ON a.id = cp.applicant_id
+#             ORDER BY i.interview_date, f.username
+#         """)
+#
+#         interviews = cursor.fetchall()
+#         conn.close()
+#
+#         return jsonify(interviews)
+#
+#     except Exception as e:
+#         app.logger.error(f"Error getting scheduled interviews: {str(e)}")
+#         return jsonify({"error": str(e)}), 500
+#
+#
+# @app.route('/api/update_faculty_schedule', methods=['POST'])
+# def update_faculty_schedule():
+#     """API to update a faculty's interview schedule date."""
+#     if 'faculty_id' not in session:
+#         return jsonify({"error": "Unauthorized"}), 403
+#
+#     data = request.json
+#     new_date = data.get("new_date")
+#     old_date = data.get("old_date")
+#     faculty_id = session.get("faculty_id")
+#
+#     if not new_date:
+#         return jsonify({"error": "Missing new date"}), 400
+#
+#     try:
+#         conn = get_db_connection()
+#         cursor = conn.cursor()
+#
+#         # Update all interviews for this faculty to the new date
+#         if old_date:
+#             cursor.execute("""
+#                 UPDATE interviews
+#                 SET interview_date = %s
+#                 WHERE faculty_id = %s AND interview_date = %s
+#             """, (new_date, faculty_id, old_date))
+#         else:
+#             cursor.execute("""
+#                 UPDATE interviews
+#                 SET interview_date = %s
+#                 WHERE faculty_id = %s
+#             """, (new_date, faculty_id))
+#
+#         conn.commit()
+#         conn.close()
+#
+#         return jsonify({"success": True, "message": "Schedule updated successfully"})
+#
+#     except Exception as e:
+#         app.logger.error(f"Error updating faculty schedule: {str(e)}")
+#         return jsonify({"success": False, "message": str(e)}), 500
+#
+#
+# @app.route('/api/delete_faculty_schedule', methods=['POST'])
+# def delete_faculty_schedule():
+#     """API to delete all interviews for a faculty."""
+#     if 'faculty_id' not in session:
+#         return jsonify({"error": "Unauthorized"}), 403
+#
+#     data = request.json
+#     date = data.get("date")
+#     faculty_id = session.get("faculty_id")
+#
+#     try:
+#         conn = get_db_connection()
+#         cursor = conn.cursor()
+#
+#         # Delete all interviews for this faculty
+#         if date:
+#             cursor.execute("""
+#                 DELETE FROM interviews
+#                 WHERE faculty_id = %s AND interview_date = %s
+#             """, (faculty_id, date))
+#         else:
+#             cursor.execute("""
+#                 DELETE FROM interviews
+#                 WHERE faculty_id = %s
+#             """, (faculty_id,))
+#
+#         conn.commit()
+#         conn.close()
+#
+#         return jsonify({"success": True, "message": "Schedule deleted successfully"})
+#
+#     except Exception as e:
+#         app.logger.error(f"Error deleting faculty schedule: {str(e)}")
+#         return jsonify({"success": False, "message": str(e)}), 500
+#
+#
+# @app.route('/api/remove_from_schedule', methods=['POST'])
+# def remove_from_schedule():
+#     """API to remove a specific candidate from the schedule."""
+#     if 'faculty_id' not in session:
+#         return jsonify({"error": "Unauthorized"}), 403
+#
+#     data = request.json
+#     applicant_id = data.get("applicant_id")
+#     faculty_id = session.get("faculty_id")
+#
+#     if not applicant_id:
+#         return jsonify({"error": "Missing applicant ID"}), 400
+#
+#     try:
+#         conn = get_db_connection()
+#         cursor = conn.cursor()
+#
+#         # Delete the specific interview
+#         cursor.execute("""
+#             DELETE FROM interviews
+#             WHERE applicant_id = %s AND faculty_id = %s
+#         """, (applicant_id, faculty_id))
+#
+#         conn.commit()
+#         conn.close()
+#
+#         return jsonify({"success": True, "message": "Candidate removed from schedule"})
+#
+#     except Exception as e:
+#         app.logger.error(f"Error removing candidate from schedule: {str(e)}")
+#         return jsonify({"success": False, "message": str(e)}), 500
 
-    faculty_name = session.get('faculty_name', 'Unknown')
 
-    # Get current date for min date attribute
-    from datetime import datetime, timedelta
-    today = datetime.now().strftime('%Y-%m-%d')
-
-    return render_template('faculty_interview_scheduling.html',
-                           faculty_name=faculty_name,
-                           min_date=today)
+"""
+The following routes should be added to your existing Flask application
+to support the admin available dates and faculty scheduling features.
+"""
 
 
-# New endpoint name to avoid conflict
-@app.route('/api/faculty_rated_applicants')
-def faculty_rated_applicants():
-    """API to get applicants that the current faculty has rated."""
-    if 'faculty_id' not in session:
-        return jsonify({"error": "Unauthorized"}), 403
+# =============================================================================
+# ADMIN AVAILABLE DATES ROUTES
+# =============================================================================
 
-    faculty_id = session.get('faculty_id')
+@app.route('/admin/available_dates')
+def admin_available_dates():
+    """Render the admin available dates page."""
+    # In a production app, you would check for admin permissions here
+    # if 'role' not in session or session['role'] != 'admin':
+    #     return redirect(url_for('login'))
 
+    return render_template('admin_dashboard.html')
+
+
+@app.route('/api/available_dates')
+def get_available_dates():
+    """API to get all available dates set by admin."""
     try:
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
 
-        # Get applicants that this faculty has rated
         cursor.execute("""
-            SELECT 
-                a.id, 
-                CONCAT(a.first_name, ' ', a.last_name) AS name, 
-                c.rating, 
-                c.interest_prompt, 
-                c.comment
-            FROM applicants a 
-            JOIN comments c ON a.id = c.application_id
-            WHERE c.faculty_id = %s
-            ORDER BY c.rating DESC, a.first_name
-        """, (faculty_id,))
+            SELECT id, date
+            FROM available_dates
+            WHERE date >= CURDATE()
+            ORDER BY date ASC
+        """)
 
-        applicants = cursor.fetchall()
-
-        # For each applicant, get their course interests
-        for applicant in applicants:
-            cursor.execute("""
-                SELECT course_name
-                FROM course_preferences
-                WHERE applicant_id = %s
-            """, (applicant['id'],))
-
-            interests = [row['course_name'] for row in cursor.fetchall()]
-            applicant['interests'] = interests
-
+        available_dates = cursor.fetchall()
+        cursor.close()
         conn.close()
-        return jsonify(applicants)
+
+        return jsonify(available_dates)
 
     except Exception as e:
-        app.logger.error(f"Error getting shortlisted applicants: {str(e)}")
+        app.logger.error(f"Error getting available dates: {str(e)}")
         return jsonify({"error": str(e)}), 500
 
 
-# New endpoint name to avoid conflict
-@app.route('/api/create_interview', methods=['POST'])
-def create_interview():
-    """API to schedule an interview with an applicant."""
-    if 'faculty_id' not in session:
-        return jsonify({"error": "Unauthorized"}), 403
+@app.route('/api/admin/save_available_dates', methods=['POST'])
+def save_available_dates():
+    """API to save available dates set by admin."""
+    # In a production app, you would check for admin permissions here
+    # if 'role' not in session or session['role'] != 'admin':
+    #     return jsonify({"error": "Unauthorized"}), 403
 
     data = request.json
-    applicant_id = data.get("applicant_id")
-    interview_date = data.get("date")
-    faculty_id = session.get("faculty_id")
+    dates = data.get('dates', [])
 
-    if not applicant_id or not interview_date:
-        return jsonify({"error": "Missing required fields"}), 400
+    if not dates:
+        return jsonify({"success": False, "message": "No dates provided"}), 400
 
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
 
-        # Check if this applicant is already scheduled with this faculty
-        cursor.execute("""
-            SELECT id
-            FROM interviews
-            WHERE applicant_id = %s AND faculty_id = %s
-        """, (applicant_id, faculty_id))
+        # Clear existing dates
+        cursor.execute("DELETE FROM available_dates")
 
-        existing = cursor.fetchone()
-
-        if existing:
-            # Update existing interview
+        # Insert new dates
+        for date in dates:
             cursor.execute("""
-                UPDATE interviews
-                SET interview_date = %s
-                WHERE applicant_id = %s AND faculty_id = %s
-            """, (interview_date, applicant_id, faculty_id))
-            message = "Interview updated successfully"
-        else:
-            # Create new interview
-            cursor.execute("""
-                INSERT INTO interviews (applicant_id, faculty_id, interview_date)
-                VALUES (%s, %s, %s)
-            """, (applicant_id, faculty_id, interview_date))
-            message = "Interview scheduled successfully"
+                INSERT INTO available_dates (date)
+                VALUES (%s)
+            """, (date,))
 
         conn.commit()
+        cursor.close()
         conn.close()
 
-        return jsonify({"message": message})
+        return jsonify({"success": True, "message": "Available dates saved successfully"})
 
     except Exception as e:
-        app.logger.error(f"Error scheduling interview: {str(e)}")
-        return jsonify({"error": str(e)}), 500
+        app.logger.error(f"Error saving available dates: {str(e)}")
+        return jsonify({"success": False, "message": str(e)}), 500
 
 
-# New endpoint name to avoid conflict
-@app.route('/api/faculty_interviews')
-def faculty_interviews():
-    """API to get all scheduled interviews."""
+@app.route('/api/admin/all_faculty')
+def get_all_faculty():
+    """API to get all faculty users."""
+    # In a production app, you would check for admin permissions here
+    # if 'role' not in session or session['role'] != 'admin':
+    #     return jsonify({"error": "Unauthorized"}), 403
+
     try:
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
 
-        # Get all scheduled interviews with details
         cursor.execute("""
-            SELECT 
-                i.id,
-                i.applicant_id,
-                i.faculty_id,
-                i.interview_date, 
-                f.username AS faculty_name, 
-                f.email,
-                CONCAT(a.first_name, ' ', a.last_name) AS applicant_name,
-                cp.course_name,
-                cp.preference
-            FROM interviews i
-            JOIN faculty_users f ON i.faculty_id = f.id
-            JOIN applicants a ON i.applicant_id = a.id
-            LEFT JOIN course_preferences cp ON a.id = cp.applicant_id
-            ORDER BY i.interview_date, f.username
+            SELECT id, username, email, created_at
+            FROM faculty_users
+            ORDER BY username
         """)
 
-        interviews = cursor.fetchall()
+        faculty = cursor.fetchall()
+        cursor.close()
         conn.close()
 
-        return jsonify(interviews)
+        return jsonify(faculty)
 
     except Exception as e:
-        app.logger.error(f"Error getting scheduled interviews: {str(e)}")
+        app.logger.error(f"Error getting all faculty: {str(e)}")
         return jsonify({"error": str(e)}), 500
+
+
+# =============================================================================
+# FACULTY SCHEDULING ROUTES
+# =============================================================================
+
+@app.route('/faculty_scheduling')
+def faculty_scheduling():
+    """Render the faculty scheduling page."""
+    # if 'faculty_id' not in session:
+    #     return redirect(url_for('faculty_login'))
+
+    faculty_id = session.get('faculty_id')
+    faculty_name = session.get('faculty_name', 'Unknown')
+
+    return render_template('faculty_scheduling.html',
+                           faculty_id=faculty_id,
+                           faculty_name=faculty_name)
 
 
 @app.route('/api/update_faculty_schedule', methods=['POST'])
 def update_faculty_schedule():
-    """API to update a faculty's interview schedule date."""
-    if 'faculty_id' not in session:
-        return jsonify({"error": "Unauthorized"}), 403
+    """API to update a faculty's interview schedule."""
+    # if 'faculty_id' not in session:
+    #     return jsonify({"success": False, "message": "Unauthorized"}), 403
 
     data = request.json
-    new_date = data.get("new_date")
-    old_date = data.get("old_date")
-    faculty_id = session.get("faculty_id")
+    new_date = data.get('new_date')
+    old_date = data.get('old_date')
+    faculty_id = session.get('faculty_id')
 
     if not new_date:
-        return jsonify({"error": "Missing new date"}), 400
+        return jsonify({"success": False, "message": "Missing new date"}), 400
 
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
+
+        # Check if this is a valid available date
+        cursor.execute("""
+            SELECT id FROM available_dates
+            WHERE date = %s
+        """, (new_date,))
+
+        date_exists = cursor.fetchone()
+        if not date_exists:
+            return jsonify({"success": False, "message": "Selected date is not available"}), 400
 
         # Update all interviews for this faculty to the new date
         if old_date:
@@ -1066,13 +1316,30 @@ def update_faculty_schedule():
                 WHERE faculty_id = %s AND interview_date = %s
             """, (new_date, faculty_id, old_date))
         else:
+            # Check if faculty already has interviews scheduled
             cursor.execute("""
-                UPDATE interviews
-                SET interview_date = %s
+                SELECT id FROM interviews
                 WHERE faculty_id = %s
-            """, (new_date, faculty_id))
+            """, (faculty_id,))
+
+            if cursor.fetchone():
+                # Update existing interviews
+                cursor.execute("""
+                    UPDATE interviews
+                    SET interview_date = %s
+                    WHERE faculty_id = %s
+                """, (new_date, faculty_id))
+            else:
+                # No existing interviews, this is initial scheduling
+                # At this point, we might want to assign some candidates to this faculty
+                # based on their ratings and preferences, but for now we'll just create a placeholder
+                cursor.execute("""
+                    INSERT INTO interviews (faculty_id, interview_date)
+                    VALUES (%s, %s)
+                """, (faculty_id, new_date))
 
         conn.commit()
+        cursor.close()
         conn.close()
 
         return jsonify({"success": True, "message": "Schedule updated successfully"})
@@ -1080,324 +1347,6 @@ def update_faculty_schedule():
     except Exception as e:
         app.logger.error(f"Error updating faculty schedule: {str(e)}")
         return jsonify({"success": False, "message": str(e)}), 500
-
-
-@app.route('/api/delete_faculty_schedule', methods=['POST'])
-def delete_faculty_schedule():
-    """API to delete all interviews for a faculty."""
-    if 'faculty_id' not in session:
-        return jsonify({"error": "Unauthorized"}), 403
-
-    data = request.json
-    date = data.get("date")
-    faculty_id = session.get("faculty_id")
-
-    try:
-        conn = get_db_connection()
-        cursor = conn.cursor()
-
-        # Delete all interviews for this faculty
-        if date:
-            cursor.execute("""
-                DELETE FROM interviews
-                WHERE faculty_id = %s AND interview_date = %s
-            """, (faculty_id, date))
-        else:
-            cursor.execute("""
-                DELETE FROM interviews
-                WHERE faculty_id = %s
-            """, (faculty_id,))
-
-        conn.commit()
-        conn.close()
-
-        return jsonify({"success": True, "message": "Schedule deleted successfully"})
-
-    except Exception as e:
-        app.logger.error(f"Error deleting faculty schedule: {str(e)}")
-        return jsonify({"success": False, "message": str(e)}), 500
-
-
-@app.route('/api/remove_from_schedule', methods=['POST'])
-def remove_from_schedule():
-    """API to remove a specific candidate from the schedule."""
-    if 'faculty_id' not in session:
-        return jsonify({"error": "Unauthorized"}), 403
-
-    data = request.json
-    applicant_id = data.get("applicant_id")
-    faculty_id = session.get("faculty_id")
-
-    if not applicant_id:
-        return jsonify({"error": "Missing applicant ID"}), 400
-
-    try:
-        conn = get_db_connection()
-        cursor = conn.cursor()
-
-        # Delete the specific interview
-        cursor.execute("""
-            DELETE FROM interviews
-            WHERE applicant_id = %s AND faculty_id = %s
-        """, (applicant_id, faculty_id))
-
-        conn.commit()
-        conn.close()
-
-        return jsonify({"success": True, "message": "Candidate removed from schedule"})
-
-    except Exception as e:
-        app.logger.error(f"Error removing candidate from schedule: {str(e)}")
-        return jsonify({"success": False, "message": str(e)}), 500
-
-
-# This file contains the fixed backend code portions for the admin dashboard
-# Add/update these functions in your flask_app.py
-
-@app.route('/admin_dashboard')
-def admin_dashboard():
-    """Render the admin dashboard page."""
-    try:
-        # Temporarily disable admin role check for testing
-        # if 'role' not in session or session['role'] != 'admin':
-        #     return redirect(url_for('login'))
-
-        return render_template('admin_dashboard.html')
-    except Exception as e:
-        app.logger.error(f"Error rendering admin dashboard: {str(e)}", exc_info=True)
-        return f"An error occurred: {str(e)}", 500
-
-
-@app.route('/api/admin/dashboard_stats')
-def admin_dashboard_stats():
-    """API to get statistics for the admin dashboard."""
-    try:
-        # Temporarily disable admin role check for testing
-        # if 'role' not in session or session['role'] != 'admin':
-        #     return jsonify({"error": "Unauthorized"}), 403
-
-        conn = get_db_connection()
-        cursor = conn.cursor(dictionary=True)
-
-        # Get total faculty count
-        cursor.execute("SELECT COUNT(*) as total FROM faculty_users")
-        faculty_count = cursor.fetchone()['total']
-
-        # Get faculty with scheduled interviews
-        cursor.execute("""
-            SELECT COUNT(DISTINCT faculty_id) as scheduled_count 
-            FROM interviews
-        """)
-        result = cursor.fetchone()
-        scheduled_faculty = result['scheduled_count'] if result and 'scheduled_count' in result else 0
-
-        # Get total applicants count
-        cursor.execute("SELECT COUNT(*) as total FROM applicants")
-        result = cursor.fetchone()
-        applicant_count = result['total'] if result and 'total' in result else 0
-
-        # Get average rating across all rated applicants
-        cursor.execute("""
-            SELECT AVG(rating) as avg_rating, COUNT(*) as rated_count 
-            FROM comments 
-            WHERE rating IS NOT NULL
-        """)
-        result = cursor.fetchone()
-        avg_rating = float(result['avg_rating']) if result and result['avg_rating'] else 0
-        rated_count = result['rated_count'] if result and 'rated_count' in result else 0
-
-        # Get rating distribution
-        cursor.execute("""
-            SELECT 
-                FLOOR(rating) as rating_value,
-                COUNT(*) as count
-            FROM comments
-            WHERE rating IS NOT NULL
-            GROUP BY FLOOR(rating)
-            ORDER BY rating_value
-        """)
-        rating_distribution = cursor.fetchall() or []
-
-        # Format rating distribution for Chart.js
-        rating_labels = []
-        rating_counts = []
-        for i in range(1, 6):  # 1-5 stars
-            found = False
-            for item in rating_distribution:
-                if item['rating_value'] == i:
-                    rating_counts.append(item['count'])
-                    found = True
-                    break
-            if not found:
-                rating_counts.append(0)
-            rating_labels.append(f"{i} Star{'s' if i > 1 else ''}")
-
-        # Get faculty data with interview counts
-        cursor.execute("""
-            SELECT 
-                f.id, 
-                f.username, 
-                f.email,
-                f.created_at,
-                COUNT(DISTINCT i.id) as interview_count,
-                (SELECT AVG(c.rating) FROM comments c WHERE c.faculty_id = f.id) as avg_rating_given,
-                (SELECT COUNT(DISTINCT c.id) FROM comments c WHERE c.faculty_id = f.id) as ratings_given,
-                MAX(i.interview_date) as latest_interview_date
-            FROM faculty_users f
-            LEFT JOIN interviews i ON f.id = i.faculty_id
-            GROUP BY f.id, f.username, f.email, f.created_at
-        """)
-        faculty_data = cursor.fetchall() or []
-
-        # Process faculty data for the frontend
-        processed_faculty = []
-        for faculty in faculty_data:
-            # Determine status - assume active if they've given ratings or scheduled interviews
-            status = 'active' if faculty['interview_count'] > 0 or (
-                        faculty['ratings_given'] and faculty['ratings_given'] > 0) else 'inactive'
-
-            # Handle date conversion safely
-            interview_date = None
-            if faculty['latest_interview_date']:
-                try:
-                    interview_date = faculty['latest_interview_date'].strftime('%Y-%m-%d')
-                except (AttributeError, ValueError):
-                    # If it's already a string or another conversion error
-                    interview_date = str(faculty['latest_interview_date'])
-
-            created_date = None
-            if faculty['created_at']:
-                try:
-                    created_date = faculty['created_at'].strftime('%Y-%m-%d')
-                except (AttributeError, ValueError):
-                    created_date = str(faculty['created_at'])
-
-            processed_faculty.append({
-                "id": faculty['id'],
-                "name": faculty['username'],
-                "email": faculty['email'],
-                "status": status,
-                "interviewDate": interview_date,
-                "scheduledCount": faculty['interview_count'],
-                "avgRating": float(faculty['avg_rating_given']) if faculty['avg_rating_given'] else 0,
-                "created": created_date,
-                "lastLogin": None  # We don't track this yet
-            })
-
-        # Get top-rated candidates
-        cursor.execute("""
-            SELECT 
-                a.id,
-                CONCAT(a.first_name, ' ', a.last_name) as name,
-                AVG(c.rating) as avg_rating,
-                COUNT(DISTINCT i.id) as interview_count
-            FROM applicants a
-            JOIN comments c ON a.id = c.application_id
-            LEFT JOIN interviews i ON a.id = i.applicant_id
-            GROUP BY a.id, a.first_name, a.last_name
-            HAVING AVG(c.rating) >= 4
-            ORDER BY avg_rating DESC, interview_count DESC
-            LIMIT 5
-        """)
-        top_candidates = cursor.fetchall() or []
-
-        # Process candidate data for the frontend
-        processed_candidates = []
-        for candidate in top_candidates:
-            processed_candidates.append({
-                "id": candidate['id'],
-                "name": candidate['name'],
-                "avgRating": float(candidate['avg_rating']) if candidate['avg_rating'] else 0,
-                "interviews": candidate['interview_count']
-            })
-
-        # Get upcoming interviews
-        cursor.execute("""
-            SELECT 
-                i.interview_date as date,
-                f.username as faculty_name,
-                COUNT(DISTINCT i.applicant_id) as candidate_count
-            FROM interviews i
-            JOIN faculty_users f ON i.faculty_id = f.id
-            WHERE i.interview_date >= CURDATE()
-            GROUP BY i.interview_date, f.username
-            ORDER BY i.interview_date
-            LIMIT 5
-        """)
-        upcoming_interviews = cursor.fetchall() or []
-
-        # Process interview data for the frontend
-        processed_interviews = []
-        for interview in upcoming_interviews:
-            # Handle date conversion
-            interview_date = None
-            if interview['date']:
-                try:
-                    interview_date = interview['date'].strftime('%Y-%m-%d')
-                except (AttributeError, ValueError):
-                    interview_date = str(interview['date'])
-
-            processed_interviews.append({
-                "date": interview_date,
-                "faculty": interview['faculty_name'],
-                "candidates": interview['candidate_count']
-            })
-
-        conn.close()
-
-        return jsonify({
-            "faculty": {
-                "total": faculty_count,
-                "scheduled": scheduled_faculty,
-                "schedulingPercent": round((scheduled_faculty / faculty_count) * 100) if faculty_count > 0 else 0,
-                "data": processed_faculty
-            },
-            "candidates": {
-                "total": applicant_count,
-                "rated": rated_count,
-                "avgRating": round(avg_rating, 1),
-                "ratingDistribution": {
-                    "labels": rating_labels,
-                    "data": rating_counts
-                },
-                "topRated": processed_candidates
-            },
-            "interviews": {
-                "upcoming": processed_interviews
-            }
-        })
-
-    except Exception as e:
-        app.logger.error(f"Error getting admin dashboard stats: {str(e)}", exc_info=True)
-        return jsonify({"error": str(e)}), 500
-
-
-# Add this test route to help debug database issues
-@app.route('/test_db_schema')
-def test_db_schema():
-    """Test route to examine database schema."""
-    try:
-        conn = get_db_connection()
-        cursor = conn.cursor()
-
-        # List all tables
-        cursor.execute("SHOW TABLES")
-        tables = cursor.fetchall()
-
-        # Get columns for each table
-        table_info = {}
-        for table in tables:
-            table_name = table[0]
-            cursor.execute(f"DESCRIBE {table_name}")
-            columns = cursor.fetchall()
-            table_info[table_name] = columns
-
-        conn.close()
-        return jsonify({"tables": tables, "table_info": table_info})
-    except Exception as e:
-        app.logger.error(f"Error testing database schema: {str(e)}", exc_info=True)
-        return jsonify({"error": str(e)}), 500
-
 
 # =============================================================================
 # MAIN APPLICATION ENTRY POINT

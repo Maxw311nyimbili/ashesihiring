@@ -1,7 +1,6 @@
-
 {% extends "base.html" %}
 
-{% block title %}Faculty Rated Candidates{% endblock %}
+{% block title %}Faculty Interview Scheduling{% endblock %}
 
 {% block styles %}
 <!-- Flatpickr Date Picker CSS -->
@@ -27,90 +26,8 @@
         border: none;
     }
 
-    .candidate-badge {
-        display: inline-block;
-        padding: 0.25rem 0.75rem;
-        border-radius: 50px;
-        font-size: 0.85rem;
-        font-weight: 500;
-        margin-bottom: 0.5rem;
-        transition: all 0.3s ease;
-    }
-
-    .candidate-badge.high-rating {
-        background-color: rgba(25, 135, 84, 0.1);
-        color: #198754;
-        border: 1px solid rgba(25, 135, 84, 0.2);
-    }
-
-    .candidate-badge.medium-rating {
-        background-color: rgba(255, 193, 7, 0.1);
-        color: #ffc107;
-        border: 1px solid rgba(255, 193, 7, 0.2);
-    }
-
-    .candidate-badge.low-rating {
-        background-color: rgba(173, 66, 69, 0.1);
-        color: var(--primary);
-        border: 1px solid rgba(173, 66, 69, 0.2);
-    }
-
-    .table thead th {
-        background-color: rgba(35, 100, 101, 0.1);
-        color: var(--secondary);
-        font-weight: 600;
-        border: none;
-    }
-
-    .table-hover tbody tr:hover {
-        background-color: rgba(173, 66, 69, 0.05);
-    }
-
-    .btn-premium {
+    .card-header.secondary {
         background: linear-gradient(to right, var(--secondary), #307f80);
-        color: white;
-        border: none;
-        box-shadow: 0 4px 10px rgba(35, 100, 101, 0.2);
-        transition: all 0.3s ease;
-    }
-
-    .btn-premium:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 15px rgba(35, 100, 101, 0.3);
-        color: white;
-    }
-
-    .btn-danger-soft {
-        background-color: rgba(173, 66, 69, 0.1);
-        color: var(--primary);
-        border: none;
-    }
-
-    .btn-danger-soft:hover {
-        background-color: var(--primary);
-        color: white;
-    }
-
-    /* Shimmer loading effect */
-    .shimmer {
-        background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
-        background-size: 200% 100%;
-        animation: shimmer 1.5s infinite;
-    }
-
-    @keyframes shimmer {
-        0% {
-            background-position: -200% 0;
-        }
-        100% {
-            background-position: 200% 0;
-        }
-    }
-
-    .shimmer-item {
-        height: 60px;
-        margin-bottom: 10px;
-        border-radius: 8px;
     }
 
     /* Calendar styling */
@@ -142,10 +59,17 @@
         background-color: rgba(35, 100, 101, 0.2);
     }
 
+    .flatpickr-day.selected-date {
+        background-color: rgba(173, 66, 69, 0.2) !important;
+        border-color: rgba(173, 66, 69, 0.3) !important;
+        color: var(--primary) !important;
+    }
+
     .flatpickr-day.today {
         border-color: var(--primary);
     }
 
+    /* Badge styling */
     .date-badge {
         display: inline-block;
         padding: 0.35rem 0.75rem;
@@ -159,6 +83,166 @@
         border: 1px solid rgba(35, 100, 101, 0.2);
     }
 
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.5rem 1rem;
+        border-radius: 50px;
+        font-size: 0.9rem;
+        font-weight: 500;
+    }
+
+    .status-badge.scheduled {
+        background-color: rgba(25, 135, 84, 0.1);
+        color: #198754;
+        border: 1px solid rgba(25, 135, 84, 0.2);
+    }
+
+    .status-badge.not-scheduled {
+        background-color: rgba(173, 66, 69, 0.1);
+        color: var(--primary);
+        border: 1px solid rgba(173, 66, 69, 0.2);
+    }
+
+    /* Button styling */
+    .btn-premium {
+        background: linear-gradient(to right, var(--secondary), #307f80);
+        color: white;
+        border: none;
+        box-shadow: 0 4px 10px rgba(35, 100, 101, 0.2);
+        transition: all 0.3s ease;
+    }
+
+    .btn-premium:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 15px rgba(35, 100, 101, 0.3);
+        color: white;
+    }
+
+    .btn-danger-soft {
+        background-color: rgba(173, 66, 69, 0.1);
+        color: var(--primary);
+        border: none;
+    }
+
+    .btn-danger-soft:hover {
+        background-color: var(--primary);
+        color: white;
+    }
+
+    /* Card with quick actions */
+    .action-card {
+        border: 1px solid #eee;
+        border-radius: 0.75rem;
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+        background-color: #fff;
+        transition: all 0.3s ease;
+    }
+
+    .action-card:hover {
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        transform: translateY(-2px);
+    }
+
+    .action-card .icon {
+        width: 50px;
+        height: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 12px;
+        margin-bottom: 1rem;
+    }
+
+    .action-card .icon.primary {
+        background-color: rgba(173, 66, 69, 0.1);
+        color: var(--primary);
+    }
+
+    .action-card .icon.secondary {
+        background-color: rgba(35, 100, 101, 0.1);
+        color: var(--secondary);
+    }
+
+    /* Scheduled candidate styles */
+    .candidate-item {
+        border: 1px solid #eee;
+        border-radius: 0.75rem;
+        padding: 1rem;
+        margin-bottom: 0.75rem;
+        transition: all 0.2s ease;
+    }
+
+    .candidate-item:hover {
+        border-color: rgba(35, 100, 101, 0.3);
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+    }
+
+    .rating-badge {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        border-radius: 50px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        margin-left: 0.5rem;
+    }
+
+    .rating-badge.high-rating {
+        background-color: rgba(25, 135, 84, 0.1);
+        color: #198754;
+        border: 1px solid rgba(25, 135, 84, 0.2);
+    }
+
+    .rating-badge.medium-rating {
+        background-color: rgba(255, 193, 7, 0.1);
+        color: #ffc107;
+        border: 1px solid rgba(255, 193, 7, 0.2);
+    }
+
+    .rating-badge.low-rating {
+        background-color: rgba(173, 66, 69, 0.1);
+        color: var(--primary);
+        border: 1px solid rgba(173, 66, 69, 0.2);
+    }
+
+    /* Info card for steps */
+    .info-card {
+        border-radius: 0.75rem;
+        border: none;
+        padding: 1.5rem;
+        background-color: rgba(35, 100, 101, 0.05);
+        margin-bottom: 1.5rem;
+    }
+
+    .info-card .step {
+        display: flex;
+        align-items: flex-start;
+        margin-bottom: 1rem;
+    }
+
+    .info-card .step:last-child {
+        margin-bottom: 0;
+    }
+
+    .info-card .step-number {
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        background-color: var(--secondary);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        margin-right: 1rem;
+        flex-shrink: 0;
+    }
+
+    .info-card .step-content {
+        flex: 1;
+    }
+
     /* Animation classes */
     .fade-in {
         animation: fadeIn 0.5s ease-in-out forwards;
@@ -168,80 +252,25 @@
         from { opacity: 0; transform: translateY(10px); }
         to { opacity: 1; transform: translateY(0); }
     }
-
-    /* Custom scrollbar for candidate list */
-    .candidate-list-container {
-        scrollbar-width: thin;
-        scrollbar-color: rgba(173, 66, 69, 0.3) #f1f1f1;
-    }
-
-    .candidate-list-container::-webkit-scrollbar {
-        width: 6px;
-    }
-
-    .candidate-list-container::-webkit-scrollbar-track {
-        background: #f1f1f1;
-        border-radius: 10px;
-    }
-
-    .candidate-list-container::-webkit-scrollbar-thumb {
-        background-color: rgba(173, 66, 69, 0.3);
-        border-radius: 10px;
-    }
-
-    .candidate-list-container::-webkit-scrollbar-thumb:hover {
-        background-color: rgba(173, 66, 69, 0.5);
-    }
-
-    /* Document links styling */
-    .document-links a {
-        display: inline-block;
-        margin-right: 10px;
-        color: var(--secondary);
-        text-decoration: none;
-        transition: all 0.2s ease;
-    }
-
-    .document-links a:hover {
-        color: var(--primary);
-    }
-
-    /* Tag pills for interests */
-    .tag-pill {
-        display: inline-block;
-        padding: 0.25rem 0.75rem;
-        border-radius: 50px;
-        font-size: 0.85rem;
-        font-weight: 500;
-        margin-right: 5px;
-        margin-bottom: 5px;
-        background-color: rgba(35, 100, 101, 0.1);
-        color: var(--secondary);
-    }
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="container py-4">
-    <!-- Header section with stats -->
+    <!-- Header section with title -->
     <div class="row mb-4">
         <div class="col-12">
             <div class="card border-0 bg-white shadow-sm">
                 <div class="card-body p-4">
                     <div class="row align-items-center">
                         <div class="col-md-8">
-                            <h3 class="fw-bold text-secondary mb-3">Faculty Rated Candidates</h3>
-                            <p class="text-muted mb-0">View your rated candidates and available interview dates</p>
+                            <h3 class="fw-bold text-secondary mb-2">Faculty Interview Scheduling</h3>
+                            <p class="text-muted mb-0">Select dates when you can conduct candidate interviews</p>
                         </div>
                         <div class="col-md-4 text-end">
-                            <div class="stat-count d-inline-block text-center me-3">
-                                <h4 class="mb-0 fw-bold text-danger" id="total-rated-count">0</h4>
-                                <span class="text-muted small">Rated</span>
-                            </div>
-                            <div class="stat-count d-inline-block text-center">
-                                <h4 class="mb-0 fw-bold text-success" id="high-rated-count">0</h4>
-                                <span class="text-muted small">High Rated</span>
-                            </div>
+                            <button class="btn btn-premium" id="refresh-data">
+                                <i class="fas fa-sync-alt me-2"></i> Refresh Data
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -249,55 +278,51 @@
         </div>
     </div>
 
-    <!-- Main content container -->
-    <div class="row">
-        <!-- Left panel: Candidate list -->
-        <div class="col-lg-6 mb-4">
-            <div class="card h-100">
-                <div class="card-header py-3">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <h5 class="mb-0 fw-bold text-white">My Rated Candidates</h5>
-                        <div>
-                            <span class="badge bg-white text-primary rounded-pill" id="candidate-count">0</span>
+    <!-- Status Overview Row -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body p-4">
+                    <h5 class="text-secondary mb-3">Your Schedule Status</h5>
+                    <div id="schedule-status-container">
+                        <!-- Will be populated by JavaScript -->
+                        <div class="text-center py-2">
+                            <div class="spinner-border text-secondary" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                            <p class="text-muted mt-2 mb-0">Loading your schedule status...</p>
                         </div>
-                    </div>
-                </div>
-                <div class="card-body p-0">
-                    <div class="p-3 bg-light border-bottom">
-                        <div class="input-group">
-                            <span class="input-group-text bg-white border-end-0">
-                                <i class="fas fa-search text-muted"></i>
-                            </span>
-                            <input type="text" class="form-control border-start-0" id="candidate-search"
-                                placeholder="Search candidates..." aria-label="Search">
-                        </div>
-                    </div>
-                    <div class="candidate-list-container" style="max-height: 600px; overflow-y: auto;">
-                        <ul class="list-group list-group-flush" id="candidate-list">
-                            <!-- Loading placeholders -->
-                            <li class="list-group-item px-3 py-3">
-                                <div class="shimmer shimmer-item"></div>
-                            </li>
-                            <li class="list-group-item px-3 py-3">
-                                <div class="shimmer shimmer-item"></div>
-                            </li>
-                            <li class="list-group-item px-3 py-3">
-                                <div class="shimmer shimmer-item"></div>
-                            </li>
-                        </ul>
                     </div>
                 </div>
             </div>
         </div>
+    </div>
 
-        <!-- Right panel: Available dates calendar -->
-        <div class="col-lg-6">
+    <!-- Main content row -->
+    <div class="row">
+        <!-- Left Column: Calendar -->
+        <div class="col-lg-6 mb-4">
             <div class="card h-100">
                 <div class="card-header py-3">
                     <h5 class="mb-0 fw-bold text-white">Available Interview Dates</h5>
                 </div>
                 <div class="card-body p-4">
-                    <p class="text-muted mb-4">The calendar below shows dates that have been set by administrators for faculty interviews. These are the only dates available for scheduling interviews.</p>
+                    <div class="info-card">
+                        <div class="step">
+                            <div class="step-number">1</div>
+                            <div class="step-content">
+                                <h6 class="mb-1">Select an available date from the calendar</h6>
+                                <p class="mb-0 text-muted small">Dates shown are those set by administrators for faculty interviews.</p>
+                            </div>
+                        </div>
+                        <div class="step">
+                            <div class="step-number">2</div>
+                            <div class="step-content">
+                                <h6 class="mb-1">Save your selection</h6>
+                                <p class="mb-0 text-muted small">Once you've chosen a date, click the 'Save Schedule' button to confirm.</p>
+                            </div>
+                        </div>
+                    </div>
 
                     <div id="loading-calendar" class="text-center py-4">
                         <div class="spinner-border text-secondary" role="status">
@@ -306,71 +331,92 @@
                         <p class="mt-2 text-muted">Loading available dates...</p>
                     </div>
 
+                    <div id="no-dates-message" class="alert alert-info mt-4 d-none">
+                        <i class="fas fa-info-circle me-2"></i> There are currently no available dates set by administrators. Please check back later.
+                    </div>
+
                     <div id="calendar-container" class="calendar-container d-none">
                         <div id="date-calendar"></div>
                     </div>
 
                     <div id="available-dates-list" class="mt-4 d-none">
                         <h6 class="text-secondary mb-3">Available Dates:</h6>
-                        <div id="dates-container">
+                        <div id="dates-container" class="mb-4">
                             <!-- Available dates will be listed here -->
                         </div>
-                    </div>
 
-                    <div id="no-dates-message" class="alert alert-info mt-4 d-none">
-                        <i class="fas fa-info-circle me-2"></i> There are currently no available dates set by administrators. Please check back later.
+                        <div class="d-grid gap-2">
+                            <button class="btn btn-primary" id="save-schedule-btn">
+                                <i class="fas fa-calendar-check me-2"></i> Save Schedule
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-</div>
 
-<!-- Candidate Details Modal -->
-<div class="modal fade" id="candidateDetailsModal" tabindex="-1" aria-labelledby="candidateDetailsModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg">
-        <div class="modal-content border-0 shadow">
-            <div class="modal-header py-3" style="background: linear-gradient(to right, var(--primary), #c95659); color: white;">
-                <h5 class="modal-title fw-bold" id="candidate-modal-name">Candidate Details</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body p-4">
-                <div class="row mb-4">
-                    <div class="col-md-6">
-                        <div class="mb-3">
-                            <h6 class="text-secondary mb-2">Your Rating</h6>
-                            <div class="rating-display" id="modal-display-rating"></div>
+        <!-- Right Column: Scheduled Candidates -->
+        <div class="col-lg-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header py-3 secondary">
+                    <h5 class="mb-0 fw-bold text-white">Scheduled Candidates</h5>
+                </div>
+                <div class="card-body p-4">
+                    <p class="text-muted mb-4">
+                        These are candidates who will be interviewed on your selected date.
+                    </p>
+
+                    <div id="loading-candidates" class="text-center py-4">
+                        <div class="spinner-border text-secondary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <p class="mt-2 text-muted">Loading scheduled candidates...</p>
+                    </div>
+
+                    <div id="no-candidates-message" class="alert alert-info mt-4 d-none">
+                        <i class="fas fa-info-circle me-2"></i> You have no scheduled candidates yet. Once you set your interview date, candidates may be assigned for interviews.
+                    </div>
+
+                    <div id="scheduled-candidates-container" class="d-none">
+                        <div class="mb-3 d-flex justify-content-between align-items-center">
+                            <h6 class="text-secondary mb-0">Your Scheduled Candidates:</h6>
+                            <span class="badge bg-secondary rounded-pill" id="candidate-count">0</span>
+                        </div>
+
+                        <div id="candidates-list">
+                            <!-- Candidates will be listed here -->
+                        </div>
+
+                        <div class="alert alert-secondary mt-4 small">
+                            <i class="fas fa-info-circle me-2"></i> Candidates are automatically assigned based on their ratings and preferences.
                         </div>
                     </div>
-                    <div class="col-md-6">
-                        <div class="mb-3">
-                            <h6 class="text-secondary mb-2">Course Interests</h6>
-                            <div id="modal-display-interests" class="interests-container"></div>
+
+                    <div class="mt-4">
+                        <h6 class="text-secondary mb-3">Quick Actions</h6>
+                        <div class="action-card">
+                            <div class="icon secondary">
+                                <i class="fas fa-user-check"></i>
+                            </div>
+                            <h6 class="mb-2">Review Rated Candidates</h6>
+                            <p class="text-muted small mb-3">View all candidates you have previously rated.</p>
+                            <a href="/faculty_rated_candidates" class="btn btn-sm btn-outline-secondary">
+                                <i class="fas fa-external-link-alt me-1"></i> View Candidates
+                            </a>
+                        </div>
+
+                        <div class="action-card">
+                            <div class="icon primary">
+                                <i class="fas fa-file-alt"></i>
+                            </div>
+                            <h6 class="mb-2">Print Interview Schedule</h6>
+                            <p class="text-muted small mb-3">Generate a printable interview schedule with candidate details.</p>
+                            <button class="btn btn-sm btn-outline-primary" id="print-schedule-btn">
+                                <i class="fas fa-print me-1"></i> Print Schedule
+                            </button>
                         </div>
                     </div>
                 </div>
-
-                <div class="mb-3" id="modal-interest-prompt-container">
-                    <h6 class="text-secondary mb-2">Interest Prompt Response</h6>
-                    <p class="mb-0 p-3 bg-light rounded-3" id="modal-display-interest-prompt"></p>
-                </div>
-
-                <div class="mb-4" id="modal-comment-container">
-                    <h6 class="text-secondary mb-2">Your Comment</h6>
-                    <p class="mb-0 p-3 bg-light rounded-3 fst-italic" id="modal-display-comment"></p>
-                </div>
-
-                <div class="row">
-                    <div class="col-md-12">
-                        <div class="mb-3">
-                            <h6 class="text-secondary mb-2">Documents</h6>
-                            <div id="modal-document-links" class="document-links"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="modal-footer border-0">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
             </div>
         </div>
     </div>
@@ -379,7 +425,31 @@
 <!-- Toast container for notifications -->
 <div id="toast-container" class="position-fixed bottom-0 end-0 p-3"></div>
 
-<!-- Hidden field to pass faculty name/email to JS -->
+<!-- Confirmation Modal -->
+<div class="modal fade" id="confirmationModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header py-3" style="background: linear-gradient(to right, var(--primary), #c95659); color: white;">
+                <h5 class="modal-title fw-bold" id="modal-title">Confirm Schedule</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <p id="modal-message">Are you sure you want to schedule your interviews for this date?</p>
+                <div id="modal-date-display" class="alert alert-info">
+                    <i class="fas fa-calendar-day me-2"></i> <span id="modal-selected-date"></span>
+                </div>
+                <p class="text-muted small">Note: This will update your availability for candidate interviews. Candidates will be assigned based on your selected date.</p>
+            </div>
+            <div class="modal-footer border-0">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="confirm-schedule-btn">Confirm Schedule</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Hidden field to pass faculty id to JS -->
+<input type="hidden" id="faculty-id" value="{{ faculty_id }}">
 <input type="hidden" id="faculty-name" value="{{ faculty_name }}">
 {% endblock %}
 
@@ -387,9 +457,5 @@
 <!-- Flatpickr date picker -->
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 
-{% block scripts %}
-<!-- Flatpickr date picker (simpler than Tempus Dominus, no popper.js dependency) -->
-<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-
-<script src="../static/scripts/faculty_scheduling.js"></script>
+<script src="/static/scripts/faculty_scheduling.js"></script>
 {% endblock %}
