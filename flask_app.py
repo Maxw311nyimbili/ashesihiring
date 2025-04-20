@@ -1691,6 +1691,489 @@ def export_candidates_report():
         return jsonify({"error": str(e)}), 500
 
 
+@app.route('/api/candidates_with_ratings')
+def get_candidates_with_ratings():
+    """API to get all candidates with their average ratings."""
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+
+        # Get all candidates with their average ratings
+        cursor.execute("""
+            SELECT 
+                a.id,
+                CONCAT(a.first_name, ' ', a.last_name) AS name,
+                AVG(c.rating) AS avg_rating,
+                COUNT(DISTINCT c.faculty_id) AS rater_count
+            FROM applicants a
+            LEFT JOIN comments c ON a.id = c.application_id
+            GROUP BY a.id, a.first_name, a.last_name
+            ORDER BY avg_rating DESC
+        """)
+
+        candidates = cursor.fetchall()
+
+        # Enhance the data for each candidate
+        for candidate in candidates:
+            # Set a default value for avg_rating if NULL
+            if candidate['avg_rating'] is None:
+                candidate['avg_rating'] = 0
+
+            # Get course interests for each candidate
+            cursor.execute("""
+                SELECT course_name
+                FROM course_preferences
+                WHERE applicant_id = %s
+            """, (candidate['id'],))
+
+            interests = [row["course_name"] for row in cursor.fetchall()]
+            candidate['interests'] = interests
+
+            # Get interview status
+            cursor.execute("""
+                SELECT i.id, i.interview_date, f.username
+                FROM interviews i
+                JOIN faculty_users f ON i.faculty_id = f.id
+                WHERE i.applicant_id = %s
+                ORDER BY i.interview_date
+            """, (candidate['id'],))
+
+            interviews = cursor.fetchall()
+
+            if interviews:
+                next_interview = interviews[0]
+                interview_date = next_interview['interview_date']
+                faculty_name = next_interview['username']
+
+                # Format the date
+                if interview_date:
+                    from datetime import datetime
+                    formatted_date = interview_date.strftime('%B %d, %Y')
+                    candidate['interview_status'] = f"Scheduled with {faculty_name} on {formatted_date}"
+                else:
+                    candidate['interview_status'] = f"Pending with {faculty_name}"
+            else:
+                if candidate['avg_rating'] >= 4:
+                    candidate['interview_status'] = "Ready for scheduling"
+                elif candidate['avg_rating'] > 0:
+                    candidate['interview_status'] = "Under review"
+                else:
+                    candidate['interview_status'] = "Not reviewed"
+
+        cursor.close()
+        conn.close()
+
+        return jsonify(candidates)
+
+    except Exception as e:
+        app.logger.error(f"Error getting candidates with ratings: {str(e)}")
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/api/admin/all_faculty')
+def get_all_faculty():
+    """API to get all faculty users."""
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+
+        cursor.execute("""
+            SELECT id, username, email, created_at
+            FROM faculty_users
+            ORDER BY username
+        """)
+
+        faculty = cursor.fetchall()
+        cursor.close()
+        conn.close()
+
+        return jsonify(faculty)
+
+    except Exception as e:
+        app.logger.error(f"Error getting all faculty: {str(e)}")
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route('/api/admin/send_reminder', methods=['POST'])
+def send_reminder():
+    """API endpoint to send a reminder to a specific faculty member."""
+    data = request.json
+    faculty_id = data.get('faculty_id')
+
+    if not faculty_id:
+        return jsonify({"success": False, "message": "Faculty ID is required"}), 400
+
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+
+        # Get faculty details
+        cursor.execute("""
+            SELECT username, email
+            FROM faculty_users
+            WHERE id = %s
+        """, (faculty_id,))
+
+        faculty = cursor.fetchone()
+
+        if not faculty:
+            return jsonify({"success": False, "message": "Faculty not found"}), 404
+
+        # Get available dates
+        cursor.execute("""
+            SELECT date
+            FROM available_dates
+            WHERE date >= CURDATE()
+            ORDER BY date ASC
+        """)
+
+        available_dates = cursor.fetchall()
+        dates_list = [date["date"].strftime("%Y-%m-%d") for date in available_dates]
+
+        cursor.close()
+        conn.close()
+
+        # In a real application, send an email here
+        # For now, we'll just log it and return success
+        app.logger.info(f"Sending reminder to {faculty['username']} ({faculty['email']})")
+
+        return jsonify({
+            "success": True,
+            "message": f"Reminder sent to {faculty['username']}",
+            "faculty": faculty,
+            "available_dates": dates_list
+        })
+
+    except Exception as e:
+        app.logger.error(f"Error sending reminder: {str(e)}")
+        return jsonify({"success": False, "message": str(e)}), 500
+
+
+@app.route('/export_scheduling_report')
+def generate_scheduling_report():
+    """API endpoint to generate a PDF report of faculty scheduling status."""
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+
+        # Get all faculty with their scheduling status
+        cursor.execute("""
+            SELECT 
+                f.id,
+                f.username,
+                f.email,
+                i.interview_date,
+                COUNT(DISTINCT a.id) AS candidates_count
+            FROM faculty_users f
+            LEFT JOIN interviews i ON f.id = i.faculty_id
+            LEFT JOIN applicants a ON i.applicant_id = a.id
+            GROUP BY f.id, f.username, f.email, i.interview_date
+            ORDER BY f.username, i.interview_date
+        """)
+
+        faculty_data = cursor.fetchall()
+
+        cursor.close()
+        conn.close()
+
+        # In a real application, generate a PDF here
+        # For now, we'll just return the data
+
+        return jsonify({
+            "success": True,
+            "message": "Report generated successfully",
+            "data": faculty_data
+        })
+
+    except Exception as e:
+        app.logger.error(f"Error generating report: {str(e)}")
+        return jsonify({"success": False, "message": str(e)}), 500
+
+
+@app.route('/api/admin/export_candidates')
+def export_candidates():
+    """API endpoint to export candidate data as a CSV or Excel file."""
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+
+        # Get all candidates with their ratings and interview status
+        cursor.execute("""
+            SELECT 
+                a.id,
+                a.first_name,
+                a.last_name,
+                a.telephone,
+                a.gender,
+                a.course_selection,
+                AVG(c.rating) AS avg_rating,
+                COUNT(DISTINCT c.faculty_id) AS rater_count,
+                i.interview_date
+            FROM applicants a
+            LEFT JOIN comments c ON a.id = c.application_id
+            LEFT JOIN interviews i ON a.id = i.applicant_id
+            GROUP BY a.id, a.first_name, a.last_name, a.telephone, a.gender, a.course_selection, i.interview_date
+            ORDER BY avg_rating DESC NULLS LAST, a.last_name, a.first_name
+        """)
+
+        candidates = cursor.fetchall()
+
+        cursor.close()
+        conn.close()
+
+        # In a real application, generate a CSV or Excel file here
+        # For now, we'll just return the data
+
+        return jsonify({
+            "success": True,
+            "message": "Candidates exported successfully",
+            "data": candidates
+        })
+
+    except Exception as e:
+        app.logger.error(f"Error exporting candidates: {str(e)}")
+        return jsonify({"success": False, "message": str(e)}), 500
+
+
+@app.route('/view_candidate_details/<int:candidate_id>')
+def view_candidate_details(candidate_id):
+    """Render the candidate details page."""
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+
+        # Get candidate details
+        cursor.execute("""
+            SELECT 
+                a.*,
+                AVG(c.rating) AS avg_rating,
+                COUNT(DISTINCT c.faculty_id) AS rater_count
+            FROM applicants a
+            LEFT JOIN comments c ON a.id = c.application_id
+            WHERE a.id = %s
+            GROUP BY a.id
+        """, (candidate_id,))
+
+        candidate = cursor.fetchone()
+
+        if not candidate:
+            return render_template('error.html', message="Candidate not found"), 404
+
+        # Get candidate's interests
+        cursor.execute("""
+            SELECT course_name, preference
+            FROM course_preferences
+            WHERE applicant_id = %s
+        """, (candidate_id,))
+
+        interests = cursor.fetchall()
+
+        # Get comments
+        cursor.execute("""
+            SELECT 
+                c.*,
+                f.username AS faculty_name
+            FROM comments c
+            JOIN faculty_users f ON c.faculty_id = f.id
+            WHERE c.application_id = %s
+            ORDER BY c.created_at DESC
+        """, (candidate_id,))
+
+        comments = cursor.fetchall()
+
+        cursor.close()
+        conn.close()
+
+        return render_template(
+            'candidate_details.html',
+            candidate=candidate,
+            interests=interests,
+            comments=comments
+        )
+
+    except Exception as e:
+        app.logger.error(f"Error viewing candidate details: {str(e)}")
+        return render_template('error.html', message=f"Error: {str(e)}"), 500
+
+
+@app.route('/view_candidate_documents/<int:candidate_id>')
+def view_candidate_documents(candidate_id):
+    """Render the candidate documents viewer page."""
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+
+        # Get candidate's documents
+        cursor.execute("""
+            SELECT 
+                id,
+                first_name,
+                last_name,
+                cv_path,
+                cover_letter_path,
+                transcript_path
+            FROM applicants
+            WHERE id = %s
+        """, (candidate_id,))
+
+        candidate = cursor.fetchone()
+
+        if not candidate:
+            return render_template('error.html', message="Candidate not found"), 404
+
+        cursor.close()
+        conn.close()
+
+        # Prepare document URLs
+        base_url = "/download_file/"
+
+        documents = {
+            "cv": {
+                "filename": os.path.basename(candidate['cv_path']) if candidate['cv_path'] else None,
+                "url": f"{base_url}?file={os.path.basename(candidate['cv_path'])}" if candidate['cv_path'] else None
+            },
+            "cover_letter": {
+                "filename": os.path.basename(candidate['cover_letter_path']) if candidate[
+                    'cover_letter_path'] else None,
+                "url": f"{base_url}?file={os.path.basename(candidate['cover_letter_path'])}" if candidate[
+                    'cover_letter_path'] else None
+            },
+            "transcript": {
+                "filename": os.path.basename(candidate['transcript_path']) if candidate['transcript_path'] else None,
+                "url": f"{base_url}?file={os.path.basename(candidate['transcript_path'])}" if candidate[
+                    'transcript_path'] else None
+            }
+        }
+
+        return render_template(
+            'document_viewer.html',
+            candidate=candidate,
+            documents=documents
+        )
+
+    except Exception as e:
+        app.logger.error(f"Error viewing candidate documents: {str(e)}")
+        return render_template('error.html', message=f"Error: {str(e)}"), 500
+
+
+@app.route('/api/view_interested_faculty/<int:candidate_id>')
+def view_interested_faculty(candidate_id):
+    """API endpoint to get faculty members interested in a candidate."""
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+
+        # Get candidate name
+        cursor.execute("""
+            SELECT CONCAT(first_name, ' ', last_name) AS name
+            FROM applicants
+            WHERE id = %s
+        """, (candidate_id,))
+
+        candidate = cursor.fetchone()
+
+        if not candidate:
+            return jsonify({"success": False, "message": "Candidate not found"}), 404
+
+        # Get faculty who rated the candidate highly
+        cursor.execute("""
+            SELECT 
+                f.id,
+                f.username,
+                f.email,
+                c.rating,
+                c.interest_prompt,
+                c.comment,
+                c.created_at
+            FROM comments c
+            JOIN faculty_users f ON c.faculty_id = f.id
+            WHERE c.application_id = %s AND (c.rating >= 4 OR c.interest_prompt = 'Yes')
+            ORDER BY c.rating DESC, c.created_at DESC
+        """, (candidate_id,))
+
+        faculty = cursor.fetchall()
+
+        cursor.close()
+        conn.close()
+
+        return jsonify({
+            "success": True,
+            "candidate": {
+                "id": candidate_id,
+                "name": candidate["name"]
+            },
+            "interested_faculty": faculty,
+            "count": len(faculty)
+        })
+
+    except Exception as e:
+        app.logger.error(f"Error getting interested faculty: {str(e)}")
+        return jsonify({"success": False, "message": str(e)}), 500
+
+
+# Ensure the /faculty_scheduling_detail endpoint exists
+@app.route('/faculty_scheduling_detail')
+def faculty_scheduling_detail():
+    """Render the faculty scheduling detail page."""
+    faculty_id = request.args.get('faculty_id')
+
+    if not faculty_id:
+        return redirect(url_for('admin_dashboard'))
+
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+
+        # Get faculty information
+        cursor.execute("""
+            SELECT id, username, email
+            FROM faculty_users
+            WHERE id = %s
+        """, (faculty_id,))
+
+        faculty = cursor.fetchone()
+
+        if not faculty:
+            return render_template('error.html', message="Faculty not found"), 404
+
+        # Get faculty's scheduled interviews
+        cursor.execute("""
+            SELECT 
+                i.id,
+                i.interview_date,
+                CONCAT(a.first_name, ' ', a.last_name) AS candidate_name,
+                a.id AS candidate_id
+            FROM interviews i
+            LEFT JOIN applicants a ON i.applicant_id = a.id
+            WHERE i.faculty_id = %s
+            ORDER BY i.interview_date
+        """, (faculty_id,))
+
+        interviews = cursor.fetchall()
+
+        cursor.close()
+        conn.close()
+
+        return render_template(
+            'faculty_scheduling_detail.html',
+            faculty=faculty,
+            interviews=interviews
+        )
+
+    except Exception as e:
+        app.logger.error(f"Error viewing faculty scheduling detail: {str(e)}")
+        return render_template('error.html', message=f"Error: {str(e)}"), 500
+
+
+# Fix the /candidate_details route to match what the JavaScript is expecting
+@app.route('/candidate_details')
+def candidate_details_page():
+    """Redirect to the view_candidate_details route."""
+    candidate_id = request.args.get('id')
+
+    if not candidate_id:
+        return redirect(url_for('admin_dashboard'))
+
+    return redirect(url_for('view_candidate_details', candidate_id=candidate_id))
 # =============================================================================
 # FACULTY RATED CANDIDATES ROUTES
 # =============================================================================
@@ -1926,6 +2409,8 @@ def update_faculty_schedule():
     except Exception as e:
         app.logger.error(f"Error updating faculty schedule: {str(e)}")
         return jsonify({"success": False, "message": str(e)}), 500
+
+
 
 # =============================================================================
 # MAIN APPLICATION ENTRY POINT
