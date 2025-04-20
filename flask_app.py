@@ -1348,6 +1348,98 @@ def update_faculty_schedule():
         app.logger.error(f"Error updating faculty schedule: {str(e)}")
         return jsonify({"success": False, "message": str(e)}), 500
 
+
+
+# =============================================================================
+# FACULTY RATED CANDIDATES ROUTES
+# =============================================================================
+
+@app.route('/faculty_rated_candidates')
+def faculty_rated_candidates():
+    """Render the faculty rated candidates page."""
+    if 'faculty_id' not in session:
+        return redirect(url_for('faculty_login'))
+
+    faculty_id = session.get('faculty_id')
+    faculty_name = session.get('faculty_name', 'Unknown')
+
+    return render_template('faculty_rated_candidates.html',
+                           faculty_id=faculty_id,
+                           faculty_name=faculty_name)
+
+@app.route('/api/faculty_rated_applicants')
+def get_faculty_rated_applicants():
+    """API to get applicants rated by the current faculty."""
+    if 'faculty_id' not in session:
+        return jsonify({"error": "Unauthorized"}), 403
+
+    faculty_id = session.get('faculty_id')
+
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+
+        # Get applicants rated by this faculty
+        cursor.execute("""
+            SELECT 
+                a.id,
+                CONCAT(a.first_name, ' ', a.last_name) AS name,
+                c.rating,
+                c.interest_prompt,
+                c.comment
+            FROM applicants a
+            JOIN comments c ON a.id = c.application_id
+            WHERE c.faculty_id = %s
+            ORDER BY c.rating DESC, a.first_name
+        """, (faculty_id,))
+
+        applicants = cursor.fetchall()
+
+        # For each applicant, get their course interests
+        for applicant in applicants:
+            cursor.execute("""
+                SELECT course_name
+                FROM course_preferences
+                WHERE applicant_id = %s
+            """, (applicant['id'],))
+
+            interests = [row['course_name'] for row in cursor.fetchall()]
+            applicant['interests'] = interests
+
+            # Get document links
+            applicant_id = applicant['id']
+            cursor.execute("""
+                SELECT cv_path, cover_letter_path, transcript_path
+                FROM applicants
+                WHERE id = %s
+            """, (applicant_id,))
+
+            doc_info = cursor.fetchone()
+
+            if doc_info:
+                cv_filename = os.path.basename(doc_info['cv_path']) if doc_info['cv_path'] else None
+                cover_letter_filename = os.path.basename(doc_info['cover_letter_path']) if doc_info[
+                    'cover_letter_path'] else None
+                transcript_filename = os.path.basename(doc_info['transcript_path']) if doc_info[
+                    'transcript_path'] else None
+
+                base_url = "/download_file/"
+
+                applicant['details'] = f"""
+                    <a href='{base_url}?file={cv_filename}' target='_blank'><i class="fas fa-file-pdf"></i> Resume</a> | 
+                    <a href='{base_url}?file={cover_letter_filename}' target='_blank'><i class="fas fa-file-alt"></i> Cover Letter</a> | 
+                    <a href='{base_url}?file={transcript_filename}' target='_blank'><i class="fas fa-file-contract"></i> Transcript</a>
+                """
+
+        cursor.close()
+        conn.close()
+
+        return jsonify(applicants)
+
+    except Exception as e:
+        app.logger.error(f"Error getting faculty rated applicants: {str(e)}")
+        return jsonify({"error": str(e)}), 500
+
 # =============================================================================
 # MAIN APPLICATION ENTRY POINT
 # =============================================================================
