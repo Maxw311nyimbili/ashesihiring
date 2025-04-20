@@ -171,18 +171,6 @@ function highlightSelectedDate(dateStr) {
 
 // Load faculty schedule status
 function loadScheduleStatus() {
-    const statusContainer = document.getElementById('schedule-status-container');
-
-    // Show loading
-    statusContainer.innerHTML = `
-        <div class="text-center py-2">
-            <div class="spinner-border text-secondary" role="status">
-                <span class="visually-hidden">Loading...</span>
-            </div>
-            <p class="text-muted mt-2 mb-0">Loading your schedule status...</p>
-        </div>
-    `;
-
     // Fetch faculty schedule status
     fetch(`/api/faculty_interviews?faculty_id=${facultyId}`)
         .then(response => {
@@ -202,44 +190,14 @@ function loadScheduleStatus() {
                     candidateCount: facultyInterviews.length
                 };
 
-                // Display scheduled status
-                statusContainer.innerHTML = `
-                    <div class="status-badge scheduled">
-                        <i class="fas fa-check-circle me-2"></i>
-                        <div>
-                            <strong>You are scheduled for interviews on ${formatDateForDisplay(currentSchedule.date)}</strong><br>
-                            <span class="small">${currentSchedule.candidateCount} candidate${currentSchedule.candidateCount !== 1 ? 's' : ''} scheduled for interviews</span>
-                        </div>
-                    </div>
-                `;
-
-                // Update calendar to highlight current date
+                // Update calendar to highlight current date if it exists
                 if (calendar) {
                     calendar.setDate(currentSchedule.date);
                 }
-            } else {
-                // Display not scheduled status
-                statusContainer.innerHTML = `
-                    <div class="status-badge not-scheduled">
-                        <i class="fas fa-exclamation-circle me-2"></i>
-                        <div>
-                            <strong>You have not scheduled an interview date</strong><br>
-                            <span class="small">Please select a date from the available options below</span>
-                        </div>
-                    </div>
-                `;
             }
         })
         .catch(error => {
             console.error('Error loading schedule status:', error);
-
-            // Display error status
-            statusContainer.innerHTML = `
-                <div class="alert alert-danger mb-0">
-                    <i class="fas fa-exclamation-triangle me-2"></i>
-                    Error loading your schedule status. Please try refreshing the page.
-                </div>
-            `;
         });
 }
 
@@ -387,15 +345,12 @@ function filterCandidates(searchTerm) {
 
 // Update candidate statistics
 function updateCandidateStats(candidates) {
-    const totalRatedCount = document.getElementById('total-rated-count');
-    const highRatedCount = document.getElementById('high-rated-count');
+    const totalRatedCount = document.getElementById('candidate-count');
 
-    // Count total and high-rated candidates
+    // Count total candidates
     const total = candidates.length;
-    const highRated = candidates.filter(c => c.rating >= 4).length;
 
     totalRatedCount.textContent = total;
-    highRatedCount.textContent = highRated;
 }
 
 // Show candidate details in modal
@@ -478,13 +433,16 @@ function saveSchedule() {
             'Content-Type': 'application/json',
         },
         body: JSON.stringify({
+            faculty_id: facultyId,  // Add faculty_id explicitly
             new_date: selectedDate,
             old_date: currentSchedule ? currentSchedule.date : null
         }),
     })
     .then(response => {
         if (!response.ok) {
-            throw new Error('Network response was not ok');
+            return response.json().then(err => {
+                throw new Error(err.message || 'Network response was not ok');
+            });
         }
         return response.json();
     })
@@ -506,7 +464,7 @@ function saveSchedule() {
     })
     .catch(error => {
         console.error('Error saving schedule:', error);
-        showToast('Error saving schedule. Please try again.', 'error');
+        showToast('Error saving schedule: ' + error.message, 'error');
     });
 }
 
@@ -712,7 +670,7 @@ function generatePrintableSchedule() {
     scheduledCandidates.forEach((candidate, index) => {
         printWindow.document.write(`
             <div class="candidate">
-                <h3>Candidate ${index + 1}: ${candidate.applicant_name}</h3>
+                <h3>Candidate ${index + 1}: ${candidate.applicant_name || 'Unnamed Candidate'}</h3>
                 <div class="candidate-info"><strong>Course:</strong> ${candidate.course_name || 'No course preference'}</div>
                 <div class="candidate-info"><strong>Preference:</strong> ${candidate.preference || 'None'}</div>
                 <div class="candidate-info"><strong>Rating:</strong> ${candidate.rating || 'Not rated'}</div>
@@ -862,19 +820,9 @@ function initEventListeners() {
         confirmationModal.hide();
     });
 
-    // Print schedule button
-    document.getElementById('print-schedule-btn').addEventListener('click', function() {
-        printInterviewSchedule();
-    });
-
-    // Print schedule button (in modal)
+    // Print modal button
     document.getElementById('print-modal-btn').addEventListener('click', function() {
         printInterviewSchedule();
-    });
-
-    // View scheduled candidates button
-    document.getElementById('view-scheduled-btn').addEventListener('click', function() {
-        loadScheduledCandidates();
     });
 
     // Candidate search functionality

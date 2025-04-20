@@ -1243,7 +1243,8 @@ def get_all_faculty():
 # FACULTY RATED CANDIDATES ROUTES
 # =============================================================================
 
-# Flask route for the faculty scheduling page
+# Update these routes in your flask application
+
 @app.route('/faculty_scheduling')
 def faculty_scheduling():
     """Render the faculty scheduling page."""
@@ -1257,7 +1258,7 @@ def faculty_scheduling():
                            faculty_id=faculty_id,
                            faculty_name=faculty_name)
 
-# API endpoint to get all available dates set by admin
+
 @app.route('/api/available_dates')
 def get_available_dates():
     """API to get all available dates set by admin."""
@@ -1282,112 +1283,7 @@ def get_available_dates():
         app.logger.error(f"Error getting available dates: {str(e)}")
         return jsonify({"error": str(e)}), 500
 
-# API endpoint to update faculty's interview schedule
-@app.route('/api/update_faculty_schedule', methods=['POST'])
-def update_faculty_schedule():
-    """API to update a faculty's interview schedule."""
-    if 'faculty_id' not in session:
-        return jsonify({"success": False, "message": "Unauthorized"}), 403
 
-    data = request.json
-    new_date = data.get('new_date')
-    old_date = data.get('old_date')
-    faculty_id = session.get('faculty_id')
-
-    if not new_date:
-        return jsonify({"success": False, "message": "Missing new date"}), 400
-
-    try:
-        conn = get_db_connection()
-        cursor = conn.cursor()
-
-        # Check if this is a valid available date
-        cursor.execute("""
-            SELECT id FROM available_dates
-            WHERE date = %s
-        """, (new_date,))
-
-        date_exists = cursor.fetchone()
-        if not date_exists:
-            return jsonify({"success": False, "message": "Selected date is not available"}), 400
-
-        # Update all interviews for this faculty to the new date
-        if old_date:
-            cursor.execute("""
-                UPDATE interviews
-                SET interview_date = %s
-                WHERE faculty_id = %s AND interview_date = %s
-            """, (new_date, faculty_id, old_date))
-        else:
-            # Check if faculty already has interviews scheduled
-            cursor.execute("""
-                SELECT id FROM interviews
-                WHERE faculty_id = %s
-            """, (faculty_id,))
-
-            if cursor.fetchone():
-                # Update existing interviews
-                cursor.execute("""
-                    UPDATE interviews
-                    SET interview_date = %s
-                    WHERE faculty_id = %s
-                """, (new_date, faculty_id))
-            else:
-                # No existing interviews, create a placeholder entry
-                cursor.execute("""
-                    INSERT INTO interviews (faculty_id, interview_date)
-                    VALUES (%s, %s)
-                """, (faculty_id, new_date))
-
-        conn.commit()
-        cursor.close()
-        conn.close()
-
-        return jsonify({"success": True, "message": "Schedule updated successfully"})
-
-    except Exception as e:
-        app.logger.error(f"Error updating faculty schedule: {str(e)}")
-        return jsonify({"success": False, "message": str(e)}), 500
-
-# API endpoint to get all faculty interviews
-@app.route('/api/faculty_interviews')
-def faculty_interviews():
-    """API to get all scheduled interviews."""
-    try:
-        conn = get_db_connection()
-        cursor = conn.cursor(dictionary=True)
-
-        # Get all scheduled interviews with details
-        cursor.execute("""
-            SELECT
-                i.id,
-                i.applicant_id,
-                i.faculty_id,
-                i.interview_date,
-                f.username AS faculty_name,
-                f.email,
-                CONCAT(a.first_name, ' ', a.last_name) AS applicant_name,
-                cp.course_name,
-                cp.preference,
-                COALESCE(c.rating, 0) as rating
-            FROM interviews i
-            JOIN faculty_users f ON i.faculty_id = f.id
-            LEFT JOIN applicants a ON i.applicant_id = a.id
-            LEFT JOIN course_preferences cp ON a.id = cp.applicant_id
-            LEFT JOIN comments c ON a.id = c.application_id AND c.faculty_id = i.faculty_id
-            ORDER BY i.interview_date, f.username
-        """)
-
-        interviews = cursor.fetchall()
-        conn.close()
-
-        return jsonify(interviews)
-
-    except Exception as e:
-        app.logger.error(f"Error getting scheduled interviews: {str(e)}")
-        return jsonify({"error": str(e)}), 500
-
-# API endpoint to get rated applicants for the current faculty
 @app.route('/api/faculty_rated_applicants')
 def get_faculty_rated_applicants():
     """API to get applicants rated by the current faculty."""
@@ -1460,6 +1356,117 @@ def get_faculty_rated_applicants():
     except Exception as e:
         app.logger.error(f"Error getting faculty rated applicants: {str(e)}")
         return jsonify({"error": str(e)}), 500
+
+
+@app.route('/api/faculty_interviews')
+def faculty_interviews():
+    """API to get all scheduled interviews."""
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+
+        # Get all scheduled interviews with details
+        cursor.execute("""
+            SELECT
+                i.id,
+                i.applicant_id,
+                i.faculty_id,
+                i.interview_date,
+                f.username AS faculty_name,
+                f.email,
+                CONCAT(a.first_name, ' ', a.last_name) AS applicant_name,
+                cp.course_name,
+                cp.preference,
+                COALESCE(c.rating, 0) as rating
+            FROM interviews i
+            JOIN faculty_users f ON i.faculty_id = f.id
+            LEFT JOIN applicants a ON i.applicant_id = a.id
+            LEFT JOIN course_preferences cp ON a.id = cp.applicant_id
+            LEFT JOIN comments c ON a.id = c.application_id AND c.faculty_id = i.faculty_id
+            ORDER BY i.interview_date, f.username
+        """)
+
+        interviews = cursor.fetchall()
+        conn.close()
+
+        return jsonify(interviews)
+
+    except Exception as e:
+        app.logger.error(f"Error getting scheduled interviews: {str(e)}")
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route('/api/update_faculty_schedule', methods=['POST'])
+def update_faculty_schedule():
+    """API to update a faculty's interview schedule."""
+    if 'faculty_id' not in session:
+        return jsonify({"success": False, "message": "Unauthorized"}), 403
+
+    data = request.json
+    new_date = data.get('new_date')
+    old_date = data.get('old_date')
+    faculty_id = data.get('faculty_id') or session.get('faculty_id')
+
+    if not new_date:
+        return jsonify({"success": False, "message": "Missing new date"}), 400
+
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        # Check if this is a valid available date
+        cursor.execute("""
+            SELECT id FROM available_dates
+            WHERE date = %s
+        """, (new_date,))
+
+        date_exists = cursor.fetchone()
+        if not date_exists:
+            return jsonify({"success": False, "message": "Selected date is not available"}), 400
+
+        # Update all interviews for this faculty to the new date
+        if old_date:
+            cursor.execute("""
+                UPDATE interviews
+                SET interview_date = %s
+                WHERE faculty_id = %s AND interview_date = %s
+            """, (new_date, faculty_id, old_date))
+            app.logger.info(f"Updated faculty {faculty_id} schedule from {old_date} to {new_date}")
+        else:
+            # Check if faculty already has interviews scheduled
+            cursor.execute("""
+                SELECT COUNT(*) as count FROM interviews
+                WHERE faculty_id = %s
+            """, (faculty_id,))
+
+            result = cursor.fetchone()
+            has_interviews = result[0] > 0 if result else False
+
+            if has_interviews:
+                # Update existing interviews
+                cursor.execute("""
+                    UPDATE interviews
+                    SET interview_date = %s
+                    WHERE faculty_id = %s
+                """, (new_date, faculty_id))
+                app.logger.info(f"Updated all interviews for faculty {faculty_id} to {new_date}")
+            else:
+                # No existing interviews, create a placeholder entry
+                cursor.execute("""
+                    INSERT INTO interviews (faculty_id, interview_date)
+                    VALUES (%s, %s)
+                """, (faculty_id, new_date))
+                app.logger.info(f"Created new schedule for faculty {faculty_id} on {new_date}")
+
+        conn.commit()
+        cursor.close()
+        conn.close()
+
+        return jsonify({"success": True, "message": "Schedule updated successfully"})
+
+    except Exception as e:
+        app.logger.error(f"Error updating faculty schedule: {str(e)}")
+        return jsonify({"success": False, "message": str(e)}), 500
 
 # =============================================================================
 # MAIN APPLICATION ENTRY POINT

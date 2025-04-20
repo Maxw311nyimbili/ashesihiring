@@ -130,41 +130,6 @@
         color: white;
     }
 
-    /* Card with quick actions */
-    .action-card {
-        border: 1px solid #eee;
-        border-radius: 0.75rem;
-        padding: 1.5rem;
-        margin-bottom: 1rem;
-        background-color: #fff;
-        transition: all 0.3s ease;
-    }
-
-    .action-card:hover {
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-        transform: translateY(-2px);
-    }
-
-    .action-card .icon {
-        width: 50px;
-        height: 50px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 12px;
-        margin-bottom: 1rem;
-    }
-
-    .action-card .icon.primary {
-        background-color: rgba(173, 66, 69, 0.1);
-        color: var(--primary);
-    }
-
-    .action-card .icon.secondary {
-        background-color: rgba(35, 100, 101, 0.1);
-        color: var(--secondary);
-    }
-
     /* Scheduled candidate styles */
     .candidate-item {
         border: 1px solid #eee;
@@ -470,43 +435,6 @@
                                 <div class="shimmer shimmer-item"></div>
                             </li>
                         </ul>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Actions Row -->
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-body p-4">
-                    <h5 class="text-secondary mb-3">Quick Actions</h5>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="action-card">
-                                <div class="icon secondary">
-                                    <i class="fas fa-user-check"></i>
-                                </div>
-                                <h6 class="mb-2">Review Scheduled Candidates</h6>
-                                <p class="text-muted small mb-3">View all candidates scheduled for your interview date.</p>
-                                <button class="btn btn-sm btn-outline-secondary" id="view-scheduled-btn">
-                                    <i class="fas fa-external-link-alt me-1"></i> View Scheduled Candidates
-                                </button>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="action-card">
-                                <div class="icon primary">
-                                    <i class="fas fa-file-alt"></i>
-                                </div>
-                                <h6 class="mb-2">Print Interview Schedule</h6>
-                                <p class="text-muted small mb-3">Generate a printable interview schedule with candidate details.</p>
-                                <button class="btn btn-sm btn-outline-primary" id="print-schedule-btn">
-                                    <i class="fas fa-print me-1"></i> Print Schedule
-                                </button>
-                            </div>
-                        </div>
                     </div>
                 </div>
             </div>
