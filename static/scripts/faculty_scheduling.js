@@ -9,7 +9,7 @@ let scheduledCandidates = [];
 let currentSchedule = null;
 let ratedCandidates = [];
 
-// Initialize when DOM is loaded
+
 document.addEventListener('DOMContentLoaded', function() {
     // Get faculty information from hidden fields
     facultyId = document.getElementById('faculty-id').value;
