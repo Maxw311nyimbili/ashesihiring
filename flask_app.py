@@ -7,6 +7,7 @@ from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 from cryptography.hazmat.primitives import hashes
 import base64
 import os
+import re
 import mysql.connector
 import logging
 import json
@@ -1243,7 +1244,8 @@ def get_all_faculty():
 # FACULTY RATED CANDIDATES ROUTES
 # =============================================================================
 
-# Update these routes in your flask application
+
+
 
 @app.route('/faculty_scheduling')
 def faculty_scheduling():
@@ -1406,6 +1408,15 @@ def update_faculty_schedule():
     new_date = data.get('new_date')
     old_date = data.get('old_date')
     faculty_id = data.get('faculty_id') or session.get('faculty_id')
+
+    # Log received data for debugging
+    app.logger.info(
+        f"Received update_faculty_schedule request: new_date={new_date}, old_date={old_date}, faculty_id={faculty_id}")
+
+    # Validate date format (should be YYYY-MM-DD)
+    if new_date and not re.match(r'^\d{4}-\d{2}-\d{2}$', new_date):
+        app.logger.error(f"Invalid date format: {new_date}")
+        return jsonify({"success": False, "message": f"Invalid date format. Expected YYYY-MM-DD, got: {new_date}"}), 400
 
     if not new_date:
         return jsonify({"success": False, "message": "Missing new date"}), 400

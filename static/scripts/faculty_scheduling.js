@@ -426,6 +426,12 @@ function saveSchedule() {
     // Show loading toast
     showToast('Saving your schedule...', 'info');
 
+    // Ensure dates are in YYYY-MM-DD format for MySQL
+    const formattedNewDate = formatDateForServer(selectedDate);
+    const formattedOldDate = currentSchedule ? formatDateForServer(currentSchedule.date) : null;
+
+    console.log('Saving schedule with new date:', formattedNewDate, 'old date:', formattedOldDate);
+
     // Call API to save schedule
     fetch('/api/update_faculty_schedule', {
         method: 'POST',
@@ -434,8 +440,8 @@ function saveSchedule() {
         },
         body: JSON.stringify({
             faculty_id: facultyId,  // Add faculty_id explicitly
-            new_date: selectedDate,
-            old_date: currentSchedule ? currentSchedule.date : null
+            new_date: formattedNewDate,
+            old_date: formattedOldDate
         }),
     })
     .then(response => {
@@ -707,6 +713,53 @@ function formatDateForDisplay(dateString) {
         month: 'long',
         day: 'numeric'
     });
+}
+
+// Format date for server (YYYY-MM-DD)
+function formatDateForServer(dateString) {
+    if (!dateString) return null;
+
+    // If already in YYYY-MM-DD format, return as is
+    if (/^\d{4}-\d{2}-\d{2}$/.test(dateString)) {
+        return dateString;
+    }
+
+    try {
+        // Handle various date formats
+        const date = new Date(dateString);
+
+        // Check if date is valid
+        if (isNaN(date.getTime())) {
+            console.error('Invalid date:', dateString);
+
+            // Try to parse European format (DD/MM/YYYY)
+            if (/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(dateString)) {
+                const parts = dateString.split('/');
+                const day = parseInt(parts[0], 10);
+                const month = parseInt(parts[1], 10) - 1;
+                const year = parseInt(parts[2], 10);
+                const europeanDate = new Date(year, month, day);
+
+                if (!isNaN(europeanDate.getTime())) {
+                    const y = europeanDate.getFullYear();
+                    const m = String(europeanDate.getMonth() + 1).padStart(2, '0');
+                    const d = String(europeanDate.getDate()).padStart(2, '0');
+                    return `${y}-${m}-${d}`;
+                }
+            }
+
+            return dateString; // Return original if cannot parse
+        }
+
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+
+        return `${year}-${month}-${day}`;
+    } catch (error) {
+        console.error('Error formatting date:', error);
+        return dateString; // Return original in case of error
+    }
 }
 
 // Show toast notification
