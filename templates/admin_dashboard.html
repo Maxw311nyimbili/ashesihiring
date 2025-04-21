@@ -248,7 +248,7 @@ body {
     border-bottom: 1px solid var(--border-color);
 }
 
-.admin-tabs .nav-link {
+.admin-tabs .admin-nav-link {
     border: none;
     color: var(--text-light);
     font-weight: 500;
@@ -258,13 +258,13 @@ body {
     transition: all 0.3s ease;
 }
 
-.admin-tabs .nav-link.active {
+.admin-tabs .admin-nav-link.active {
     color: var(--primary);
     background-color: transparent;
     border-bottom: 3px solid var(--primary);
 }
 
-.admin-tabs .nav-link:hover:not(.active) {
+.admin-tabs .admin-nav-link:hover:not(.active) {
     border-bottom: 3px solid var(--border-color);
     color: var(--text-dark);
 }
@@ -443,7 +443,7 @@ body {
         margin-top: 2rem;
     }
 
-    .admin-tabs .nav-link {
+    .admin-tabs .admin-nav-link {
         padding: 0.5rem 0.75rem;
         font-size: 0.9rem;
     }
@@ -555,17 +555,17 @@ body {
     <!-- Main tabs navigation - Changed class to admin-tabs to avoid conflict with navbar -->
     <ul class="nav admin-tabs mb-4" id="adminTabs" role="tablist">
         <li class="nav-item" role="presentation">
-            <button class="nav-link active" id="dates-tab" data-bs-toggle="tab" data-bs-target="#dates" type="button" role="tab" aria-controls="dates" aria-selected="true">
+            <button class="admin-nav-link active" id="dates-tab" data-bs-toggle="tab" data-bs-target="#dates" type="button" role="tab" aria-controls="dates" aria-selected="true">
                 <i class="fas fa-calendar-alt me-2"></i> Interview Dates
             </button>
         </li>
         <li class="nav-item" role="presentation">
-            <button class="nav-link" id="faculty-tab" data-bs-toggle="tab" data-bs-target="#faculty" type="button" role="tab" aria-controls="faculty" aria-selected="false">
+            <button class="admin-nav-link" id="faculty-tab" data-bs-toggle="tab" data-bs-target="#faculty" type="button" role="tab" aria-controls="faculty" aria-selected="false">
                 <i class="fas fa-users me-2"></i> Faculty
             </button>
         </li>
         <li class="nav-item" role="presentation">
-            <button class="nav-link" id="candidates-tab" data-bs-toggle="tab" data-bs-target="#candidates" type="button" role="tab" aria-controls="candidates" aria-selected="false">
+            <button class="admin-nav-link" id="candidates-tab" data-bs-toggle="tab" data-bs-target="#candidates" type="button" role="tab" aria-controls="candidates" aria-selected="false">
                 <i class="fas fa-user-graduate me-2"></i> Candidates
             </button>
         </li>
