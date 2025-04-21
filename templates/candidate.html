@@ -24,7 +24,6 @@
 
         body {
             font-family: 'Poppins', sans-serif;
-            background-color: #f8f9fa;
             color: var(--text-dark);
             overflow-x: hidden;
             background: linear-gradient(135deg, rgba(173, 66, 69, 0.85), rgba(112, 47, 50, 0.95)),
@@ -32,6 +31,7 @@
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
+            min-height: 100vh;
         }
 
         /* Navbar Styling */
@@ -109,7 +109,7 @@
             color: var(--primary);
         }
 
-        /* Hero Banner with Background Image */
+        /* Hero Banner with Background */
         .hero-banner {
             position: relative;
             padding: 120px 0 80px;
@@ -120,16 +120,6 @@
         .hero-banner .container {
             position: relative;
             z-index: 2;
-        }
-
-        .hero-banner::before {
-            content: '';
-            position: absolute;
-            bottom: -2px;
-            left: 0;
-            width: 100%;
-            height: 80px;
-            background: linear-gradient(to top, #f8f9fa, transparent);
         }
 
         .shape {
@@ -154,15 +144,6 @@
             height: 200px;
             border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
             background-color: var(--light);
-        }
-
-        /* Main Container Styling */
-        .main-container {
-            padding: 0 0 40px;
-            background-color: #f8f9fa;
-            border-radius: 20px 20px 0 0;
-            position: relative;
-            z-index: 3;
         }
 
         /* Heading Styling */
@@ -190,42 +171,57 @@
             text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
         }
 
+        /* Main Container Styling */
+        .main-container {
+            padding: 0 0 40px;
+            position: relative;
+            z-index: 3;
+        }
+
         /* Form Styling */
         .form-heading {
             margin: 30px 0 20px;
             padding-bottom: 10px;
-            border-bottom: 1px solid #eee;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
         }
 
         .form-heading h2 {
             font-size: 1.8rem;
             font-weight: 600;
-            color: var(--dark);
+            color: white;
         }
 
-        .candidate-section2 {
-            background-color: white;
+        .candidate-section {
+            background-color: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
             border-radius: 15px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
             padding: 30px;
             margin-bottom: 30px;
             position: relative;
             overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
 
         .form-control {
             padding: 12px 15px;
             border-radius: 8px;
-            border: 1px solid #e0e0e0;
-            background-color: #f9f9f9;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            background-color: rgba(255, 255, 255, 0.2);
             margin-bottom: 20px;
             transition: all 0.3s;
+            color: white;
         }
 
         .form-control:focus {
-            border-color: var(--secondary);
-            box-shadow: 0 0 0 3px rgba(173, 66, 69, 0.1);
-            background-color: white;
+            border-color: white;
+            box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.2);
+            background-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .form-control::placeholder {
+            color: rgba(255, 255, 255, 0.7);
         }
 
         .form-check {
@@ -236,22 +232,31 @@
             cursor: pointer;
             width: 18px;
             height: 18px;
+            background-color: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
         }
 
         .form-check-input:checked {
             background-color: var(--primary);
-            border-color: var(--primary);
+            border-color: white;
         }
 
         .form-check-label {
             padding-left: 5px;
             cursor: pointer;
+            color: white;
+        }
+
+        label {
+            color: white;
+            margin-bottom: 10px;
+            font-weight: 500;
         }
 
         /* Notification Area */
         .notification {
-            background-color: var(--light);
-            border-left: 4px solid var(--primary);
+            background-color: rgba(255, 255, 255, 0.2);
+            border-left: 4px solid white;
             padding: 15px;
             margin-bottom: 20px;
             border-radius: 5px;
@@ -259,7 +264,7 @@
 
         .notification p {
             margin: 0;
-            color: var(--dark);
+            color: white;
             font-size: 0.95rem;
         }
 
@@ -269,23 +274,23 @@
         }
 
         .candidate-card {
-            border: 1px dashed #ccc;
+            border: 1px dashed rgba(255, 255, 255, 0.5);
             border-radius: 10px;
             padding: 20px;
             text-align: center;
             transition: all 0.3s;
-            background-color: #f9f9f9;
+            background-color: rgba(255, 255, 255, 0.1);
         }
 
         .candidate-card:hover {
-            border-color: var(--secondary);
-            background-color: var(--light);
+            border-color: white;
+            background-color: rgba(255, 255, 255, 0.2);
         }
 
         .upload-btn {
-            background-color: var(--primary);
+            background-color: rgba(255, 255, 255, 0.2);
             color: white;
-            border: none;
+            border: 1px solid rgba(255, 255, 255, 0.3);
             padding: 10px 20px;
             border-radius: 50px;
             font-weight: 500;
@@ -294,15 +299,15 @@
         }
 
         .upload-btn:hover {
-            background-color: var(--dark);
+            background-color: rgba(255, 255, 255, 0.3);
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(173, 66, 69, 0.2);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
         }
 
         .file-name {
             margin-top: 10px;
             font-size: 0.9rem;
-            color: var(--text-light);
+            color: rgba(255, 255, 255, 0.8);
         }
 
         /* Select Course Section */
@@ -313,14 +318,14 @@
         .select-heading {
             font-weight: 600;
             margin-bottom: 15px;
-            color: var(--dark);
+            color: white;
         }
 
         /* Submit Button */
         .btn {
-            background-color: var(--primary);
+            background-color: rgba(255, 255, 255, 0.2);
             color: white;
-            border: none;
+            border: 1px solid rgba(255, 255, 255, 0.3);
             padding: 12px 30px;
             border-radius: 50px;
             font-weight: 600;
@@ -331,9 +336,20 @@
         }
 
         .btn:hover {
-            background-color: var(--dark);
+            background-color: white;
+            color: var(--primary);
             transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(173, 66, 69, 0.3);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-submit {
+            background-color: white;
+            color: var(--primary);
+        }
+
+        .btn-submit:hover {
+            background-color: var(--light);
+            color: var(--dark);
         }
 
         /* Modal Styling */
@@ -405,7 +421,7 @@
             right: -50px;
             width: 200px;
             height: 200px;
-            background-color: var(--primary);
+            background-color: white;
             border-radius: 50%;
         }
 
@@ -414,7 +430,7 @@
             left: -80px;
             width: 250px;
             height: 250px;
-            background-color: var(--secondary);
+            background-color: white;
             border-radius: 50%;
         }
 
@@ -436,7 +452,7 @@
                 background-color: white;
             }
 
-            .candidate-section2 {
+            .candidate-section {
                 padding: 20px;
             }
 
@@ -546,12 +562,12 @@
             <div class="form-heading"><h2>General Information</h2></div>
 
             <form action="/submit" method="POST" enctype="multipart/form-data">
-                <div class="candidate-section2 row">
+                <div class="candidate-section row">
                     <div class="card-decoration decoration-1"></div>
                     <div class="card-decoration decoration-2"></div>
 
-                    <div class="col-lg-6">
-                        <div class="form">
+                    <div class="col-md-6">
+                        <div class="form mb-4">
                             <div><input type="text" name="first-name" placeholder="Enter first name" class="form-control"></div>
                             <div><input type="text" name="last-name" placeholder="Enter last name" class="form-control"></div>
                             <div><input type="tel" name="telephone" placeholder="+233" class="form-control"></div>
@@ -567,7 +583,7 @@
                         </div>
                     </div>
 
-                    <div class="col-lg-6">
+                    <div class="col-md-6">
                         <div class="outer-container">
                             <div class="notification"><p>Submit documents in PDF. Ensure to name them properly (SurnameFirstname)</p></div>
                             <div class="candidate-container">
@@ -595,37 +611,42 @@
                                     <p class="file-name" id="transcriptName">No file selected</p>
                                 </div>
                             </div>
+                        </div>
+                    </div>
 
-                            <div class="select">
-                                <div class="select-heading">Which courses would you be interested in being a Faculty Intern?</div>
-                                <br>
-                                <div class="main">
-                                    <div class="form-check">
+                    <div class="col-12">
+                        <div class="select">
+                            <div class="select-heading">Which courses would you be interested in being a Faculty Intern?</div>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="form-check mt-3">
                                         <input class="form-check-input" type="radio" name="course_selection" id="csMis" value="CS/MIS" onclick="updateHiddenField('CS/MIS');" data-bs-target="#courseSelectionModal" data-bs-toggle="modal">
                                         <label class="form-check-label" for="csMis">CS/MIS courses</label>
                                     </div>
-                                    <br>
-                                    <div class="form-check">
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-check mt-3">
                                         <input class="form-check-input" type="radio" name="course_selection" id="math" value="Math" data-bs-target="#applicationModal" data-bs-toggle="modal" onclick="updateHiddenField('Math');closeModal()">
                                         <label class="form-check-label" for="math">Math courses</label>
                                     </div>
-                                    <br>
-                                    <div class="form-check">
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-check mt-3">
                                         <input class="form-check-input" type="radio" name="course_selection" id="both" value="Both" onclick="updateHiddenField('Both');openModal()" data-bs-toggle="modal" data-bs-target="#applicationModal">
                                         <label class="form-check-label" for="both">Both (CS/MIS courses & Math Courses)</label>
                                     </div>
-
-                                    <!-- Hidden field to store selected course ID -->
-                                    <input type="hidden" name="course_selection_id" id="course_selection_id">
                                 </div>
                             </div>
+
+                            <!-- Hidden field to store selected course ID -->
+                            <input type="hidden" name="course_selection_id" id="course_selection_id">
                         </div>
                     </div>
                 </div>
 
                 <div class="row">
-                    <div class="col-lg-4">
-                        <button type="submit" class="btn">
+                    <div class="col-12 text-center">
+                        <button type="submit" class="btn btn-submit">
                             <i class="fas fa-paper-plane me-2"></i>Submit Application
                         </button>
                     </div>
