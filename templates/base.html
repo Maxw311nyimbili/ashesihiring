@@ -362,28 +362,24 @@
                                 <i class="fas fa-home"></i> Home
                             </a>
                         </li>
+
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('candidate_page') }}">
-                                <i class="fas fa-briefcase"></i> Apply
+                            <a class="nav-link" href="{{ url_for('faculty_dashboard') }}">
+                                <i class="fas fa-gauge-high"></i> Dashboard
                             </a>
                         </li>
+
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('faculty_login') }}">
-                                <i class="fas fa-user-circle"></i> Faculty Portal
+                            <a class="nav-link" href="{{ url_for('faculty_scheduling_detail') }}">
+                                <i class="fa-solid fa-calendar-days"></i> Interview Scheduling
                             </a>
                         </li>
-                        {% if current_user.is_authenticated %}
-                            <li class="nav-item">
-                                <a class="nav-link" href="{{ url_for('faculty_dashboard') }}">
-                                    <i class="fas fa-gauge-high"></i> Dashboard
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="{{ url_for('logout') }}">
-                                    <i class="fas fa-right-from-bracket"></i> Logout
-                                </a>
-                            </li>
-                        {% endif %}
+
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('logout') }}">
+                                <i class="fas fa-right-from-bracket"></i> Logout
+                            </a>
+                        </li>
                     </ul>
                 </div>
             </div>
