@@ -67,21 +67,47 @@ def faculty_signup():
         username = request.form['username']
         email = request.form['email']
         password = request.form['password']
+        confirm_password = request.form['confirmPassword']
+        agree_terms = request.form.get('agreeTerms') == 'on'
 
-        salt = os.urandom(16)
-        hashed_password = hash_password(password, salt)
+        # Validate inputs
+        error = None
+        if len(username) < 3 or len(username) > 30:
+            error = "Username must be between 3 and 30 characters."
+        elif not re.match(r'^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$', email):
+            error = "Please enter a valid email address."
+        elif len(password) < 8:
+            error = "Password must be at least 8 characters."
+        elif password != confirm_password:
+            error = "Passwords do not match."
+        elif not agree_terms:
+            error = "You must agree to the terms of service."
 
-        conn = get_db_connection()
-        cursor = conn.cursor()
-        cursor.execute(
-            "INSERT INTO faculty_users (username, email, password_hash, salt) VALUES (%s, %s, %s, %s)",
-            (username, email, hashed_password, base64.b64encode(salt).decode())
-        )
-        conn.commit()
-        conn.close()
+        if error:
+            return render_template('faculty_signup.html', error=error)
 
-        return redirect(url_for('faculty_login'))
+        # Process valid form data
+        try:
+            salt = os.urandom(16)
+            hashed_password = hash_password(password, salt)
 
+            conn = get_db_connection()
+            cursor = conn.cursor()
+            cursor.execute(
+                "INSERT INTO faculty_users (username, email, password_hash, salt) VALUES (%s, %s, %s, %s)",
+                (username, email, hashed_password, base64.b64encode(salt).decode())
+            )
+            conn.commit()
+            conn.close()
+
+            # Redirect to login page after successful registration
+            return redirect(url_for('faculty_login'))
+
+        except Exception as e:
+            app.logger.error(f"Error creating faculty account: {str(e)}")
+            return render_template('faculty_signup.html', error="An error occurred. Please try again later.")
+
+    # For GET requests, just render the template
     return render_template('faculty_signup.html')
 
 @app.route('/faculty-login', methods=['GET', 'POST'])

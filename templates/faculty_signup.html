@@ -213,7 +213,7 @@
                             <div class="step">3</div>
                         </div>
 
-                        <form method="POST" id="signupForm" novalidate>
+                        <form method="POST" action="/faculty_signup" id="signupForm" novalidate>
                             <div class="input-group mb-3">
                                 <i class="fas fa-user input-icon"></i>
                                 <input type="text" class="form-control icon-input" id="username" name="username" placeholder="Username" required minlength="3" maxlength="30">
@@ -265,7 +265,6 @@
 
                         <div class="signup-footer text-center">
                             <p>Already have an account? <a href="/faculty-login" class="link-item">Login</a></p>
-
                         </div>
                     </div>
                 </div>
@@ -420,6 +419,7 @@
 
             // Form submission handler
             signupForm.addEventListener('submit', function(event) {
+                event.preventDefault(); // Prevent default form submission
                 let isValid = true;
 
                 // Validate username
@@ -459,18 +459,12 @@
                 }
 
                 if (!isValid) {
-                    event.preventDefault();
                     signupAlert.textContent = 'Please correct the errors in the form.';
                     signupAlert.classList.remove('d-none');
+                    signupAlert.classList.add('alert-danger');
                 } else {
-                    // This would normally submit to the server
-                    // For demo purposes, show completion of step 1
-                    event.preventDefault();
-                    document.querySelector('.step.active').classList.remove('active');
-                    document.querySelectorAll('.step')[1].classList.add('active');
-                    signupAlert.textContent = 'Account details verified! Continuing to the next step...';
-                    signupAlert.classList.remove('d-none', 'alert-danger');
-                    signupAlert.classList.add('alert-success');
+                    // If everything is valid, submit the form to the backend
+                    signupForm.submit();
                 }
             });
         });

@@ -185,7 +185,7 @@
                             <h3 class="login-title text-center">Faculty Login</h3>
                         </div>
 
-                        <form method="POST" id="loginForm" novalidate>
+                        <form method="POST" action="/faculty-login" id="loginForm" novalidate>
                             <div class="input-group">
                                 <i class="fas fa-envelope input-icon"></i>
                                 <input type="email" class="form-control icon-input" name="email" id="email" placeholder="Your Email" required>
@@ -205,19 +205,23 @@
                                 </div>
                             </div>
 
+                            <!-- Display server error messages -->
+                            {% if login_error %}
+                            <div class="alert alert-danger mb-3" role="alert">
+                                {{ login_error }}
+                            </div>
+                            {% endif %}
+
+                            <!-- Client-side validation error area -->
+                            <div id="loginNotification" class="alert d-none mb-3" role="alert"></div>
+
                             <button type="submit" class="btn btn-primary w-100">Log In</button>
                         </form>
 
                         <div class="login-footer text-center">
                             <p>Don't have an account? <a href="/faculty_signup" class="link-item">Sign up</a></p>
-
                         </div>
                     </div>
-                </div>
-
-                <!-- Login notification area -->
-                <div class="text-center mt-3">
-                    <div id="loginNotification" class="alert d-none" role="alert"></div>
                 </div>
             </div>
         </div>
@@ -287,13 +291,8 @@
                     loginNotification.textContent = 'Please correct the errors in the form.';
                     loginNotification.classList.remove('d-none', 'alert-success');
                     loginNotification.classList.add('alert-danger');
-                } else {
-                    // This would normally submit to the server
-                    // For demo purposes, we'll show a success message
-                    loginNotification.textContent = 'Login successful!';
-                    loginNotification.classList.remove('d-none', 'alert-danger');
-                    loginNotification.classList.add('alert-success');
                 }
+                // If valid, the form will submit normally to the backend
             });
         });
     </script>
