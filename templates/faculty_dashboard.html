@@ -15,351 +15,677 @@
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap" rel="stylesheet">
 
     <style>
-        :root {
-            --primary: #AD4245;
-            --secondary: #236465;
-            --light: #f8f9fa;
-            --dark: #343a40;
-        }
+       /* Enhanced Candidate Review CSS */
 
-        body {
-            font-family: "DM Sans", sans-serif;
-            background-color: #f5f5f7;
-            min-height: 100vh;
-        }
+:root {
+    --primary: #AD4245;
+    --secondary: #236465;
+    --accent: #F2BDB1;
+    --light: #F8E9E0;
+    --dark: #702F32;
+    --text-dark: #333333;
+    --text-light: #666666;
+}
 
-        .card-container {
-            perspective: 1000px;
-            height: 600px;
-            position: relative;
-            max-width: 1000px;
-            margin: 0 auto;
-        }
+body {
+    font-family: "DM Sans", sans-serif;
+    color: var(--text-dark);
+    background: linear-gradient(135deg, rgba(173, 66, 69, 0.85), rgba(112, 47, 50, 0.95)),
+                url('../static/images/banner.webp');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    min-height: 100vh;
+}
 
-        .card-wrapper {
-            transition: transform 0.5s ease-in-out;
-            transform-style: preserve-3d;
-            position: relative;
-            height: 100%;
-        }
+/* Navbar Styling */
+.navbar {
+    padding: 15px 0;
+    transition: all 0.3s ease;
+    background-color: rgba(255, 255, 255, 0.1) !important;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
 
-        .candidate-card {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            backface-visibility: hidden;
-            border-radius: 1rem;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
-            background: white;
-            overflow: hidden;
-            transition: transform 0.4s ease-out, opacity 0.4s ease-out;
-        }
+.navbar.scrolled {
+    padding: 10px 0;
+    background-color: white !important;
+}
 
-        .card-enter-active {
-            animation: slideIn 0.5s forwards;
-        }
+.navbar-brand img {
+    transition: all 0.3s ease;
+}
 
-        .card-leave-active {
-            animation: slideOut 0.5s forwards;
-        }
+.nav-link {
+    position: relative;
+    font-weight: 500 !important;
+    padding: 0.5rem 1rem !important;
+    margin: 0 0.2rem;
+    color: white !important;
+    transition: all 0.3s ease;
+}
 
-        @keyframes slideIn {
-            from { transform: translateX(100%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
+.navbar.scrolled .nav-link {
+    color: var(--text-dark) !important;
+}
 
-        @keyframes slideOut {
-            from { transform: translateX(0); opacity: 1; }
-            to { transform: translateX(-100%); opacity: 0; }
-        }
+.nav-link:before {
+    content: "";
+    position: absolute;
+    width: 0;
+    height: 2px;
+    bottom: 0;
+    left: 50%;
+    background-color: white;
+    transition: all 0.3s ease;
+    transform: translateX(-50%);
+}
 
-        .nav-indicator {
-            display: flex;
-            justify-content: center;
-            margin-top: -25px;
-            position: relative;
-            z-index: 10;
-        }
+.navbar.scrolled .nav-link:before {
+    background-color: var(--primary);
+}
 
-        .nav-dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            background-color: #d8d8d8;
-            margin: 0 5px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
+.nav-link:hover:before,
+.nav-link.active:before {
+    width: 70%;
+}
 
-        .nav-dot.active {
-            background-color: var(--primary);
-            transform: scale(1.3);
-        }
+.nav-link:hover,
+.nav-link.active {
+    color: rgba(255, 255, 255, 0.9) !important;
+}
 
-        .card-header {
-            background: linear-gradient(to right, var(--primary), #c95659);
-            color: white;
-            border: none;
-            padding: 1.25rem;
-        }
+.navbar.scrolled .nav-link:hover,
+.navbar.scrolled .nav-link.active {
+    color: var(--primary) !important;
+}
 
-        .card-body {
-            padding: 1.5rem;
-            height: calc(100% - 70px);
-            overflow-y: auto;
-        }
+.nav-link i {
+    margin-right: 5px;
+    font-size: 0.9rem;
+}
 
-        .btn-primary {
-            background-color: var(--primary);
-            border-color: var(--primary);
-        }
+/* Main container styling */
+.container {
+    position: relative;
+    z-index: 1;
+}
 
-        .btn-primary:hover {
-            background-color: #973a3d;
-            border-color: #973a3d;
-        }
+.container h3 {
+    color: white;
+    font-weight: 700 !important;
+    margin-bottom: 2rem !important;
+    position: relative;
+    display: inline-block;
+}
 
-        .btn-secondary {
-            background-color: var(--secondary);
-            border-color: var(--secondary);
-        }
+.container h3:after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: white;
+    border-radius: 3px;
+}
 
-        .btn-secondary:hover {
-            background-color: #1a4a4b;
-            border-color: #1a4a4b;
-        }
+/* Card Container */
+.card-container {
+    perspective: 1000px;
+    height: 600px;
+    position: relative;
+    max-width: 1000px;
+    margin: 0 auto;
+}
 
-        .btn-outline-primary {
-            color: var(--primary);
-            border-color: var(--primary);
-        }
+.card-wrapper {
+    transition: transform 0.5s ease-in-out;
+    transform-style: preserve-3d;
+    position: relative;
+    height: 100%;
+}
 
-        .btn-outline-primary:hover {
-            background-color: var(--primary);
-            color: white;
-        }
+.candidate-card {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    border-radius: 1.5rem;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    overflow: hidden;
+    transition: transform 0.4s ease-out, opacity 0.4s ease-out;
+}
 
-        .rating-card {
-            background-color: white;
-            border-radius: 1rem;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
-            transition: all 0.3s ease;
-        }
+.card-enter-active {
+    animation: slideIn 0.5s forwards;
+}
 
-        .rating-card:hover {
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-        }
+.card-leave-active {
+    animation: slideOut 0.5s forwards;
+}
 
-        .nav-controls {
-            position: absolute;
-            top: 50%;
-            width: 100%;
-            transform: translateY(-50%);
-            z-index: 20;
-            pointer-events: none;
-        }
+@keyframes slideIn {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
 
-        .nav-btn {
-            background-color: white;
-            width: 45px;
-            height: 45px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
-            cursor: pointer;
-            transition: all 0.3s ease;
-            pointer-events: auto;
-        }
+@keyframes slideOut {
+    from { transform: translateX(0); opacity: 1; }
+    to { transform: translateX(-100%); opacity: 0; }
+}
 
-        .nav-btn:hover {
-            background-color: var(--primary);
-            color: white;
-        }
+.nav-indicator {
+    display: flex;
+    justify-content: center;
+    margin-top: -25px;
+    position: relative;
+    z-index: 10;
+}
 
-        .prev-btn {
-            left: -22px;
-            position: absolute;
-        }
+.nav-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.3);
+    margin: 0 5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
 
-        .next-btn {
-            right: -22px;
-            position: absolute;
-        }
+.nav-dot.active {
+    background-color: white;
+    transform: scale(1.3);
+}
 
-        .candidate-info-box {
-            border-left: 4px solid var(--primary);
-            padding-left: 15px;
-            margin-bottom: 20px;
-        }
+.card-header {
+    background: transparent;
+    color: white;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 1.5rem;
+}
 
-        .comment-card {
-            border-left: 3px solid var(--secondary);
-            padding-left: 15px;
-            margin-bottom: 15px;
-        }
+.card-body {
+    padding: 1.5rem;
+    height: calc(100% - 70px);
+    overflow-y: auto;
+    color: white;
+}
 
-        .comment-actions {
-            visibility: hidden;
-            opacity: 0;
-            transition: all 0.3s ease;
-        }
+/* Button Styling */
+.btn {
+    padding: 0.7rem 1.5rem;
+    border-radius: 50px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-size: 0.85rem;
+}
 
-        .comment-card:hover .comment-actions {
-            visibility: visible;
-            opacity: 1;
-        }
+.btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
 
-        /* Tabs styling */
-        .nav-tabs .nav-link {
-            color: #495057;
-            border: none;
-            padding: 0.75rem 1rem;
-            border-bottom: 3px solid transparent;
-            font-weight: 500;
-        }
+.btn-primary {
+    background-color: rgba(173, 66, 69, 0.8);
+    border: none;
+    color: white;
+}
 
-        .nav-tabs .nav-link.active {
-            color: var(--primary);
-            background-color: transparent;
-            border-bottom: 3px solid var(--primary);
-        }
+.btn-primary:hover {
+    background-color: var(--primary);
+}
 
-        .tag-pill {
-            background-color: #f8f2f2;
-            color: var(--primary);
-            border: 1px solid #e9d8d8;
-            font-size: 0.85rem;
-            padding: 0.25rem 0.75rem;
-            border-radius: 50px;
-            display: inline-block;
-            margin-right: 0.5rem;
-            margin-bottom: 0.5rem;
-        }
+.btn-secondary {
+    background-color: rgba(35, 100, 101, 0.8) !important;
+    border: none;
+    color: white !important;
+}
 
-        /* Document links styling */
-        .document-links {
-            margin-top: 1.5rem;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.75rem;
-        }
-        
-        .document-links a {
-            display: inline-flex;
-            align-items: center;
-            padding: 0.6rem 1.2rem;
-            background-color: #f8f9fa;
-            border: 1px solid #e9ecef;
-            border-radius: 0.5rem;
-            color: var(--secondary);
-            text-decoration: none;
-            transition: all 0.3s ease;
-            font-weight: 500;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .document-links a:hover {
-            background-color: var(--secondary);
-            color: white;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(35, 100, 101, 0.2);
-        }
-        
-        .document-links a:active {
-            transform: translateY(0);
-            box-shadow: 0 2px 6px rgba(35, 100, 101, 0.15);
-        }
-        
-        .document-links a i {
-            margin-right: 0.6rem;
-            font-size: 1.1rem;
-            transition: transform 0.3s ease;
-        }
-        
-        .document-links a:hover i {
-            transform: scale(1.1);
-        }
-        
-        /* Document type specific styling */
-        .document-links a[href*="Resume"] {
-            border-left: 3px solid #0d6efd;
-        }
-        
-        .document-links a[href*="Cover Letter"] {
-            border-left: 3px solid #198754;
-        }
-        
-        .document-links a[href*="Transcript"] {
-            border-left: 3px solid #6f42c1;
-        }
-        
-        /* Document link badge */
-        .document-links a::after {
-            content: "View";
-            position: absolute;
-            top: 0;
-            right: 0;
-            background-color: rgba(35, 100, 101, 0.1);
-            color: var(--secondary);
-            font-size: 0.7rem;
-            padding: 0.1rem 0.4rem;
-            border-bottom-left-radius: 0.5rem;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-        
-        .document-links a:hover::after {
-            opacity: 1;
-        }
-        
-        /* Custom scrollbar */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
+.btn-secondary:hover {
+    background-color: var(--secondary) !important;
+}
 
-        ::-webkit-scrollbar-track {
-            background: #f1f1f1;
-            border-radius: 10px;
-        }
+.btn-outline-primary {
+    color: white;
+    border-color: rgba(255, 255, 255, 0.3);
+    background-color: rgba(173, 66, 69, 0.1);
+}
 
-        ::-webkit-scrollbar-thumb {
-            background: #ccc;
-            border-radius: 10px;
-        }
+.btn-outline-primary:hover {
+    background-color: var(--primary);
+    color: white;
+    border-color: var(--primary);
+}
 
-        ::-webkit-scrollbar-thumb:hover {
-            background: #aaa;
-        }
+.btn-outline-secondary {
+    color: white !important;
+    border-color: rgba(255, 255, 255, 0.3) !important;
+    background-color: rgba(35, 100, 101, 0.1) !important;
+}
 
-        @media (max-width: 992px) {
-            .card-container {
-                height: 650px;
-            }
-        }
+.btn-outline-secondary:hover {
+    background-color: rgba(35, 100, 101, 0.3) !important;
+    color: white !important;
+}
 
-        @media (max-width: 768px) {
-            .card-container {
-                height: 750px;
-            }
+/* Rating Card */
+.rating-card {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 1rem;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+}
 
-            .nav-btn {
-                width: 35px;
-                height: 35px;
-            }
+.rating-card:hover {
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    transform: translateY(-3px);
+}
 
-            .document-links {
-                flex-direction: column;
-                gap: 0.5rem;
-            }
-            
-            .document-links a {
-                width: 100%;
-                justify-content: center;
-            }
-        }
+/* Navigation Controls */
+.nav-controls {
+    position: absolute;
+    top: 50%;
+    width: 100%;
+    transform: translateY(-50%);
+    z-index: 20;
+    pointer-events: none;
+}
+
+.nav-btn {
+    background-color: rgba(255, 255, 255, 0.2);
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    pointer-events: auto;
+    color: white;
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.nav-btn:hover {
+    background-color: white;
+    color: var(--primary);
+    transform: scale(1.1);
+}
+
+.prev-btn {
+    left: -22px;
+    position: absolute;
+}
+
+.next-btn {
+    right: -22px;
+    position: absolute;
+}
+
+/* Candidate Info Styling */
+.candidate-info-box {
+    border-left: 4px solid white;
+    padding-left: 15px;
+    margin-bottom: 20px;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 0 8px 8px 0;
+    padding: 15px;
+}
+
+/* Comment Card Styling */
+.comment-card {
+    border-left: 3px solid rgba(35, 100, 101, 0.7);
+    padding-left: 15px;
+    margin-bottom: 15px;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 0 8px 8px 0;
+    padding: 12px;
+    transition: all 0.3s ease;
+}
+
+.comment-card:hover {
+    background-color: rgba(255, 255, 255, 0.15);
+    transform: translateX(3px);
+}
+
+.comment-actions {
+    visibility: hidden;
+    opacity: 0;
+    transition: all 0.3s ease;
+}
+
+.comment-card:hover .comment-actions {
+    visibility: visible;
+    opacity: 1;
+}
+
+/* Tabs Styling */
+.nav-tabs {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.nav-tabs .nav-link {
+    color: rgba(255, 255, 255, 0.7) !important;
+    border: none;
+    padding: 0.75rem 1rem;
+    border-bottom: 3px solid transparent;
+    font-weight: 500;
+}
+
+.nav-tabs .nav-link.active {
+    color: white !important;
+    background-color: transparent;
+    border-bottom: 3px solid white;
+}
+
+.nav-tabs .nav-link:hover:not(.active) {
+    color: rgba(255, 255, 255, 0.9) !important;
+    border-bottom: 3px solid rgba(255, 255, 255, 0.3);
+}
+
+/* Tag Pill Styling */
+.tag-pill {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    font-size: 0.85rem;
+    padding: 0.25rem 0.75rem;
+    border-radius: 50px;
+    display: inline-block;
+    margin-right: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+/* Document Links Styling */
+.document-links {
+    margin-top: 1.5rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+}
+
+.document-links a {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.6rem 1.2rem;
+    background-color: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 0.5rem;
+    color: white;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    font-weight: 500;
+    position: relative;
+    overflow: hidden;
+}
+
+.document-links a:hover {
+    background-color: white;
+    color: var(--primary);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.document-links a:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.document-links a i {
+    margin-right: 0.6rem;
+    font-size: 1.1rem;
+    transition: transform 0.3s ease;
+}
+
+.document-links a:hover i {
+    transform: scale(1.1);
+}
+
+/* Document type specific styling */
+.document-links a[href*="Resume"] {
+    border-left: 3px solid rgba(13, 110, 253, 0.7);
+}
+
+.document-links a[href*="Cover Letter"] {
+    border-left: 3px solid rgba(25, 135, 84, 0.7);
+}
+
+.document-links a[href*="Transcript"] {
+    border-left: 3px solid rgba(111, 66, 193, 0.7);
+}
+
+/* Document link badge */
+.document-links a::after {
+    content: "View";
+    position: absolute;
+    top: 0;
+    right: 0;
+    background-color: rgba(255, 255, 255, 0.2);
+    color: white;
+    font-size: 0.7rem;
+    padding: 0.1rem 0.4rem;
+    border-bottom-left-radius: 0.5rem;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.document-links a:hover::after {
+    opacity: 1;
+}
+
+/* Modal Styling */
+.modal-content {
+    background-color: rgba(255, 255, 255, 0.95);
+    border-radius: 15px;
+    border: none;
+    box-shadow: 0 15px 50px rgba(0, 0, 0, 0.15);
+}
+
+.modal-header {
+    background: linear-gradient(to right, var(--primary), var(--dark));
+    color: white;
+    border-top-left-radius: 15px;
+    border-top-right-radius: 15px;
+    border-bottom: none;
+}
+
+.modal-title {
+    font-weight: 600;
+}
+
+.modal-body {
+    color: var(--text-dark);
+}
+
+.btn-close-white {
+    filter: brightness(0) invert(1);
+}
+
+.modal-footer {
+    border-top: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+/* Form Controls */
+.form-control {
+    background-color: rgba(255, 255, 255, 0.8);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    padding: 10px 15px;
+    transition: all 0.3s ease;
+}
+
+.form-control:focus {
+    background-color: white;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(173, 66, 69, 0.2);
+}
+
+/* Rating Stars */
+.star-rating {
+    font-size: 1.5rem;
+    color: #ffc107;
+    cursor: pointer;
+}
+
+.star-rating .star {
+    margin: 0 2px;
+    transition: all 0.2s ease;
+}
+
+.star-rating .star:hover,
+.star-rating .star.active {
+    transform: scale(1.2);
+}
+
+/* Alert Styling */
+.alert {
+    border-radius: 10px;
+    border: none;
+}
+
+.alert-warning {
+    background-color: rgba(255, 193, 7, 0.1);
+    border-left: 4px solid #ffc107;
+}
+
+/* Toast Styling */
+.toast {
+    background-color: rgba(255, 255, 255, 0.9);
+    border-radius: 10px;
+    border: none;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.toast-header {
+    background-color: var(--primary);
+    color: white;
+    border-bottom: none;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+}
+
+/* Badge Styling */
+.badge {
+    padding: 0.5em 0.8em;
+    border-radius: 50px;
+    font-weight: 500;
+}
+
+.badge.bg-info {
+    background-color: rgba(13, 202, 240, 0.2) !important;
+    color: #0dcaf0 !important;
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.5);
+}
+
+/* Decorative Elements */
+.shape {
+    position: fixed;
+    z-index: 0;
+    opacity: 0.1;
+}
+
+.shape-1 {
+    top: 10%;
+    right: 5%;
+    width: 300px;
+    height: 300px;
+    background-color: white;
+    border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
+}
+
+.shape-2 {
+    bottom: 10%;
+    left: 5%;
+    width: 250px;
+    height: 250px;
+    background-color: white;
+    border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+}
+
+/* Responsive Styles */
+@media (max-width: 992px) {
+    .card-container {
+        height: 650px;
+    }
+
+    .nav-btn {
+        width: 40px;
+        height: 40px;
+    }
+}
+
+@media (max-width: 768px) {
+    .card-container {
+        height: 750px;
+    }
+
+    .nav-btn {
+        width: 35px;
+        height: 35px;
+    }
+
+    .document-links {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .document-links a {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .container h3 {
+        font-size: 1.5rem;
+    }
+
+    .modal-dialog {
+        margin: 0.5rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .nav-btn {
+        width: 30px;
+        height: 30px;
+        font-size: 0.8rem;
+    }
+
+    .btn {
+        padding: 0.6rem 1.2rem;
+        font-size: 0.8rem;
+    }
+}
     </style>
 </head>
 <body>
@@ -424,6 +750,9 @@
             <!-- Navigation dots will be added dynamically -->
         </div>
     </div>
+
+    <div class="shape shape-1"></div>
+    <div class="shape shape-2"></div>
 
     <!-- Rating Modal -->
     <div class="modal fade" id="rateModal" tabindex="-1" aria-hidden="true">
