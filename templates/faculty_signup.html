@@ -5,28 +5,481 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Faculty Signup</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #AD4245;
+            --secondary: #D88373;
+            --accent: #F2BDB1;
+            --light: #F8E9E0;
+            --dark: #702F32;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--dark) 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .signup-card {
+            background-color: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            position: relative;
+        }
+
+        .card-decoration {
+            position: absolute;
+            height: 200px;
+            width: 200px;
+            border-radius: 50%;
+            background: var(--accent);
+            opacity: 0.6;
+            z-index: 0;
+        }
+
+        .decoration-1 {
+            top: -100px;
+            right: -100px;
+        }
+
+        .decoration-2 {
+            bottom: -120px;
+            left: -120px;
+            background: var(--secondary);
+            height: 250px;
+            width: 250px;
+        }
+
+        .decoration-3 {
+            top: 50%;
+            right: -80px;
+            background: var(--light);
+            height: 150px;
+            width: 150px;
+            transform: translateY(-50%);
+        }
+
+        .signup-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .signup-title {
+            color: var(--dark);
+            font-weight: 700;
+            margin-bottom: 25px;
+            position: relative;
+            display: inline-block;
+        }
+
+        .signup-title:after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 0;
+            height: 4px;
+            width: 50px;
+            background: var(--secondary);
+            border-radius: 2px;
+        }
+
+        .form-control {
+            border-radius: 8px;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            transition: all 0.3s;
+        }
+
+        .form-control:focus {
+            box-shadow: 0 0 0 3px rgba(173, 66, 69, 0.2);
+            border-color: var(--primary);
+        }
+
+        .input-group {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .input-icon {
+            position: absolute;
+            top: 50%;
+            left: 15px;
+            transform: translateY(-50%);
+            color: var(--primary);
+            z-index: 10;
+        }
+
+        .icon-input {
+            padding-left: 45px;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            border: none;
+            border-radius: 8px;
+            padding: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: all 0.3s;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--dark);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(112, 47, 50, 0.3);
+        }
+
+        .link-item {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .link-item:hover {
+            color: var(--dark);
+            text-decoration: underline;
+        }
+
+        .signup-footer {
+            margin-top: 25px;
+            color: #666;
+        }
+
+        .steps-indicator {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .step {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            background-color: #f0f0f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 8px;
+            font-weight: bold;
+            color: #888;
+            position: relative;
+        }
+
+        .step:not(:last-child):after {
+            content: '';
+            position: absolute;
+            right: -8px;
+            top: 50%;
+            transform: translateY(-50%);
+            height: 2px;
+            width: 16px;
+            background-color: #f0f0f0;
+        }
+
+        .step.active {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .step.active:not(:last-child):after {
+            background-color: var(--primary);
+        }
+    </style>
 </head>
-<body style="background: #AD4245;">
-    <div class="container mt-5">
-        <div class="card shadow p-4 mx-auto" style="max-width: 500px;">
-            <h3 class="text-center">Faculty Signup</h3>
-            <form method="POST">
-                <div class="mb-3">
-                    <label for="username" class="form-label">Username</label>
-                    <input type="text" class="form-control" name="username" required>
+<body>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6 col-lg-5">
+                <div class="signup-card p-4 p-md-5">
+                    <div class="card-decoration decoration-1"></div>
+                    <div class="card-decoration decoration-2"></div>
+                    <div class="card-decoration decoration-3"></div>
+
+                    <div class="signup-content">
+                        <div class="text-center mb-4">
+                            <img src="/api/placeholder/100/100" alt="University Logo" class="mb-3" style="max-height: 80px;">
+                            <h3 class="signup-title text-center">Faculty Signup</h3>
+                        </div>
+
+                        <div class="steps-indicator">
+                            <div class="step active">1</div>
+                            <div class="step">2</div>
+                            <div class="step">3</div>
+                        </div>
+
+                        <form method="POST" id="signupForm" novalidate>
+                            <div class="input-group mb-3">
+                                <i class="fas fa-user input-icon"></i>
+                                <input type="text" class="form-control icon-input" id="username" name="username" placeholder="Username" required minlength="3" maxlength="30">
+                                <div class="invalid-feedback">Username must be between 3 and 30 characters.</div>
+                            </div>
+
+                            <div class="input-group mb-3">
+                                <i class="fas fa-envelope input-icon"></i>
+                                <input type="email" class="form-control icon-input" id="email" name="email" placeholder="Academic Email" required>
+                                <div class="invalid-feedback">Please enter a valid academic email address.</div>
+                            </div>
+
+                            <div class="input-group mb-3">
+                                <i class="fas fa-lock input-icon"></i>
+                                <input type="password" class="form-control icon-input" id="password" name="password" placeholder="Create Password" required minlength="8">
+                                <div class="invalid-feedback">Password must be at least 8 characters with letters, numbers, and special characters.</div>
+                            </div>
+
+                            <div class="password-strength-meter mb-3">
+                                <div class="d-flex">
+                                    <span id="strengthBar1" class="flex-grow-1 me-1 bg-secondary opacity-25" style="height: 5px; border-radius: 2px;"></span>
+                                    <span id="strengthBar2" class="flex-grow-1 me-1 bg-secondary opacity-25" style="height: 5px; border-radius: 2px;"></span>
+                                    <span id="strengthBar3" class="flex-grow-1 me-1 bg-secondary opacity-25" style="height: 5px; border-radius: 2px;"></span>
+                                    <span id="strengthBar4" class="flex-grow-1 bg-secondary opacity-25" style="height: 5px; border-radius: 2px;"></span>
+                                </div>
+                                <small id="passwordStrengthText" class="text-muted">Password strength</small>
+                            </div>
+
+                            <div class="input-group mb-4">
+                                <i class="fas fa-lock input-icon"></i>
+                                <input type="password" class="form-control icon-input" id="confirmPassword" name="confirmPassword" placeholder="Confirm Password" required>
+                                <div class="invalid-feedback">Passwords do not match.</div>
+                            </div>
+
+                            <div class="mb-4">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="agreeTerms" name="agreeTerms" required>
+                                    <label class="form-check-label small" for="agreeTerms">
+                                        I agree to the <a href="#" class="link-item">Terms of Service</a> and <a href="#" class="link-item">Privacy Policy</a>
+                                    </label>
+                                    <div class="invalid-feedback">You must agree to the terms before creating an account.</div>
+                                </div>
+                            </div>
+
+                            <div class="alert alert-danger d-none" id="signupAlert" role="alert"></div>
+
+                            <button type="submit" class="btn btn-primary w-100">Create Account</button>
+                        </form>
+
+                        <div class="signup-footer text-center">
+                            <p>Already have an account? <a href="/faculty_login" class="link-item">Login</a></p>
+                            <div class="mt-3">
+                                <small class="text-muted">Supported by</small>
+                                <div class="d-flex justify-content-center mt-2">
+                                    <img src="/api/placeholder/75/30" alt="Partner logo" class="mx-2" style="opacity: 0.6;">
+                                    <img src="/api/placeholder/75/30" alt="Partner logo" class="mx-2" style="opacity: 0.6;">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="mb-3">
-                    <label for="email" class="form-label">Email</label>
-                    <input type="email" class="form-control" name="email" required>
-                </div>
-                <div class="mb-3">
-                    <label for="password" class="form-label">Password</label>
-                    <input type="password" class="form-control" name="password" required>
-                </div>
-                <button type="submit" class="btn btn-primary w-100">Sign Up</button>
-            </form>
-            <p class="mt-3 text-center">Already have an account? <a href="/faculty_login">Login</a></p>
+            </div>
         </div>
     </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const signupForm = document.getElementById('signupForm');
+            const usernameInput = document.getElementById('username');
+            const emailInput = document.getElementById('email');
+            const passwordInput = document.getElementById('password');
+            const confirmPasswordInput = document.getElementById('confirmPassword');
+            const agreeTermsCheckbox = document.getElementById('agreeTerms');
+            const signupAlert = document.getElementById('signupAlert');
+
+            // Password strength elements
+            const strengthBar1 = document.getElementById('strengthBar1');
+            const strengthBar2 = document.getElementById('strengthBar2');
+            const strengthBar3 = document.getElementById('strengthBar3');
+            const strengthBar4 = document.getElementById('strengthBar4');
+            const passwordStrengthText = document.getElementById('passwordStrengthText');
+
+            // Email validation pattern
+            const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+            // Academic email pattern (customize as needed)
+            const academicEmailPattern = /^[a-zA-Z0-9._-]+@.*\.(edu|ac\.[a-z]{2}|edu\.[a-z]{2})$/;
+
+            // Username validation
+            usernameInput.addEventListener('input', function() {
+                if (usernameInput.value.length >= 3 && usernameInput.value.length <= 30) {
+                    usernameInput.classList.remove('is-invalid');
+                    usernameInput.classList.add('is-valid');
+                } else {
+                    usernameInput.classList.remove('is-valid');
+                    if (usernameInput.value) {
+                        usernameInput.classList.add('is-invalid');
+                    } else {
+                        usernameInput.classList.remove('is-invalid');
+                    }
+                }
+            });
+
+            // Email validation
+            emailInput.addEventListener('input', function() {
+                if (emailPattern.test(emailInput.value)) {
+                    emailInput.classList.remove('is-invalid');
+                    emailInput.classList.add('is-valid');
+
+                    // Check if it's an academic email
+                    if (!academicEmailPattern.test(emailInput.value)) {
+                        emailInput.classList.add('is-warning');
+                    } else {
+                        emailInput.classList.remove('is-warning');
+                    }
+                } else {
+                    emailInput.classList.remove('is-valid', 'is-warning');
+                    if (emailInput.value) {
+                        emailInput.classList.add('is-invalid');
+                    } else {
+                        emailInput.classList.remove('is-invalid');
+                    }
+                }
+            });
+
+            // Password strength checker
+            passwordInput.addEventListener('input', function() {
+                const password = passwordInput.value;
+                let strength = 0;
+
+                // Reset all bars
+                [strengthBar1, strengthBar2, strengthBar3, strengthBar4].forEach(bar => {
+                    bar.className = 'flex-grow-1 me-1 bg-secondary opacity-25';
+                });
+
+                if (password.length >= 8) strength++;
+                if (password.match(/[A-Z]/)) strength++;
+                if (password.match(/[0-9]/)) strength++;
+                if (password.match(/[^A-Za-z0-9]/)) strength++;
+
+                // Update the strength bars based on password strength
+                if (strength >= 1) {
+                    strengthBar1.className = 'flex-grow-1 me-1 bg-danger';
+                    passwordStrengthText.textContent = 'Weak';
+                    passwordStrengthText.className = 'text-danger small';
+                }
+                if (strength >= 2) {
+                    strengthBar2.className = 'flex-grow-1 me-1 bg-warning';
+                    passwordStrengthText.textContent = 'Fair';
+                    passwordStrengthText.className = 'text-warning small';
+                }
+                if (strength >= 3) {
+                    strengthBar3.className = 'flex-grow-1 me-1 bg-info';
+                    passwordStrengthText.textContent = 'Good';
+                    passwordStrengthText.className = 'text-info small';
+                }
+                if (strength === 4) {
+                    strengthBar4.className = 'flex-grow-1 bg-success';
+                    passwordStrengthText.textContent = 'Strong';
+                    passwordStrengthText.className = 'text-success small';
+                }
+
+                // Validate password
+                if (password.length >= 8 && strength >= 2) {
+                    passwordInput.classList.remove('is-invalid');
+                    passwordInput.classList.add('is-valid');
+                } else {
+                    passwordInput.classList.remove('is-valid');
+                    if (password) {
+                        passwordInput.classList.add('is-invalid');
+                    } else {
+                        passwordInput.classList.remove('is-invalid');
+                    }
+                }
+
+                // Check password confirmation if it has a value
+                if (confirmPasswordInput.value) {
+                    validatePasswordMatch();
+                }
+            });
+
+            // Confirm password validation
+            function validatePasswordMatch() {
+                if (confirmPasswordInput.value === passwordInput.value && passwordInput.value) {
+                    confirmPasswordInput.classList.remove('is-invalid');
+                    confirmPasswordInput.classList.add('is-valid');
+                    return true;
+                } else {
+                    confirmPasswordInput.classList.remove('is-valid');
+                    if (confirmPasswordInput.value) {
+                        confirmPasswordInput.classList.add('is-invalid');
+                    } else {
+                        confirmPasswordInput.classList.remove('is-invalid');
+                    }
+                    return false;
+                }
+            }
+
+            confirmPasswordInput.addEventListener('input', validatePasswordMatch);
+
+            // Terms agreement validation
+            agreeTermsCheckbox.addEventListener('change', function() {
+                if (agreeTermsCheckbox.checked) {
+                    agreeTermsCheckbox.classList.remove('is-invalid');
+                } else {
+                    agreeTermsCheckbox.classList.add('is-invalid');
+                }
+            });
+
+            // Form submission handler
+            signupForm.addEventListener('submit', function(event) {
+                let isValid = true;
+
+                // Validate username
+                if (usernameInput.value.length < 3 || usernameInput.value.length > 30) {
+                    usernameInput.classList.add('is-invalid');
+                    isValid = false;
+                }
+
+                // Validate email
+                if (!emailPattern.test(emailInput.value)) {
+                    emailInput.classList.add('is-invalid');
+                    isValid = false;
+                }
+
+                // Validate password
+                const password = passwordInput.value;
+                let passwordStrength = 0;
+                if (password.length >= 8) passwordStrength++;
+                if (password.match(/[A-Z]/)) passwordStrength++;
+                if (password.match(/[0-9]/)) passwordStrength++;
+                if (password.match(/[^A-Za-z0-9]/)) passwordStrength++;
+
+                if (password.length < 8 || passwordStrength < 2) {
+                    passwordInput.classList.add('is-invalid');
+                    isValid = false;
+                }
+
+                // Validate password confirmation
+                if (!validatePasswordMatch()) {
+                    isValid = false;
+                }
+
+                // Validate terms agreement
+                if (!agreeTermsCheckbox.checked) {
+                    agreeTermsCheckbox.classList.add('is-invalid');
+                    isValid = false;
+                }
+
+                if (!isValid) {
+                    event.preventDefault();
+                    signupAlert.textContent = 'Please correct the errors in the form.';
+                    signupAlert.classList.remove('d-none');
+                } else {
+                    // This would normally submit to the server
+                    // For demo purposes, show completion of step 1
+                    event.preventDefault();
+                    document.querySelector('.step.active').classList.remove('active');
+                    document.querySelectorAll('.step')[1].classList.add('active');
+                    signupAlert.textContent = 'Account details verified! Continuing to the next step...';
+                    signupAlert.classList.remove('d-none', 'alert-danger');
+                    signupAlert.classList.add('alert-success');
+                }
+            });
+        });
+    </script>
 </body>
 </html>

@@ -5,115 +5,297 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Faculty Login</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #AD4245;
+            --secondary: #D88373;
+            --accent: #F2BDB1;
+            --light: #F8E9E0;
+            --dark: #702F32;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--dark) 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .login-card {
+            background-color: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            position: relative;
+        }
+
+        .card-decoration {
+            position: absolute;
+            height: 200px;
+            width: 200px;
+            border-radius: 50%;
+            background: var(--accent);
+            opacity: 0.6;
+            z-index: 0;
+        }
+
+        .decoration-1 {
+            top: -100px;
+            right: -100px;
+        }
+
+        .decoration-2 {
+            bottom: -120px;
+            left: -120px;
+            background: var(--secondary);
+            height: 250px;
+            width: 250px;
+        }
+
+        .login-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .login-title {
+            color: var(--dark);
+            font-weight: 700;
+            margin-bottom: 25px;
+            position: relative;
+            display: inline-block;
+        }
+
+        .login-title:after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 0;
+            height: 4px;
+            width: 50px;
+            background: var(--secondary);
+            border-radius: 2px;
+        }
+
+        .form-control {
+            border-radius: 8px;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            transition: all 0.3s;
+        }
+
+        .form-control:focus {
+            box-shadow: 0 0 0 3px rgba(173, 66, 69, 0.2);
+            border-color: var(--primary);
+        }
+
+        .input-group {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .input-icon {
+            position: absolute;
+            top: 50%;
+            left: 15px;
+            transform: translateY(-50%);
+            color: var(--primary);
+            z-index: 10;
+        }
+
+        .icon-input {
+            padding-left: 45px;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            border: none;
+            border-radius: 8px;
+            padding: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: all 0.3s;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--dark);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(112, 47, 50, 0.3);
+        }
+
+        .link-item {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .link-item:hover {
+            color: var(--dark);
+            text-decoration: underline;
+        }
+
+        .login-footer {
+            margin-top: 25px;
+            color: #666;
+        }
+
+        /* Debug modal styling */
+        .btn-debug {
+            background-color: var(--light);
+            color: var(--dark);
+            border: none;
+            transition: all 0.3s;
+        }
+
+        .btn-debug:hover {
+            background-color: var(--accent);
+            color: var(--dark);
+        }
+
+        .modal-content {
+            border-radius: 15px;
+        }
+
+        .modal-header {
+            background-color: var(--primary);
+            color: white;
+            border-radius: 15px 15px 0 0;
+        }
+
+        .modal-footer {
+            background-color: #f8f9fa;
+            border-radius: 0 0 15px 15px;
+        }
+    </style>
 </head>
-<body class="" style="background: #AD4245;">
-    <div class="container mt-5">
-        <div class="card shadow p-4 mx-auto" style="max-width: 400px;">
-            <h3 class="text-center">Faculty Login</h3>
-            <form method="POST">
-                <div class="mb-3">
-                    <label for="email" class="form-label">Email</label>
-                    <input type="email" class="form-control" name="email" required>
-                </div>
-                <div class="mb-3">
-                    <label for="password" class="form-label">Password</label>
-                    <input type="password" class="form-control" name="password" required>
-                </div>
-                <button type="submit" class="btn btn-primary w-100">Login</button>
-            </form>
-            <p class="mt-3 text-center">Don't have an account? <a href="/faculty_signup">Sign up</a></p>
-        </div>
-    </div>
+<body>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6 col-lg-5">
+                <div class="login-card p-4 p-md-5">
+                    <div class="card-decoration decoration-1"></div>
+                    <div class="card-decoration decoration-2"></div>
 
- {% if faculty_debug %}
-        <!-- Debug Button -->
-        <button type="button" class="btn btn-info mt-3" data-bs-toggle="modal" data-bs-target="#debugModal">
-            Show Faculty Debug Info
-        </button>
+                    <div class="login-content">
+                        <div class="text-center mb-4">
+                            <img src="/api/placeholder/100/100" alt="University Logo" class="mb-3" style="max-height: 80px;">
+                            <h3 class="login-title text-center">Faculty Login</h3>
+                        </div>
 
-        <!-- Debug Modal -->
-        <div class="modal fade" id="debugModal" tabindex="-1" aria-labelledby="debugModalLabel" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="debugModalLabel">Faculty Debug Info</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <form method="POST" id="loginForm" novalidate>
+                            <div class="input-group">
+                                <i class="fas fa-envelope input-icon"></i>
+                                <input type="email" class="form-control icon-input" name="email" id="email" placeholder="Your Email" required>
+                                <div class="invalid-feedback">Please enter a valid email address.</div>
+                            </div>
+
+                            <div class="input-group">
+                                <i class="fas fa-lock input-icon"></i>
+                                <input type="password" class="form-control icon-input" name="password" id="password" placeholder="Password" required minlength="8">
+                                <div class="invalid-feedback">Password must be at least 8 characters long.</div>
+                            </div>
+
+                            <div class="mb-4">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="rememberMe" name="rememberMe">
+                                    <label class="form-check-label" for="rememberMe">Remember me</label>
+                                </div>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary w-100">Log In</button>
+                        </form>
+
+                        <div class="login-footer text-center">
+                            <p>Don't have an account? <a href="/faculty_signup" class="link-item">Sign up</a></p>
+                            <a href="#" class="link-item small">Forgot Password?</a>
+                        </div>
                     </div>
-                    <div class="modal-body">
-                        <pre>{{ faculty_debug }}</pre>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    </div>
+                </div>
+
+                <!-- Login notification area -->
+                <div class="text-center mt-3">
+                    <div id="loginNotification" class="alert d-none" role="alert"></div>
                 </div>
             </div>
         </div>
-        {% endif %}
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // Form validation
+        document.addEventListener('DOMContentLoaded', function() {
+            const loginForm = document.getElementById('loginForm');
+            const emailInput = document.getElementById('email');
+            const passwordInput = document.getElementById('password');
+            const loginNotification = document.getElementById('loginNotification');
+
+            // Email validation pattern
+            const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+            // Real-time validation for email
+            emailInput.addEventListener('input', function() {
+                if (emailPattern.test(emailInput.value)) {
+                    emailInput.classList.remove('is-invalid');
+                    emailInput.classList.add('is-valid');
+                } else {
+                    emailInput.classList.remove('is-valid');
+                    if (emailInput.value) {
+                        emailInput.classList.add('is-invalid');
+                    } else {
+                        emailInput.classList.remove('is-invalid');
+                    }
+                }
+            });
+
+            // Real-time validation for password
+            passwordInput.addEventListener('input', function() {
+                if (passwordInput.value.length >= 8) {
+                    passwordInput.classList.remove('is-invalid');
+                    passwordInput.classList.add('is-valid');
+                } else {
+                    passwordInput.classList.remove('is-valid');
+                    if (passwordInput.value) {
+                        passwordInput.classList.add('is-invalid');
+                    } else {
+                        passwordInput.classList.remove('is-invalid');
+                    }
+                }
+            });
+
+            // Form submission handler
+            loginForm.addEventListener('submit', function(event) {
+                let isValid = true;
+
+                // Validate email
+                if (!emailPattern.test(emailInput.value)) {
+                    emailInput.classList.add('is-invalid');
+                    isValid = false;
+                }
+
+                // Validate password
+                if (passwordInput.value.length < 8) {
+                    passwordInput.classList.add('is-invalid');
+                    isValid = false;
+                }
+
+                if (!isValid) {
+                    event.preventDefault();
+                    loginNotification.textContent = 'Please correct the errors in the form.';
+                    loginNotification.classList.remove('d-none', 'alert-success');
+                    loginNotification.classList.add('alert-danger');
+                } else {
+                    // This would normally submit to the server
+                    // For demo purposes, we'll show a success message
+                    loginNotification.textContent = 'Login successful!';
+                    loginNotification.classList.remove('d-none', 'alert-danger');
+                    loginNotification.classList.add('alert-success');
+                }
+            });
+        });
+    </script>
 </body>
 </html>
-
-
-<!--<!DOCTYPE html>-->
-<!--<html lang="en">-->
-<!--<head>-->
-<!--    <meta charset="UTF-8">-->
-<!--    <meta name="viewport" content="width=device-width, initial-scale=1.0">-->
-<!--    <title>Faculty Login</title>-->
-<!--    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">-->
-<!--</head>-->
-<!--<body>-->
-<!--    <div class="container mt-5">-->
-<!--        <h2>Faculty Login</h2>-->
-
-<!--        &lt;!&ndash; Display error message &ndash;&gt;-->
-<!--        {% if login_error %}-->
-<!--        <div class="alert alert-danger">{{ login_error }}</div>-->
-<!--        {% endif %}-->
-
-<!--        <form method="POST">-->
-<!--            <div class="mb-3">-->
-<!--                <label for="email" class="form-label">Email</label>-->
-<!--                <input type="email" class="form-control" id="email" name="email" required>-->
-<!--            </div>-->
-<!--            <div class="mb-3">-->
-<!--                <label for="password" class="form-label">Password</label>-->
-<!--                <input type="password" class="form-control" id="password" name="password" required>-->
-<!--            </div>-->
-<!--            <button type="submit" class="btn btn-primary">Login</button>-->
-<!--        </form>-->
-
-<!--        &lt;!&ndash; Debug Modal &ndash;&gt;-->
-<!--        <div class="modal fade" id="debugModal" tabindex="-1" aria-labelledby="debugModalLabel" aria-hidden="true">-->
-<!--            <div class="modal-dialog">-->
-<!--                <div class="modal-content">-->
-<!--                    <div class="modal-header">-->
-<!--                        <h5 class="modal-title" id="debugModalLabel">Faculty Debug Info</h5>-->
-<!--                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>-->
-<!--                    </div>-->
-<!--                    <div class="modal-body">-->
-<!--                        <pre>{{ faculty_debug }}</pre>-->
-<!--                    </div>-->
-<!--                    <div class="modal-footer">-->
-<!--                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>-->
-<!--                    </div>-->
-<!--                </div>-->
-<!--            </div>-->
-<!--        </div>-->
-<!--    </div>-->
-
-<!--    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>-->
-
-<!--    <script>-->
-<!--        // Automatically show the modal if faculty_debug is set-->
-<!--        window.onload = function() {-->
-<!--            {% if faculty_debug %}-->
-<!--                var debugModal = new bootstrap.Modal(document.getElementById('debugModal'));-->
-<!--                debugModal.show();-->
-<!--            {% endif %}-->
-<!--        };-->
-<!--    </script>-->
-
-<!--</body>-->
-<!--</html>-->
