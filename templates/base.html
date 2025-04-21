@@ -16,14 +16,11 @@
 
     <style>
         :root {
-            --primary: #444054;        /* Dark slate color */
-            --primary-light: #5d5970;  /* Lighter slate */
-            --secondary: #236465;      /* Teal */
-            --secondary-light: #399091; /* Light teal */
-            --accent: #AD4245;         /* Deep red */
-            --accent-light: #C65457;   /* Lighter red */
-            --light: #F4F5F7;          /* Light gray/off-white */
-            --dark: #2C2C2C;           /* Deep gray/almost black */
+            --primary: #AD4245;
+            --secondary: #D88373;
+            --accent: #F2BDB1;
+            --light: #F8E9E0;
+            --dark: #702F32;
             --text-dark: #333333;
             --text-light: #666666;
             --text-muted: #8A8A8A;
@@ -83,233 +80,76 @@
 
         .nav-link:hover,
         .nav-link.active {
-            color: var(--accent) !important;
+            color: var(--primary) !important;
         }
 
         .nav-link i {
             margin-right: 8px;
         }
 
-        /* Card styling */
-        .card {
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-            transition: all 0.3s ease;
-            border: 1px solid var(--border-color);
-            margin-bottom: 25px;
-            background-color: white;
+        /* Footer */
+        .footer {
+            padding: 4rem 0 2rem;
+            background-color: #1a1a1a;
+            color: rgba(255, 255, 255, 0.7);
         }
 
-        .card:hover {
-            box-shadow: 0 8px 18px rgba(0, 0, 0, 0.1);
-            transform: translateY(-5px);
+        .footer-logo {
+            margin-bottom: 1.5rem;
+            display: block;
         }
 
-        .card-header {
-            background: var(--primary);
+        .footer-desc {
+            font-size: 0.9rem;
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+
+        .footer-heading {
+            font-size: 1.2rem;
             color: white;
-            border-top-left-radius: 8px !important;
-            border-top-right-radius: 8px !important;
-            padding: 1rem 1.25rem;
+            margin-bottom: 1.5rem;
             font-weight: 600;
-        }
-
-        .card-header.secondary {
-            background: var(--secondary);
-        }
-
-        .card-header.accent {
-            background: var(--accent);
-        }
-
-        .card-body {
-            padding: 1.5rem;
-        }
-
-        .card-footer {
-            background: transparent;
-            border-top: 1px solid var(--border-color);
-            padding: 1rem 1.25rem;
-        }
-
-        /* Button styling */
-        .btn {
-            padding: 0.6rem 1.5rem;
-            border-radius: 6px;
-            font-weight: 500;
-            transition: all 0.3s ease;
-            letter-spacing: 0.3px;
-        }
-
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-        }
-
-        .btn-primary {
-            background-color: var(--primary);
-            border-color: var(--primary);
-        }
-
-        .btn-primary:hover {
-            background-color: var(--primary-light);
-            border-color: var(--primary-light);
-        }
-
-        .btn-secondary {
-            background-color: var(--secondary);
-            border-color: var(--secondary);
-        }
-
-        .btn-secondary:hover {
-            background-color: var(--secondary-light);
-            border-color: var(--secondary-light);
-        }
-
-        .btn-accent {
-            background-color: var(--accent);
-            border-color: var(--accent);
-            color: white;
-        }
-
-        .btn-accent:hover {
-            background-color: var(--accent-light);
-            border-color: var(--accent-light);
-            color: white;
-        }
-
-        .btn-outline-accent {
-            border-color: var(--accent);
-            color: var(--accent);
-        }
-
-        .btn-outline-accent:hover {
-            background-color: var(--accent);
-            color: white;
-        }
-
-        /* Table styling */
-        .table th {
-            font-weight: 600;
-            background-color: rgba(35, 100, 101, 0.1);
-            color: var(--text-dark);
-        }
-
-        .table-hover tbody tr:hover {
-            background-color: rgba(35, 100, 101, 0.03);
-        }
-
-        /* Footer styling */
-        footer {
-            background-color: white;
-            color: var(--text-muted);
-            padding: 2rem 0;
-            box-shadow: 0 -2px 15px rgba(0, 0, 0, 0.03);
-            margin-top: auto;
         }
 
         .footer-links {
             list-style: none;
             padding-left: 0;
-            display: flex;
-            justify-content: center;
-            gap: 2rem;
-            margin-bottom: 1.5rem;
+        }
+
+        .footer-links li {
+            margin-bottom: 0.8rem;
         }
 
         .footer-links a {
-            color: var(--text-muted);
+            color: rgba(255, 255, 255, 0.7);
             text-decoration: none;
             transition: all 0.3s;
+            font-size: 0.9rem;
         }
 
         .footer-links a:hover {
-            color: var(--accent);
-        }
-
-        .footer-social {
-            display: flex;
-            justify-content: center;
-            gap: 1.5rem;
-            margin-bottom: 1.5rem;
+            color: white;
+            padding-left: 5px;
         }
 
         .footer-social a {
-            color: var(--text-muted);
+            color: rgba(255, 255, 255, 0.5);
             font-size: 1.2rem;
+            margin-right: 1rem;
             transition: all 0.3s;
         }
 
         .footer-social a:hover {
-            color: var(--accent);
+            color: white;
         }
 
         .copyright {
             text-align: center;
-            font-size: 0.9rem;
-            color: var(--text-muted);
-            margin-bottom: 0;
-        }
-
-        /* Stats cards */
-        .stats-card {
-            min-height: 140px;
-            background-color: white;
-            border-left: 4px solid var(--primary);
-            transition: all 0.4s ease;
-        }
-
-        .stats-card.primary {
-            border-left-color: var(--primary);
-        }
-
-        .stats-card.secondary {
-            border-left-color: var(--secondary);
-        }
-
-        .stats-card.accent {
-            border-left-color: var(--accent);
-        }
-
-        .stats-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
-        }
-
-        .stats-card .icon {
-            width: 50px;
-            height: 50px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 8px;
-            margin-bottom: 1rem;
-        }
-
-        .stats-card .icon.primary {
-            background-color: rgba(68, 64, 84, 0.1);
-            color: var(--primary);
-        }
-
-        .stats-card .icon.secondary {
-            background-color: rgba(35, 100, 101, 0.1);
-            color: var(--secondary);
-        }
-
-        .stats-card .icon.accent {
-            background-color: rgba(173, 66, 69, 0.1);
-            color: var(--accent);
-        }
-
-        .stats-card .stat-value {
-            font-size: 1.8rem;
-            font-weight: 700;
-            margin-bottom: 0.25rem;
-        }
-
-        .stats-card .stat-label {
-            color: var(--text-light);
-            font-size: 0.9rem;
+            padding-top: 2rem;
+            margin-top: 3rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 0.85rem;
         }
 
         /* Responsive adjustments */
@@ -329,10 +169,12 @@
                 padding-right: 1.25rem;
             }
 
-            .footer-links {
-                flex-direction: column;
-                align-items: center;
-                gap: 1rem;
+            .footer {
+                text-align: center;
+            }
+
+            .footer-col {
+                margin-bottom: 2rem;
             }
         }
     </style>
@@ -357,7 +199,7 @@
                 <!-- Navbar Links -->
                 <div class="collapse navbar-collapse" id="navbarNav">
                     <ul class="navbar-nav ms-auto">
-                        <li class="nav-item">
+                          <li class="nav-item">
                             <a class="nav-link active" href="{{ url_for('index') }}">
                                 <i class="fas fa-home"></i> Home
                             </a>
@@ -390,32 +232,51 @@
         {% block content %}{% endblock %}
     </main>
 
-    <footer>
+    <!-- Footer -->
+    <footer class="footer">
         <div class="container">
             <div class="row">
-                <div class="col-lg-12 text-center">
-                    <img src="../static/images/Group 13.png" alt="Ashesi Logo" width="150" class="mb-4">
-
-                    <ul class="footer-links">
-                        <li><a href="{{ url_for('index') }}">Home</a></li>
-                        <li><a href="{{ url_for('candidate_page') }}">Apply</a></li>
-                        <li><a href="#">About</a></li>
-                        <li><a href="#">FAQ</a></li>
-                        <li><a href="#">Privacy Policy</a></li>
-                        <li><a href="#">Contact Us</a></li>
-                    </ul>
-
+                <div class="col-lg-4 footer-col">
+                    <img src="../static/images/Group 13.png" alt="Ashesi CSIS Logo" width="150" class="footer-logo">
+                    <p class="footer-desc">
+                        The Computer Science and Information Systems department at Ashesi University is dedicated to developing future tech leaders through quality education and industry experience.
+                    </p>
                     <div class="footer-social">
                         <a href="#"><i class="fab fa-facebook-f"></i></a>
                         <a href="#"><i class="fab fa-twitter"></i></a>
                         <a href="#"><i class="fab fa-linkedin-in"></i></a>
                         <a href="#"><i class="fab fa-instagram"></i></a>
                     </div>
-
-                    <p class="copyright">
-                        &copy; 2025 Ashesi Faculty Instructor Hiring System. All rights reserved.
-                    </p>
                 </div>
+                <div class="col-lg-2 col-md-6 footer-col">
+                    <h4 class="footer-heading">Quick Links</h4>
+                    <ul class="footer-links">
+                        <li><a href="{{ url_for('index') }}">Home</a></li>
+                        <li><a href="{{ url_for('candidate_page') }}">Apply</a></li>
+                        <li><a href="#">About</a></li>
+                        <li><a href="#">FAQ</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-3 col-md-6 footer-col">
+                    <h4 class="footer-heading">Useful Links</h4>
+                    <ul class="footer-links">
+                        <li><a href="#">Privacy Policy</a></li>
+                        <li><a href="#">Terms of Service</a></li>
+                        <li><a href="#">Support Center</a></li>
+                        <li><a href="#">Contact Us</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-3 footer-col">
+                    <h4 class="footer-heading">Contact Info</h4>
+                    <ul class="footer-links">
+                        <li><i class="fas fa-map-marker-alt me-2"></i> Ashesi University, Berekuso</li>
+                        <li><i class="fas fa-phone me-2"></i> (233) 302-610-330</li>
+                        <li><i class="fas fa-envelope me-2"></i> csis@ashesi.edu.gh</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="copyright">
+                &copy; 2025 Ashesi CSIS. All rights reserved.
             </div>
         </div>
     </footer>

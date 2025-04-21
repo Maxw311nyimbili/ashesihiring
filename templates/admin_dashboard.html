@@ -5,18 +5,16 @@
 {% block styles %}
 <!-- Flatpickr Date Picker CSS -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<!-- Include your updated CSS here -->
 <style>
- /* Admin Dashboard Styles */
+/* Admin Dashboard Styles */
 
 :root {
-    --primary: #444054;        /* Dark slate color */
-    --primary-light: #5d5970;  /* Lighter slate */
-    --secondary: #236465;      /* Teal */
-    --secondary-light: #399091; /* Light teal */
-    --accent: #AD4245;         /* Deep red */
-    --accent-light: #C65457;   /* Lighter red */
-    --light: #F4F5F7;          /* Light gray/off-white */
-    --dark: #2C2C2C;           /* Deep gray/almost black */
+    --primary: #AD4245;
+    --secondary: #D88373;
+    --accent: #F2BDB1;
+    --light: #F8E9E0;
+    --dark: #702F32;
     --text-dark: #333333;
     --text-light: #666666;
     --text-muted: #8A8A8A;
@@ -26,7 +24,7 @@
 body {
     font-family: 'Poppins', sans-serif;
     color: var(--text-dark);
-    background-color: var(--accent);
+    background-color: var(--light);
     min-height: 100vh;
 }
 
@@ -126,17 +124,17 @@ body {
 }
 
 .stats-card .icon.primary {
-    background-color: rgba(68, 64, 84, 0.1);
+    background-color: rgba(173, 66, 69, 0.1);
     color: var(--primary);
 }
 
 .stats-card .icon.secondary {
-    background-color: rgba(35, 100, 101, 0.1);
+    background-color: rgba(216, 131, 115, 0.1);
     color: var(--secondary);
 }
 
 .stats-card .icon.accent {
-    background-color: rgba(173, 66, 69, 0.1);
+    background-color: rgba(242, 189, 177, 0.1);
     color: var(--accent);
 }
 
@@ -187,8 +185,8 @@ body {
 }
 
 .btn-primary:hover {
-    background-color: var(--primary-light);
-    border-color: var(--primary-light);
+    background-color: #c04a4d;
+    border-color: #c04a4d;
 }
 
 .btn-secondary {
@@ -198,25 +196,25 @@ body {
 }
 
 .btn-secondary:hover {
-    background-color: var(--secondary-light);
-    border-color: var(--secondary-light);
+    background-color: #e29085;
+    border-color: #e29085;
 }
 
 .btn-accent, .btn-danger {
-    background-color: var(--accent);
-    border-color: var(--accent);
+    background-color: var(--primary);
+    border-color: var(--primary);
     color: white;
 }
 
 .btn-accent:hover, .btn-danger:hover {
-    background-color: var(--accent-light);
-    border-color: var(--accent-light);
+    background-color: #c04a4d;
+    border-color: #c04a4d;
 }
 
 .btn-premium {
-    background-color: rgba(68, 64, 84, 0.1);
+    background-color: rgba(173, 66, 69, 0.1);
     color: var(--primary);
-    border: 1px solid rgba(68, 64, 84, 0.2);
+    border: 1px solid rgba(173, 66, 69, 0.2);
 }
 
 .btn-premium:hover {
@@ -226,13 +224,13 @@ body {
 
 .btn-danger-soft {
     background-color: rgba(173, 66, 69, 0.1);
-    color: var(--accent);
+    color: var(--primary);
     border: 1px solid rgba(173, 66, 69, 0.2);
 }
 
 .btn-danger-soft:hover {
     background-color: rgba(173, 66, 69, 0.2);
-    color: var(--accent);
+    color: var(--primary);
 }
 
 .btn-outline-secondary {
@@ -245,12 +243,12 @@ body {
     color: var(--text-dark);
 }
 
-/* Tab styling */
-.nav-tabs {
+/* Tab styling - Specifically for admin tabs */
+.admin-tabs {
     border-bottom: 1px solid var(--border-color);
 }
 
-.nav-tabs .nav-link {
+.admin-tabs .nav-link {
     border: none;
     color: var(--text-light);
     font-weight: 500;
@@ -260,13 +258,13 @@ body {
     transition: all 0.3s ease;
 }
 
-.nav-tabs .nav-link.active {
+.admin-tabs .nav-link.active {
     color: var(--primary);
     background-color: transparent;
     border-bottom: 3px solid var(--primary);
 }
 
-.nav-tabs .nav-link:hover:not(.active) {
+.admin-tabs .nav-link:hover:not(.active) {
     border-bottom: 3px solid var(--border-color);
     color: var(--text-dark);
 }
@@ -279,7 +277,7 @@ body {
 .table th {
     font-weight: 600;
     border-color: var(--border-color);
-    background-color: rgba(68, 64, 84, 0.05);
+    background-color: rgba(173, 66, 69, 0.05);
     color: var(--text-dark);
 }
 
@@ -289,7 +287,7 @@ body {
 }
 
 .table-hover tbody tr:hover {
-    background-color: rgba(68, 64, 84, 0.03);
+    background-color: rgba(173, 66, 69, 0.03);
 }
 
 /* Calendar styling */
@@ -328,7 +326,7 @@ body {
 }
 
 .flatpickr-day.today {
-    border-color: var(--accent) !important;
+    border-color: var(--secondary) !important;
 }
 
 /* Badge styling */
@@ -340,9 +338,9 @@ body {
     font-weight: 500;
     margin-right: 0.5rem;
     margin-bottom: 0.5rem;
-    background-color: rgba(68, 64, 84, 0.1);
+    background-color: rgba(173, 66, 69, 0.1);
     color: var(--primary);
-    border: 1px solid rgba(68, 64, 84, 0.2);
+    border: 1px solid rgba(173, 66, 69, 0.2);
     position: relative;
 }
 
@@ -350,7 +348,7 @@ body {
     position: absolute;
     top: -8px;
     right: -8px;
-    background-color: var(--accent);
+    background-color: var(--primary);
     color: white;
     border-radius: 50%;
     width: 20px;
@@ -364,7 +362,7 @@ body {
 }
 
 .date-badge .badge-remove:hover {
-    background-color: var(--accent-light);
+    background-color: #c04a4d;
     transform: scale(1.1);
 }
 
@@ -398,9 +396,9 @@ body {
 
 /* Alert and notification styling */
 .alert-info {
-    background-color: rgba(35, 100, 101, 0.1);
+    background-color: rgba(216, 131, 115, 0.1);
     color: var(--secondary);
-    border: 1px solid rgba(35, 100, 101, 0.2);
+    border: 1px solid rgba(216, 131, 115, 0.2);
     border-radius: 6px;
 }
 
@@ -445,7 +443,7 @@ body {
         margin-top: 2rem;
     }
 
-    .nav-tabs .nav-link {
+    .admin-tabs .nav-link {
         padding: 0.5rem 0.75rem;
         font-size: 0.9rem;
     }
@@ -554,8 +552,8 @@ body {
         </div>
     </div>
 
-    <!-- Main tabs navigation -->
-    <ul class="nav nav-tabs mb-4" id="adminTabs" role="tablist">
+    <!-- Main tabs navigation - Changed class to admin-tabs to avoid conflict with navbar -->
+    <ul class="nav admin-tabs mb-4" id="adminTabs" role="tablist">
         <li class="nav-item" role="presentation">
             <button class="nav-link active" id="dates-tab" data-bs-toggle="tab" data-bs-target="#dates" type="button" role="tab" aria-controls="dates" aria-selected="true">
                 <i class="fas fa-calendar-alt me-2"></i> Interview Dates
@@ -765,7 +763,7 @@ body {
 <div class="modal fade" id="confirmationModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-0 shadow">
-            <div class="modal-header py-3" style="background: linear-gradient(to right, var(--primary), #c95659); color: white;">
+            <div class="modal-header py-3" style="background: linear-gradient(to right, var(--primary), var(--dark)); color: white;">
                 <h5 class="modal-title fw-bold" id="modal-title">Confirm Action</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
